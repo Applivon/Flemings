@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+		<!-- Partner/Customer - Inheritance Update -->
+		<record id="fg_res_partner_kanban_user_view_one_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.kanban.user.view.one.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base_setup.res_partner_kanban_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//span[hasclass('oe_kanban_list_many2many')]" position="after">
+					<strong t-if="record.user_id.raw_value"><field name="user_id"/></strong>
+					<strong t-if="record.last_sale_date.raw_value">
+						<br/><span>Last Sale Date : <field name="last_sale_date"/></span>
+					</strong>
+					<strong t-if="record.last_invoice_date.raw_value">
+						<br/><span>Last Invoice Date : <field name="last_invoice_date"/></span>
+					</strong>
+					<strong t-if="record.last_purchase_date.raw_value">
+						<br/><span>Last Purchase Date : <field name="last_purchase_date"/></span>
+					</strong>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_kanban_user_view_two_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.kanban.user.view.two.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.res_partner_kanban_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//strong[hasclass('o_kanban_record_title')]" position="before">
+					<span t-if="record.type = 'delivery' and record.comment.raw_value">
+						<field name="comment"/>
+					</span>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='category_id']" position="after">
+					<field name="last_sale_date" readonly="1" force_save="1" attrs="{'invisible':[('customer_rank' ,'=', 0)]}"/>
+					<field name="last_invoice_date" readonly="1" force_save="1" attrs="{'invisible':[('customer_rank' ,'=', 0)]}"/>
+					<field name="last_purchase_date" readonly="1" force_save="1" attrs="{'invisible':[('supplier_rank' ,'=', 0)]}"/>
+                </xpath>
+				<xpath expr="//field[@name='vat']" position="after">
+					<field name="is_sales_user_group" invisible="1"/>
+					<field name="customer_rank" invisible="1"/>
+					<field name="supplier_rank" invisible="1"/>
+                </xpath>
+				<xpath expr="//field[@name='company_type']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='name'][1]" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'required' : [('type', '=', 'contact')], 'invisible': [('is_company','=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='name'][2]" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'required' : [('type', '=', 'contact')], 'invisible': [('is_company','=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='parent_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': ['|', '&amp;', ('is_company','=', True),('parent_id', '=', False),('company_name', '!=', False),('company_name', '!=', '')]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='company_name']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': ['|', '|', ('company_name', '=', False), ('company_name', '=', ''), ('is_company', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='vat']" position="attributes">
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('parent_id','!=',False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='function']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('is_company','=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='phone']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='mobile']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='email']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'required': [('user_ids','!=', [])]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='website']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='title']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('is_company', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='lang']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('active_lang_count', '&lt;=', 1)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='category_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='child_ids']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//group[@name='sale']/field[@name='user_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//group[@name='misc']/field[@name='company_registry']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('parent_id','!=',False)]}</attribute>
+                </xpath>
+				<xpath expr="//group[@name='misc']/field[@name='ref']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//group[@name='misc']/field[@name='company_id']" position="attributes">
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('parent_id', '!=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//group[@name='misc']/field[@name='industry_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('is_company', '=', False)]}</attribute>
+                </xpath>
+
+				<xpath expr="//page[@name='internal_notes']" position="before">
+					<page name="customer_price_book_line" string="Customer Price Book" attrs="{'invisible':[('customer_rank' ,'=', 0)]}">
+						<field name="customer_price_book_line">
+							<tree string="Price Book Details" create="0" edit="0" delete="0" default_order="order_date desc">
+								<field name="partner_id" invisible="1"/>
+								<field name="product_sku"/>
+								<field name="product_id" options="{'no_open': True, 'no_create':True}"/>
+								<field name="sale_order_number"/>
+								<field name="sale_order_id" invisible="1"/>
+								<field name="invoice_number"/>
+								<field name="invoice_id" invisible="1"/>
+								<field name="order_date"/>
+								<field name="price_unit"/>
+							</tree>
+							<form string="Price Book Details">
+								<group>
+									<group>
+										<field name="partner_id" invisible="1"/>
+										<field name="product_sku" readonly="1" force_save="1"/>
+										<field name="product_id" options="{'no_open': True, 'no_create':True}" readonly="1" force_save="1"/>
+										<field name="price_unit" readonly="1" force_save="1"/>
+									</group>
+									<group>
+										<field name="sale_order_number" readonly="1" force_save="1"/>
+										<field name="invoice_number" readonly="1" force_save="1"/>
+										<field name="order_date" readonly="1" force_save="1"/>
+										<field name="sale_order_id" invisible="1"/>
+										<field name="invoice_id" invisible="1"/>
+									</group>
+								</group>
+							</form>
+						</field>
+					</page>
+					<page name="vendor_price_book_line" string="Vendor Price Book" attrs="{'invisible':[('supplier_rank' ,'=', 0)]}">
+						<field name="vendor_price_book_line">
+							<tree string="Price Book Details" create="0" edit="0" delete="0" default_order="order_date desc">
+								<field name="partner_id" invisible="1"/>
+								<field name="product_sku"/>
+								<field name="product_id" options="{'no_open': True, 'no_create':True}"/>
+								<field name="purchase_order_number"/>
+								<field name="bill_number"/>
+								<field name="order_date"/>
+								<field name="price_unit"/>
+							</tree>
+							<form string="Price Book Details">
+								<group>
+									<group>
+										<field name="partner_id" invisible="1"/>
+										<field name="product_sku" readonly="1" force_save="1"/>
+										<field name="product_id" options="{'no_open': True, 'no_create':True}" readonly="1" force_save="1"/>
+										<field name="price_unit" readonly="1" force_save="1"/>
+									</group>
+									<group>
+										<field name="purchase_order_number" readonly="1" force_save="1"/>
+										<field name="bill_number" readonly="1" force_save="1"/>
+										<field name="order_date" readonly="1" force_save="1"/>
+										<field name="purchase_order_id" invisible="1"/>
+										<field name="bill_id" invisible="1"/>
+									</group>
+								</group>
+							</form>
+						</field>
+					</page>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_two_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.two.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="account.view_partner_property_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='bank_ids']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='property_account_receivable_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='property_account_payable_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='credit']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='use_partner_credit_limit']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='credit_limit']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('use_partner_credit_limit', '=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='property_account_position_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='property_payment_term_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='property_supplier_payment_term_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_three_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.three.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="l10n_sg.view_partner_form_l10n_sg"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='l10n_sg_unique_entity_number']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_four_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.four.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="sales_team.res_partner_view_team"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='team_id'][2]" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_five_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.five.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="point_of_sale.view_partner_property_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='barcode']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_six_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.six.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="purchase.view_partner_property_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='receipt_reminder_email']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='reminder_date_before_receipt']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='property_purchase_currency_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_seven_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.seven.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="product.view_partner_property_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='property_product_pricelist']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('is_company','=',False),('parent_id','!=',False)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_eight_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.eight.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="delivery.view_partner_property_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='property_delivery_carrier_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_nine_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.nine.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="stock.view_partner_stock_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='property_stock_customer']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='property_stock_supplier']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_form_user_view_ten_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.form.user.view.ten.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="website.view_partner_form_inherit_website"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='website_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+                </xpath>
+			</field>
+		</record>
+
+		<!-- Customer - Filters & Action Domain Update -->
+		<record id="view_res_partner_filter_aox_base_inherit" model="ir.ui.view">
+			<field name="name">view.res.partner.filter.aox.base.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="account.res_partner_view_search"/>
+			<field name="arch" type="xml">
+				<xpath expr="//filter[@name='customer']" position="before">
+					<filter string="only Customer" name="fg_only_customer" domain="[('customer_rank','&gt;', 0), ('parent_id','=', False)]"/>
+					<separator/>
+				</xpath>
+			</field>
+		</record>
+
+        <record id="account.res_partner_action_customer" model="ir.actions.act_window">
+            <field name="context">{'search_default_fg_only_customer': 1, 'res_partner_search_mode': 'customer', 'default_is_company': True, 'default_customer_rank': 1}</field>
+        </record>
+
+		<!-- Product - Form View Inherit -->
+		<record id="fg_product_template_item_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.product.template.item.form.view.inherit</field>
+			<field name="model">product.template</field>
+			<field name="inherit_id" ref="product.product_template_form_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='uom_po_id']" position="after">
+					<field name="item_category_id" options="{'no_create': True}"/>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="fg_product_template_available_stock_tree_view_inherit" model="ir.ui.view">
+			<field name="name">fg.product.template.available.stock.form.view.inherit</field>
+			<field name="model">product.template</field>
+			<field name="inherit_id" ref="product.product_template_tree_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='list_price']" position="before">
+					<field name="fg_available_stock"/>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="fg_product_product_available_stock_tree_view_inherit" model="ir.ui.view">
+			<field name="name">fg.product.product.available.stock.form.view.inherit</field>
+			<field name="model">product.product</field>
+			<field name="inherit_id" ref="product.product_product_tree_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='lst_price']" position="before">
+					<field name="fg_available_stock"/>
+				</xpath>
+			</field>
+		</record>
+
+		<!-- CRM - Pipline - Kanban View Inherit -->
+		<record id="fg_crm_case_kanban_view_leads_inherit" model="ir.ui.view">
+			<field name="name">fg.crm.case.kanban.view.leads.inherit</field>
+			<field name="model">crm.lead</field>
+			<field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+			<field name="arch" type="xml">
+				<xpath expr="//div[hasclass('oe_kanban_content')]" position="inside">
+					<div>
+						<strong t-if="record.date_deadline.raw_value">
+							Expected Closing Date : <field name="date_deadline"/>
+						</strong>
+					</div>
+					<div>
+						<strong t-if="record.team_id.raw_value">
+							<span>Sales Team : <field name="team_id"/></span>
+						</strong>
+					</div>
+                </xpath>
+			</field>
+		</record>
+
+		<!-- Stock Quant - List View Inherit -->
+		<record id="fg_quant_reserved_qty_list_view_inherit" model="ir.ui.view">
+			<field name="name">fg.quant.reserved.qty.list.view.inherit</field>
+			<field name="model">stock.quant</field>
+			<field name="inherit_id" ref="stock.view_stock_quant_tree"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='quantity']" position="after">
+					<field name="reserved_quantity" string="Reserved Quantity"/>
+                </xpath>
+			</field>
+		</record>
+
+		<!-- Configuration - Item Category -->
+		<record id="fg_item_category_list_view" model="ir.ui.view">
+	        <field name="name">fg.item.category.tree</field>
+	        <field name="model">fg.item.category</field>
+	        <field name="arch" type="xml">
+	            <tree string="Item Category" editable="bottom" duplicate="0">
+	                <field name="name" required="1"/>
+	                <field name="user_ids" widget="many2many_tags"/>
+	            </tree>
+	        </field>
+	    </record>
+
+		<record id="fg_item_category_search_view" model="ir.ui.view">
+            <field name="name">fg.item.category.search</field>
+            <field name="model">fg.item.category</field>
+            <field name="arch" type="xml">
+                <search string="Item Category">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+	    <record id="fg_item_category_action" model="ir.actions.act_window">
+	        <field name="name">Item Category</field>
+	        <field name="type">ir.actions.act_window</field>
+	        <field name="res_model">fg.item.category</field>
+			<field name="search_view_id" ref="fg_item_category_search_view"/>
+            <field name="view_id" ref="fg_item_category_list_view"/>
+	    </record>
+
+		<menuitem id="menu_fg_item_category" parent="sale.menu_sale_config" action="fg_item_category_action" sequence="70"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="fg_user_access_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.user.access.form.view.inherit</field>
+			<field name="model">res.users</field>
+			<field name="inherit_id" ref="base.user_groups_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//page[@name='access_rights']/group[1]" position="after">
+					<group name="fg_user_access" string="Flemings User Access">
+						<group>
+							<field name="fg_sales_group"/>
+							<field name="fg_inventory_group"/>
+							<field name="fg_production_group"/>
+							<field name="fg_logistics_group"/>
+							<field name="fg_finance_group"/>
+							<field name="fg_admin_group"/>
+						</group>
+						<group>
+							<field name="fg_business_support_group"/>
+							<field name="fg_product_group"/>
+							<field name="fg_production_controller_group"/>
+							<field name="fg_operations_group"/>
+							<field name="fg_hr_group"/>
+						</group>
+					</group>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="fg_res_partner_kanban_user_view_inherit" model="ir.ui.view">
+			<field name="name">fg.res.partner.kanban.user.view.inherit</field>
+			<field name="model">res.users</field>
+			<field name="inherit_id" ref="base_setup.res_partner_kanban_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//span[hasclass('oe_kanban_list_many2many')]" position="after">
+					<strong t-if="record.user_id.raw_value"><field name="user_id"/></strong>
+                </xpath>
+			</field>
+		</record>
+
+    </data>
+</odoo>

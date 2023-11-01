@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+,,,,,,,
+access_fg_item_category_fg_finance_group,access_fg_item_category_fg_finance_group,flemings_base.model_fg_item_category,flemings_base.fg_finance_group,1,1,1,1
+access_fg_item_category_fg_admin_group,access_fg_item_category_fg_admin_group,flemings_base.model_fg_item_category,flemings_base.fg_admin_group,1,1,1,1
+access_fg_item_category_group_all,access_fg_item_category_group_all,flemings_base.model_fg_item_category,,1,0,0,0
+,,,,,,,
+access_res_partner_fg_finance_group,access_res_partner_fg_finance_group,flemings_base.model_res_partner,flemings_base.fg_finance_group,1,1,1,1
+access_res_partner_fg_admin_group,access_res_partner_fg_admin_group,flemings_base.model_res_partner,flemings_base.fg_admin_group,1,1,1,1
+access_res_partner_fg_sales_group,access_res_partner_fg_sales_group,flemings_base.model_res_partner,flemings_base.fg_sales_group,1,1,0,0
+access_res_users_fg_sales_group,access_res_users_fg_sales_group,flemings_base.model_res_users,flemings_base.fg_sales_group,1,1,0,0
+,,,,,,,
+access_customer_price_book_details_group_all,access_customer_price_book_details_group_all,flemings_base.model_customer_price_book_details,,1,1,1,1
+access_vendor_price_book_details_group_all,access_vendor_price_book_details_group_all,flemings_base.model_vendor_price_book_details,,1,1,1,1
+,,,,,,,
+access_flemings_purchase_price_report_wizard_group_all,access_flemings_purchase_price_report_wizard_group_all,flemings_base.model_flemings_purchase_price_report_wizard,,1,1,1,1
+,,,,,,,
