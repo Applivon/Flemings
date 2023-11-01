@@ -395,6 +395,18 @@
 			</field>
 		</record>
 
+		<!-- Sales Order - Form View Inherit -->
+		<record id="fg_sale_order_sno_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.sale.order.sno.form.view.inherit</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_order_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='order_line']/tree/field[@name='sequence']" position="before">
+					<field name="fg_sno" string="S.No." readonly="1" force_save="1"/>
+                </xpath>
+			</field>
+		</record>
+
 		<!-- Configuration - Item Category -->
 		<record id="fg_item_category_list_view" model="ir.ui.view">
 	        <field name="name">fg.item.category.tree</field>

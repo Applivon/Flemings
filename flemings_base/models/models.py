@@ -102,6 +102,12 @@ class FlemingsVendorPriceBook(models.Model):
 class FlemingsSalesOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    @api.onchange('order_id', 'sequence')
+    def onchange_order_id_fg_sno(self):
+        self.fg_sno = len(self.order_id.order_line)
+
+    fg_sno = fields.Integer('S.No', default=1)
+
     def _get_display_price(self):
         """Compute the displayed unit price for a given line.
 
