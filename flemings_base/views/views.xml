@@ -47,6 +47,7 @@
 					<field name="last_purchase_date" readonly="1" force_save="1" attrs="{'invisible':[('supplier_rank' ,'=', 0)]}"/>
                 </xpath>
 				<xpath expr="//field[@name='vat']" position="after">
+					<field name="fax"/>
 					<field name="is_sales_user_group" invisible="1"/>
 					<field name="customer_rank" invisible="1"/>
 					<field name="supplier_rank" invisible="1"/>
@@ -311,6 +312,17 @@
 			</field>
 		</record>
 
+		<record id="flemings_company_form_fax_inherit" model="ir.ui.view">
+			<field name="name">flemings.company.form.fax.inherit</field>
+			<field name="model">res.company</field>
+			<field name="inherit_id" ref="base.view_company_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='email']" position="before">
+					<field name="fax"/>
+				</xpath>
+			</field>
+		</record>
+
 		<!-- Customer - Filters & Action Domain Update -->
 		<record id="view_res_partner_filter_aox_base_inherit" model="ir.ui.view">
 			<field name="name">view.res.partner.filter.aox.base.inherit</field>
@@ -352,7 +364,7 @@
 		</record>
 
 		<record id="fg_product_product_available_stock_tree_view_inherit" model="ir.ui.view">
-			<field name="name">fg.product.product.available.stock.form.view.inherit</field>
+			<field name="name">fg.product.product.available.stock.tree.view.inherit</field>
 			<field name="model">product.product</field>
 			<field name="inherit_id" ref="product.product_product_tree_view"/>
 			<field name="arch" type="xml">
@@ -401,11 +413,32 @@
 			<field name="model">sale.order</field>
 			<field name="inherit_id" ref="sale.view_order_form"/>
 			<field name="arch" type="xml">
+				<xpath expr="//field[@name='payment_term_id']" position="after">
+					<field name="fg_purchase_order_no"/>
+					<field name="fg_remarks"/>
+                </xpath>
+				<xpath expr="//group[@name='sales_person']/field[@name='user_id']" position="after">
+					<field name="customer_service_id" options="{'no_create':True}"/>
+					<field name="delivery_mode_id" options="{'no_create':True}"/>
+                </xpath>
 				<xpath expr="//field[@name='order_line']/tree/field[@name='sequence']" position="before">
 					<field name="fg_sno" string="S.No." readonly="1" force_save="1"/>
                 </xpath>
 			</field>
 		</record>
+
+        <!-- Stock Picking - Form View Inherit -->
+		<record id="fg_stock_picking_remarks_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.stock.picking.remarks.form.view.inherit</field>
+			<field name="model">stock.picking</field>
+			<field name="inherit_id" ref="stock.view_picking_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='owner_id']" position="after">
+					<field name="fg_purchase_order_no"/>
+					<field name="fg_remarks"/>
+                </xpath>
+            </field>
+        </record>
 
 		<!-- Configuration - Item Category -->
 		<record id="fg_item_category_list_view" model="ir.ui.view">
@@ -437,7 +470,37 @@
             <field name="view_id" ref="fg_item_category_list_view"/>
 	    </record>
 
+		<!-- Configuration - Delivery Mode -->
+		<record id="fg_delivery_carrier_list_view" model="ir.ui.view">
+	        <field name="name">fg.delivery.carrier.tree</field>
+	        <field name="model">fg.delivery.carrier</field>
+	        <field name="arch" type="xml">
+	            <tree string="Delivery Mode" editable="bottom" duplicate="0">
+	                <field name="name" required="1"/>
+	            </tree>
+	        </field>
+	    </record>
+
+		<record id="fg_delivery_carrier_search_view" model="ir.ui.view">
+            <field name="name">fg.delivery.carrier.search</field>
+            <field name="model">fg.delivery.carrier</field>
+            <field name="arch" type="xml">
+                <search string="Delivery Mode">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+	    <record id="fg_delivery_carrier_action" model="ir.actions.act_window">
+	        <field name="name">Delivery Mode</field>
+	        <field name="type">ir.actions.act_window</field>
+	        <field name="res_model">fg.delivery.carrier</field>
+			<field name="search_view_id" ref="fg_delivery_carrier_search_view"/>
+            <field name="view_id" ref="fg_delivery_carrier_list_view"/>
+	    </record>
+
 		<menuitem id="menu_fg_item_category" parent="sale.menu_sale_config" action="fg_item_category_action" sequence="70"/>
+		<menuitem id="menu_fg_delivery_carrier" parent="sale.menu_sale_config" action="fg_delivery_carrier_action" sequence="75"/>
 
     </data>
 </odoo>

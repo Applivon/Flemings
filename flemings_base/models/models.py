@@ -21,6 +21,13 @@ class FlemingsItemCategory(models.Model):
     user_ids = fields.Many2many('res.users', 'res_users_item_category_rel', 'item_category_id', 'user_id', string='Users')
 
 
+class FlemingsDeliveryMode(models.Model):
+    _name = 'fg.delivery.carrier'
+    _description = 'Delivery Mode'
+
+    name = fields.Char('Delivery Mode')
+
+
 class FlemingsResPartner(models.Model):
     _inherit = 'res.partner'
 
@@ -61,8 +68,15 @@ class FlemingsResPartner(models.Model):
     last_sale_date = fields.Date('Last Sale Date', copy=False)
     last_purchase_date = fields.Date('Last Purchase Date', copy=False)
     last_invoice_date = fields.Date('Last Invoice Date', copy=False)
-    customer_price_book_line = fields.One2many('customer.price.book.details', 'partner_id', string='Price Book')
-    vendor_price_book_line = fields.One2many('vendor.price.book.details', 'partner_id', string='Price Book')
+    customer_price_book_line = fields.One2many('customer.price.book.details', 'partner_id', string='Customer Price Book')
+    vendor_price_book_line = fields.One2many('vendor.price.book.details', 'partner_id', string='Vendor Price Book')
+    fax = fields.Char('Fax')
+
+
+class FlemingsResCompany(models.Model):
+    _inherit = 'res.company'
+
+    fax = fields.Char(related='partner_id.fax', string='Fax', readonly=False)
 
 
 class FlemingsCustomerPriceBook(models.Model):
@@ -144,10 +158,21 @@ class FlemingsSalesOrderLine(models.Model):
 class FlemingsSalesOrder(models.Model):
     _inherit = 'sale.order'
 
+    fg_purchase_order_no = fields.Char('Purchase Order No.')
+    customer_service_id = fields.Many2one('res.users', string='Customer Service')
+    delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
+    fg_remarks = fields.Text('Remarks')
+
     def action_confirm(self):
         res = super(FlemingsSalesOrder, self).action_confirm()
         for order in self:
             order.update_customer_price_book()
+            # Pickings Update
+            for picking in order.picking_ids:
+                picking.write({
+                    'fg_purchase_order_no': order.fg_purchase_order_no,
+                    'fg_remarks': order.fg_remarks,
+                })
         return res
 
     def update_customer_price_book(self):
@@ -388,6 +413,9 @@ class FlemingsProductProduct(models.Model):
 class FlemingsStockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    fg_purchase_order_no = fields.Char('Purchase Order No.')
+    fg_remarks = fields.Text('Remarks')
+
     def button_validate(self):
         res = super(FlemingsStockPicking, self).button_validate()
         # Check if Delivery Order Product Quantities are Available
@@ -396,8 +424,8 @@ class FlemingsStockPicking(models.Model):
             is_qty_unavailable = False
 
             unavailable_sno = 1
-            for line_product_id in record.move_line_nosuggest_ids.mapped('product_id'):
-                picking_qty = sum(record.move_line_nosuggest_ids.filtered(lambda x: x.product_id.id == line_product_id.id).mapped('qty_done'))
+            for line_product_id in record.move_line_ids_without_package.mapped('product_id'):
+                picking_qty = sum(record.move_line_ids_without_package.filtered(lambda x: x.product_id.id == line_product_id.id).mapped('qty_done'))
 
                 if picking_qty > line_product_id.qty_available:
                     qty_unavailable_error_msg += '\n' + str(unavailable_sno) + '. ' + str(line_product_id.display_name) + ' - ' + str(line_product_id.qty_available)

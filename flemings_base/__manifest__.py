@@ -24,9 +24,15 @@
         # Views
         'views/res_users_view.xml',
         'views/views.xml',
+        'views/stock_low_view.xml',
 
         # Wizard
         'wizard/flemings_purchase_price_report_view.xml',
+
+        # Report
+        'report/base_report.xml',
+        'report/sales_order_report.xml',
+        'report/delivery_order_report.xml',
 
     ],
     'qweb': [],

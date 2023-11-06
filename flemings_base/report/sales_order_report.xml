@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Sales Order Report -->
+        <template id="report_fg_sales_order_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="flemings_base.report_fg_sales_order_custom_layout">
+                        <div class="page" style="font-family:sans-serif !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
+
+                            <style>
+                                td {word-break: break-word !important; word-spacing: 3px !important; padding:5px; page-break-inside: avoid !important;}
+
+                                .non-border, .non-border > tr, .non-border > tr > td {
+                                    border: none !important; border-color: #ffffff !important;
+                                }
+                            </style>
+
+                            <t t-if="o and 'company_id' in o">
+                                <t t-set="company" t-value="o.company_id.sudo()"/>
+                            </t>
+                            <t t-if="not o or not 'company_id' in o">
+                                <t t-set="company" t-value="res_company"/>
+                            </t>
+
+                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                <thead>
+                                    <tr>
+                                        <td style="width:5%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
+                                        <td style="width:40%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:left;">Product Code / Description</td>
+                                        <td style="width:8%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Qty</td>
+                                        <td style="width:12%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
+                                        <td style="width:12%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Unit Price</td>
+                                        <td style="width:10%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Disc</td>
+                                        <td style="width:13%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Total Amount</td>
+                                    </tr>
+                                </thead>
+                                <t t-foreach="o.order_line.sorted(key=lambda x: x.fg_sno)" t-as="line">
+                                    <tr>
+                                        <td style="width:5%; padding:5px; text-align:left;">
+                                            <span t-field="line.fg_sno"/>
+                                        </td>
+                                        <td style="width:40%; padding:5px; text-align:left;">
+                                            <span t-field="line.product_id.default_code"/><br/>
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td style="width:8%; padding:5px; text-align:right;">
+                                            <span t-esc="'{0:,.0f}'.format(line.product_uom_qty)"/>
+                                        </td>
+                                        <td style="width:12%; padding:5px; text-align:center;">
+                                            <span t-field="line.product_uom"/>
+                                        </td>
+                                        <td style="width:12%; padding:5px; text-align:right;">
+                                            <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                        </td>
+                                        <td style="width:10%; padding:5px; text-align:right;"/>
+                                        <td style="width:13%; padding:5px; text-align:right;">
+                                            <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </table>
+
+                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                <tr>
+                                    <td style="width:53%; padding:5px; border-top:1px solid black; text-align:right; padding-right:3px;">Total Quantity:</td>
+                                    <td style="width:12%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;">
+                                        <span t-esc="'{0:,.0f}'.format(sum(o.order_line.mapped('product_uom_qty')))"/>
+                                    </td>
+                                    <td style="width:22%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">Sub Total : <span t-field="o.currency_id"/></td>
+                                    <td style="width:12%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                                </tr>
+                                <tr style="height:6px;"/>
+                                <tr>
+                                    <td colspan="3"/>
+                                    <td style="width:12%; padding:5px; border-bottom:1px solid black;"/>
+                                </tr>
+
+                                <tr style="height:12px;"/>
+                                <tr>
+                                    <td colspan="2" rowspan="3"/>
+                                    <td style="width:22%; padding:5px; text-align:right; font-weight:bold;">Tax Base : <span t-field="o.currency_id"/></td>
+                                    <td style="width:12%; padding:5px; text-align:right; font-weight:bold; border-bottom:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                                </tr>
+
+                                <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
+                                    <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
+                                    <t t-foreach="tax_totals['groups_by_subtotal'][subtotal_to_show]" t-as="amount_by_group">
+                                        <tr>
+                                            <td style="width:22%; padding:5px; text-align:right; font-weight:bold;">
+                                                <span t-esc="amount_by_group['tax_group_name']"/> : <span t-field="o.currency_id"/>
+                                            </td>
+                                            <td style="width:12%; padding:5px; text-align:right; font-weight:bold;">
+                                                <span t-esc="'{0:,.2f}'.format(amount_by_group['tax_group_amount'])"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+
+                                <tr>
+                                    <td style="width:22%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
+                                    <td style="width:12%; padding:5px; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"/>
+                                    <td style="width:12%; padding:1px !important; border-top:1px solid black; border-bottom:1px solid black; outline-offset:-2px;"/>
+                                </tr>
+                            </table>
+
+                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                <tr>
+                                    <td style="width:50%; padding:5px; text-decoration:underline;">Remarks</td>
+                                    <td style="width:50%;"/>
+                                </tr>
+                                <tr>
+                                    <td style="width:50%; padding:5px;">
+                                        <span t-field="o.fg_remarks"/>
+                                    </td>
+                                    <td style="width:50%;"/>
+                                </tr>
+                                <tr>
+                                    <td style="width:50%; border-top:1px dashed black; border-bottom:1px dashed black; outline-offset:-2px;"/>
+                                    <td style="width:50%;"/>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <record id="paperformat_fg_sales_order_report" model="report.paperformat">
+            <field name="name">Flemings Sales Order</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">118</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">8</field>
+            <field name="margin_right">8</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">113</field>
+            <field name="dpi">80</field>
+        </record>
+
+        <record id="report_fg_sales_order" model="ir.actions.report">
+            <field name="name">Sales Order</field>
+            <field name="model">sale.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">flemings_base.report_fg_sales_order_document</field>
+            <field name="report_file">flemings_base.report_fg_sales_order_document</field>
+            <field name="binding_type">report</field>
+            <field name="binding_model_id" ref="flemings_base.model_sale_order"/>
+            <field name="paperformat_id" ref="paperformat_fg_sales_order_report"/>
+            <field name="print_report_name">'Sales Order - %s' % (object.name or '').replace('/','_')</field>
+        </record>
+
+        <!-- Sales Order Report - Header Layout -->
+        <template id="report_fg_sales_order_custom_header_layout">
+            <div class="header">
+                <style>
+                    td {word-break: break-word !important; word-spacing: 3px !important; padding:5px; page-break-inside: avoid !important;}
+
+                    .non-border, .non-border > tr, .non-border > tr > td {
+                        border: none !important; border-color: #ffffff !important;
+                    }
+                </style>
+
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                    <thead>
+                        <tr>
+                            <td style="width:25%; text-align:left; padding-left:6px;">
+                                <img t-att-src="image_data_uri(company.logo)" alt="Logo" style="width:200px; float:left !important"/>
+                            </td>
+                            <td style="width:50%; text-align:left;">
+                                <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
+                                    <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:14pt; font-weight:bold; padding-right:4px;"/>
+                                    <p style="margin-bottom:0px; padding-top:0px; text-align:left">
+                                        <span t-if="company.street or company.street2">
+                                            <br/>
+                                            <span t-if="company.street">
+                                                <span t-field="company.street"/>
+                                            </span>
+                                            <span t-if="company.street2">,
+                                                <span t-field="company.street2"/>
+                                            </span>
+                                            <br/>
+                                        </span>
+
+                                        <span t-if="company.country_id">
+                                            <span t-field="company.country_id.name"/>
+                                        </span>
+                                        <span t-if="company.zip">
+                                            ,
+                                            <span t-field="company.zip"/>
+                                        </span>
+                                        <span t-if="company.phone">Tel:
+                                            <span t-field="company.phone"/>
+                                        </span>
+                                        <span t-if="company.vat">Fax:
+                                            <span t-field="company.fax"/>
+                                        </span>
+                                        <br/>
+
+                                        <span t-if="company.email">Email:
+                                            <span t-field="company.email"/>
+                                        </span>
+                                        <span t-if="company.website">
+                                            <span t-field="company.website"/>
+                                        </span>
+                                    </p>
+                                </div>
+                            </td>
+                            <td style="width:25%; text-align:right; padding-right:6px;">
+                                <img t-att-src="image_data_uri(company.logo)" alt="Logo" style="width:200px; float:left !important"/>
+                            </td>
+                            </tr>
+                        <tr>
+                            <td colspan="3" style="width:100%; border-bottom: 1px solid black; padding:5px;">
+                                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                    <tr style="height:6px;"/>
+                                    <tr>
+                                        <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                                <tr>
+                                                    <td>Bill To: </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span t-field="o.partner_id"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span t-field="o.partner_id.street"/></td>
+                                                </tr>
+                                                <t t-if="o.partner_id.street2">
+                                                    <tr>
+                                                        <td><span t-field="o.partner_id.street2"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.partner_id.country_id and o.partner_id.country_id.code != 'SG'">
+                                                    <td>
+                                                        <span t-field="o.partner_id.city"/>
+                                                        <t t-if="o.partner_id.city and o.partner_id.state_id">,&#160;</t>
+                                                        <span t-field="o.partner_id.state_id"/>
+                                                    </td>
+                                                </t>
+                                                <tr>
+                                                    <td><span t-field="o.partner_id.country_id"/> <span t-field="o.partner_id.zip"/></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                                <tr>
+                                                    <td>Deliver To: </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span t-field="o.partner_id"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span t-field="o.partner_id.street"/></td>
+                                                </tr>
+                                                <t t-if="o.partner_id.street2">
+                                                    <tr>
+                                                        <td><span t-field="o.partner_id.street2"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="o.partner_id.country_id and o.partner_id.country_id.code != 'SG'">
+                                                    <td>
+                                                        <span t-field="o.partner_id.city"/>
+                                                        <t t-if="o.partner_id.city and o.partner_id.state_id">,&#160;</t>
+                                                        <span t-field="o.partner_id.state_id"/>
+                                                    </td>
+                                                </t>
+                                                <tr>
+                                                    <td><span t-field="o.partner_id.country_id"/> <span t-field="o.partner_id.zip"/></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                                <tr>
+                                                    <td colspan="2" style="width:100%; text-align:center; font-size:15pt;"><strong>SALES ORDER</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Sales Order No.</td>
+                                                    <td style="width:56%;">: <span t-field="o.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Sales Order Date</td>
+                                                    <td style="width:56%;">: <span t-field="o.date_order" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Delivery Date</td>
+                                                    <td style="width:56%;">: <span t-field="o.commitment_date" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Delivery Mode</td>
+                                                    <td style="width:56%;">: <span t-field="o.delivery_mode_id"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Currency</td>
+                                                    <td style="width:56%;">: <span t-field="o.currency_id"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Payment Term</td>
+                                                    <td style="width:56%;">: <span t-field="o.payment_term_id"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Salesperson</td>
+                                                    <td style="width:56%;">: <span t-field="o.user_id"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Customer Service</td>
+                                                    <td style="width:56%;">: <span t-field="o.customer_service_id"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:44%;">Purchase Order No.</td>
+                                                    <td style="width:56%;">: <span t-field="o.fg_purchase_order_no"/></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!--<tr style="height:6px;"/>-->
+                                    <tr>
+                                        <td colspan="2" style="width:64%; text-align:left;">
+                                            ATTN : <span t-field="o.user_id"/>
+                                        </td>
+                                        <td rowspan="3" style="width:36%; text-align:left;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                                <tr>
+                                                    <td style="width:45%;">Country</td>
+                                                    <td style="width:55%;">: <span t-field="o.partner_id.country_id"/></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="width:64%; text-align:left;">
+                                            Tel: <span t-field="company.phone"/>
+                                            Fax: <span t-field="company.fax"/>
+                                            Mob: <span t-field="company.mobile"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="width:64%; text-align:left;">
+                                            Email: <span t-field="company.email"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </template>
+
+		<!-- Sales Order Report - Footer Layout	-->
+		<template id="report_fg_sales_order_custom_footer_layout">
+            <div class="footer">
+                <style>
+                    td {word-break: break-word !important; word-spacing: 3px !important; page-break-inside: avoid !important;}
+
+                    .non-border, .non-border > tr, .non-border > tr > td {
+                        border: none !important; border-color: #ffffff !important;
+                    }
+                </style>
+
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                    <thead>
+                        <tr>
+                            <td style="width:66%; text-align:left; border-top:1px solid black; vertical-align:middle !important;">
+                                Print By: <span t-esc="user.name"/> /
+                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%y %I:%M:%S %p')"/>
+                            </td>
+                            <td style="width:34%; text-align:right; border-top:1px solid black; vertical-align:middle !important;">
+                                Page <span class="page"/> of <span class="topage"/>
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </template>
+
+		<!-- Sales Order Report - Layout Call -->
+		<template id="report_fg_sales_order_custom_layout">
+            <t t-if="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-if="not o or not 'company_id' in o">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+            <div class="article">
+                <t t-call="flemings_base.report_fg_sales_order_custom_header_layout"/>
+                <t t-out="0"/>
+                <t t-call="flemings_base.report_fg_sales_order_custom_footer_layout"/>
+            </div>
+        </template>
+
+        <!-- Hide Default Quotation Report -->
+        <record id="sale.action_report_saleorder" model="ir.actions.report">
+            <field name="binding_model_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>
+
