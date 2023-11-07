@@ -43,6 +43,17 @@ class FlemingsResPartner(models.Model):
                     node.set('delete', 'false')
                 res['arch'] = etree.tostring(doc)
 
+        if (self._context.get('default_supplier_rank') and self._context.get('default_supplier_rank') == 1
+                and not (self.env.user.fg_finance_group or self.env.user.fg_admin_group)):
+            if view_type in ('tree', 'form', 'kanban'):
+                doc = etree.XML(res['arch'])
+                for node in doc.xpath("//" + view_type + ""):
+                    node.set('create', 'false')
+                    node.set('delete', 'false')
+                    if view_type == 'form':
+                        node.set('edit', 'false')
+                res['arch'] = etree.tostring(doc)
+
         return res
 
     def _compute_can_edit_partner_address(self):

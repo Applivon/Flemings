@@ -272,7 +272,7 @@
                     </thead>
                 </table>
 
-                <div class="last-page" style="margin-bottom: 5px; position: absolute; top: 1170px; width: 100%; padding-right: 47px; page-break-inside:avoid !important;">
+                <div class="last-page" style="margin-bottom: 5px; position: absolute; top: 1170px; width: 100%; padding-right: 47px; page-break-before:always !important;">
                 	<div class="row">
                         <div class="col-4" style="padding-right: 0; font-size:9pt !important;">
 	                        <div style="height:10px;"/>

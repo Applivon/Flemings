@@ -123,6 +123,11 @@
 				<xpath expr="//field[@name='child_ids']/form/sheet/field[@name='type']" position="attributes">
 					<attribute name="attrs">{'invisible': [('parent.is_sales_user_group', '=', True)]}</attribute>
                 </xpath>
+                <xpath expr="//field[@name='child_ids']/kanban/templates//field[@name='name']" position="before">
+					<div t-if="record.type = 'delivery' and record.comment.raw_value">
+                        <field name="comment"/>
+                    </div>
+                </xpath>
 				<xpath expr="//group[@name='sale']/field[@name='user_id']" position="attributes">
 					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
