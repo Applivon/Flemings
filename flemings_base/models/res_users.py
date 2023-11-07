@@ -31,6 +31,8 @@ class FlemingsResUsers(models.Model):
             # Flemings User System Group
             if record.fg_sales_group:
                 groups.append('flemings_base.fg_sales_group')
+            if record.fg_purchaser_group:
+                groups.append('flemings_base.fg_purchaser_group')
             if record.fg_business_support_group:
                 groups.append('flemings_base.fg_business_support_group')
             if record.fg_inventory_group:
@@ -65,6 +67,7 @@ class FlemingsResUsers(models.Model):
             record.sudo().write({'groups_id': self._get_groups(existing_base_groups, groups)})
 
     fg_sales_group = fields.Boolean(string='Sales')
+    fg_purchaser_group = fields.Boolean(string='Purchaser')
     fg_business_support_group = fields.Boolean(string='Business Support Executive')
     fg_inventory_group = fields.Boolean(string='Inventory/Procurement')
     fg_product_group = fields.Boolean(string='Product/E-commerce')
@@ -81,7 +84,7 @@ class FlemingsResUsers(models.Model):
         res = super(FlemingsResUsers, self).create(vals)
         for record in res:
             # Flemings System - User Group Update
-            if 'fg_sales_group' in vals or 'fg_business_support_group' in vals \
+            if 'fg_sales_group' in vals or 'fg_purchaser_group' in vals or 'fg_business_support_group' in vals \
                     or 'fg_inventory_group' in vals or 'fg_product_group' in vals \
                     or 'fg_production_group' in vals or 'fg_production_controller_group' in vals \
                     or 'fg_logistics_group' in vals or 'fg_operations_group' in vals \
@@ -95,7 +98,7 @@ class FlemingsResUsers(models.Model):
         res = super(FlemingsResUsers, self).write(vals)
         for record in self:
             # Flemings System - User Group Update
-            if 'fg_sales_group' in vals or 'fg_business_support_group' in vals \
+            if 'fg_sales_group' in vals or 'fg_purchaser_group' in vals or 'fg_business_support_group' in vals \
                     or 'fg_inventory_group' in vals or 'fg_product_group' in vals \
                     or 'fg_production_group' in vals or 'fg_production_controller_group' in vals \
                     or 'fg_logistics_group' in vals or 'fg_operations_group' in vals \
@@ -113,7 +116,7 @@ class FlemingsResUsers(models.Model):
             doc = etree.XML(res['arch'])
 
             fg_user_groups = [
-                'flemings_base.fg_sales_group', 'flemings_base.fg_business_support_group',
+                'flemings_base.fg_sales_group', 'flemings_base.fg_purchaser_group', 'flemings_base.fg_business_support_group',
                 'flemings_base.fg_inventory_group', 'flemings_base.fg_product_group',
                 'flemings_base.fg_production_group', 'flemings_base.fg_production_controller_group',
                 'flemings_base.fg_logistics_group', 'flemings_base.fg_operations_group',

@@ -42,75 +42,101 @@
 			<field name="inherit_id" ref="base.view_partner_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='category_id']" position="after">
-					<field name="last_sale_date" readonly="1" force_save="1" attrs="{'invisible':[('customer_rank' ,'=', 0)]}"/>
-					<field name="last_invoice_date" readonly="1" force_save="1" attrs="{'invisible':[('customer_rank' ,'=', 0)]}"/>
-					<field name="last_purchase_date" readonly="1" force_save="1" attrs="{'invisible':[('supplier_rank' ,'=', 0)]}"/>
+					<field name="last_sale_date" readonly="1" force_save="1" attrs="{'invisible':['|', ('last_sale_date', '=', False), ('customer_rank' ,'=', 0)]}"/>
+					<field name="last_invoice_date" readonly="1" force_save="1" attrs="{'invisible':['|', ('last_invoice_date', '=', False), ('customer_rank' ,'=', 0)]}"/>
+					<field name="last_purchase_date" readonly="1" force_save="1" attrs="{'invisible':['|', ('last_purchase_date', '=', False), ('supplier_rank' ,'=', 0)]}"/>
                 </xpath>
 				<xpath expr="//field[@name='vat']" position="after">
-					<field name="fax"/>
+					<field name="can_edit_partner_address" invisible="1"/>
 					<field name="is_sales_user_group" invisible="1"/>
+					<field name="is_purchaser_user_group" invisible="1"/>
 					<field name="customer_rank" invisible="1"/>
 					<field name="supplier_rank" invisible="1"/>
+					<field name="fax" attrs="{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}" force_save="1"/>
+                </xpath>
+				<xpath expr="//field[@name='type']" position="attributes">
+					<attribute name="attrs">{'invisible': [('is_company','=', True)], 'required': [('is_company','!=', True)], 'readonly': ['|', '|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True), ('user_ids', '!=', [])]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='street']" position="attributes">
+					<attribute name="attrs">{'readonly': [('can_edit_partner_address', '=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='street2']" position="attributes">
+					<attribute name="attrs">{'readonly': [('can_edit_partner_address', '=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='city']" position="attributes">
+					<attribute name="attrs">{'readonly': [('can_edit_partner_address', '=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='state_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('can_edit_partner_address', '=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='zip']" position="attributes">
+					<attribute name="attrs">{'readonly': [('can_edit_partner_address', '=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='country_id']" position="attributes">
+					<attribute name="attrs">{'readonly': [('can_edit_partner_address', '=', False)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='company_type']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='name'][1]" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'required' : [('type', '=', 'contact')], 'invisible': [('is_company','=', False)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'required' : [('type', '=', 'contact')], 'invisible': [('is_company','=', False)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='name'][2]" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'required' : [('type', '=', 'contact')], 'invisible': [('is_company','=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'required' : [('type', '=', 'contact')], 'invisible': [('is_company','=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='parent_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': ['|', '&amp;', ('is_company','=', True),('parent_id', '=', False),('company_name', '!=', False),('company_name', '!=', '')]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': ['|', '&amp;', ('is_company','=', True),('parent_id', '=', False),('company_name', '!=', False),('company_name', '!=', '')]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='company_name']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': ['|', '|', ('company_name', '=', False), ('company_name', '=', ''), ('is_company', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': ['|', '|', ('company_name', '=', False), ('company_name', '=', ''), ('is_company', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='vat']" position="attributes">
-					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('parent_id','!=',False)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', '|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True), ('parent_id','!=',False)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='function']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('is_company','=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': [('is_company','=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='phone']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='mobile']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='email']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'required': [('user_ids','!=', [])]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'required': [('user_ids','!=', [])]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='website']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='title']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('is_company', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': [('is_company', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='lang']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('active_lang_count', '&lt;=', 1)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': [('active_lang_count', '&lt;=', 1)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='category_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='child_ids']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="context">{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_lang': lang, 'default_user_id': user_id, 'default_type': 'delivery'}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='child_ids']/form/sheet/field[@name='type']" position="attributes">
+					<attribute name="attrs">{'invisible': [('parent.is_sales_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//group[@name='sale']/field[@name='user_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//group[@name='misc']/field[@name='company_registry']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('parent_id','!=',False)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': [('parent_id','!=',False)]}</attribute>
                 </xpath>
 				<xpath expr="//group[@name='misc']/field[@name='ref']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//group[@name='misc']/field[@name='company_id']" position="attributes">
-					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('parent_id', '!=', False)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', '|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True), ('parent_id', '!=', False)]}</attribute>
                 </xpath>
 				<xpath expr="//group[@name='misc']/field[@name='industry_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('is_company', '=', False)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': [('is_company', '=', False)]}</attribute>
                 </xpath>
 
 				<xpath expr="//page[@name='internal_notes']" position="before">
@@ -186,31 +212,31 @@
 			<field name="inherit_id" ref="account.view_partner_property_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='bank_ids']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='property_account_receivable_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='property_account_payable_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='credit']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='use_partner_credit_limit']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='credit_limit']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('use_partner_credit_limit', '=', False)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': [('use_partner_credit_limit', '=', False)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='property_account_position_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='property_payment_term_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='property_supplier_payment_term_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 			</field>
 		</record>
@@ -221,7 +247,7 @@
 			<field name="inherit_id" ref="l10n_sg.view_partner_form_l10n_sg"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='l10n_sg_unique_entity_number']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 			</field>
 		</record>
@@ -232,7 +258,7 @@
 			<field name="inherit_id" ref="sales_team.res_partner_view_team"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='team_id'][2]" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 			</field>
 		</record>
@@ -243,7 +269,7 @@
 			<field name="inherit_id" ref="point_of_sale.view_partner_property_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='barcode']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 			</field>
 		</record>
@@ -254,13 +280,13 @@
 			<field name="inherit_id" ref="purchase.view_partner_property_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='receipt_reminder_email']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='reminder_date_before_receipt']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='property_purchase_currency_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 			</field>
 		</record>
@@ -271,7 +297,7 @@
 			<field name="inherit_id" ref="product.view_partner_property_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='property_product_pricelist']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)], 'invisible': [('is_company','=',False),('parent_id','!=',False)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)], 'invisible': [('is_company','=',False),('parent_id','!=',False)]}</attribute>
                 </xpath>
 			</field>
 		</record>
@@ -282,7 +308,7 @@
 			<field name="inherit_id" ref="delivery.view_partner_property_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='property_delivery_carrier_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 			</field>
 		</record>
@@ -293,10 +319,10 @@
 			<field name="inherit_id" ref="stock.view_partner_stock_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='property_stock_customer']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='property_stock_supplier']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 			</field>
 		</record>
@@ -307,7 +333,7 @@
 			<field name="inherit_id" ref="website.view_partner_form_inherit_website"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='website_id']" position="attributes">
-					<attribute name="attrs">{'readonly': [('is_sales_user_group', '=', True)]}</attribute>
+					<attribute name="attrs">{'readonly': ['|', ('is_sales_user_group', '=', True), ('is_purchaser_user_group', '=', True)]}</attribute>
                 </xpath>
 			</field>
 		</record>

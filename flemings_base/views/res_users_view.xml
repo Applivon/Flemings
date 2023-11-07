@@ -18,6 +18,7 @@
 							<field name="fg_admin_group"/>
 						</group>
 						<group>
+							<field name="fg_purchaser_group"/>
 							<field name="fg_business_support_group"/>
 							<field name="fg_product_group"/>
 							<field name="fg_production_controller_group"/>

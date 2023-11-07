@@ -35,36 +35,34 @@ class FlemingsResPartner(models.Model):
     def get_view(self, view_id=None, view_type='form', **options):
         res = super(FlemingsResPartner, self).get_view(view_id, view_type, **options)
 
-        if (self._context.get('default_supplier_rank') and self._context.get('default_supplier_rank') == 1
-                and not (self.env.user.fg_finance_group or self.env.user.fg_admin_group)):
-            if view_type == 'tree':
+        if self.env.user.fg_sales_group or self.env.user.fg_purchaser_group:
+            if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
-                for node in doc.xpath("//tree"):
+                for node in doc.xpath("//" + view_type + ""):
                     node.set('create', 'false')
                     node.set('delete', 'false')
                 res['arch'] = etree.tostring(doc)
 
-            if view_type == 'form':
-                doc = etree.XML(res['arch'])
-                for node in doc.xpath("//form"):
-                    node.set('create', 'false')
-                    node.set('edit', 'false')
-                    node.set('delete', 'false')
-                res['arch'] = etree.tostring(doc)
-
-            if view_type == 'kanban':
-                doc = etree.XML(res['arch'])
-                for node in doc.xpath("//kanban"):
-                    node.set('create', 'false')
-                    node.set('delete', 'false')
-                res['arch'] = etree.tostring(doc)
         return res
 
-    def _compute_is_sales_user_group(self):
+    def _compute_can_edit_partner_address(self):
+        for record in self:
+            if self.env.user.fg_sales_group or self.env.user.fg_purchaser_group:
+                can_edit_partner_address = False
+            elif self.type == 'contact' and record.parent_id:
+                can_edit_partner_address = False
+            else:
+                can_edit_partner_address = True
+            record.can_edit_partner_address = can_edit_partner_address
+
+    def _compute_is_fg_user_group(self):
         for record in self:
             record.is_sales_user_group = True if self.env.user.fg_sales_group else False
+            record.is_purchaser_user_group = True if self.env.user.fg_purchaser_group else False
 
-    is_sales_user_group = fields.Boolean('Is Sales User ?', compute='_compute_is_sales_user_group')
+    can_edit_partner_address = fields.Boolean('Can Edit Person Address ?', compute='_compute_can_edit_partner_address')
+    is_sales_user_group = fields.Boolean('Is Sales User ?', compute='_compute_is_fg_user_group')
+    is_purchaser_user_group = fields.Boolean('Is Purchaser User ?', compute='_compute_is_fg_user_group')
     last_sale_date = fields.Date('Last Sale Date', copy=False)
     last_purchase_date = fields.Date('Last Purchase Date', copy=False)
     last_invoice_date = fields.Date('Last Invoice Date', copy=False)
