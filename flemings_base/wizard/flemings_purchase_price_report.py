@@ -116,7 +116,7 @@ class FlemingsPurchasePriceReportXlsx(models.AbstractModel):
 
             vendor_domain = [('date_approve', '>=', obj.from_date), ('date_approve', '<=', obj.to_date), ('state', 'in', ('purchase', 'done'))]
             if obj.partner_ids:
-                vendor_domain.append(('id', 'in', obj.partner_ids.ids or []))
+                vendor_domain.append(('partner_id', 'in', obj.partner_ids.ids or []))
 
             purchase_orders = self.env['purchase.order'].sudo().search(vendor_domain)
             purchase_order_ids = purchase_orders.mapped('id')

@@ -231,7 +231,7 @@
                                                 <tr>
                                                     <td style="width:44%;">Process By</td>
                                                     <td style="width:56%;">:
-                                                        <span t-field="o.sale_id.customer_service_id"/>
+                                                        <span t-field="o.customer_service_id"/>
                                                     </td>
                                                 </tr>
                                                 <tr>

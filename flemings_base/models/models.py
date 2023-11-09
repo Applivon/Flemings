@@ -180,6 +180,7 @@ class FlemingsSalesOrder(models.Model):
             for picking in order.picking_ids:
                 picking.write({
                     'fg_purchase_order_no': order.fg_purchase_order_no,
+                    'customer_service_id': order.customer_service_id.id,
                     'fg_remarks': order.fg_remarks,
                 })
         return res
@@ -188,11 +189,11 @@ class FlemingsSalesOrder(models.Model):
         for record in self.filtered(lambda x: x.partner_id):
             for line in record.order_line:
                 exist_price_book = self.env['customer.price.book.details'].search(
-                    [('partner_id', '=', record.partner_id.id), ('product_id', '=', line.product_id.id)],
+                    [('partner_id', '=', record.partner_id.parent_id.id or record.partner_id.id), ('product_id', '=', line.product_id.id)],
                     order='order_date desc', limit=1)
                 if not exist_price_book:
                     self.env['customer.price.book.details'].create({
-                        'partner_id': record.partner_id.id,
+                        'partner_id': record.partner_id.parent_id.id or record.partner_id.id,
                         'product_id': line.product_id.id,
                         'product_sku': line.product_id.default_code,
                         'sale_order_id': record.id,
@@ -228,11 +229,11 @@ class FlemingsPurchaseOrder(models.Model):
         for record in self.filtered(lambda x: x.partner_id):
             for line in record.order_line:
                 exist_price_book = self.env['vendor.price.book.details'].search(
-                    [('partner_id', '=', record.partner_id.id), ('product_id', '=', line.product_id.id)],
+                    [('partner_id', '=', record.partner_id.parent_id.id or record.partner_id.id), ('product_id', '=', line.product_id.id)],
                     order='order_date desc', limit=1)
                 if not exist_price_book:
                     self.env['vendor.price.book.details'].create({
-                        'partner_id': record.partner_id.id,
+                        'partner_id': record.partner_id.parent_id.id or record.partner_id.id,
                         'product_id': line.product_id.id,
                         'product_sku': line.product_id.default_code,
                         'purchase_order_id': record.id,
@@ -284,7 +285,7 @@ class FlemingsSalesAccountMove(models.Model):
         for record in self.filtered(lambda x: x.partner_id):
             for line in record.invoice_line_ids:
                 exist_price_book = self.env['customer.price.book.details'].search(
-                    [('partner_id', '=', record.partner_id.id), ('product_id', '=', line.product_id.id)],
+                    [('partner_id', '=', record.partner_id.parent_id.id or record.partner_id.id), ('product_id', '=', line.product_id.id)],
                     order='order_date desc', limit=1)
 
                 sale_order = self.env['sale.order'].search([]).filtered(lambda x: x.invoice_ids in record)
@@ -292,7 +293,7 @@ class FlemingsSalesAccountMove(models.Model):
 
                 if not exist_price_book:
                     self.env['customer.price.book.details'].create({
-                        'partner_id': record.partner_id.id,
+                        'partner_id': record.partner_id.parent_id.id or record.partner_id.id,
                         'product_id': line.product_id.id,
                         'product_sku': line.product_id.default_code,
                         'sale_order_id': sale_order[0].id if sale_order else False,
@@ -303,7 +304,7 @@ class FlemingsSalesAccountMove(models.Model):
                         'price_unit': line.price_unit
                     })
                 else:
-                    if (exist_price_book.price_unit != line.price_unit) or (sale_order_id and exist_price_book.sale_order_id == sale_order_id):
+                    if (exist_price_book.price_unit != line.price_unit) or (sale_order_id and exist_price_book.sale_order_id != sale_order_id):
                         exist_price_book.write({
                             'sale_order_id': sale_order[0].id if sale_order else False,
                             'sale_order_number': sale_order[0].name if sale_order else False,
@@ -318,7 +319,7 @@ class FlemingsSalesAccountMove(models.Model):
         for record in self.filtered(lambda x: x.partner_id):
             for line in record.invoice_line_ids:
                 exist_price_book = self.env['vendor.price.book.details'].search(
-                    [('partner_id', '=', record.partner_id.id), ('product_id', '=', line.product_id.id)],
+                    [('partner_id', '=', record.partner_id.parent_id.id or record.partner_id.id), ('product_id', '=', line.product_id.id)],
                     order='order_date desc', limit=1)
 
                 purchase_order = self.env['purchase.order'].search([]).filtered(lambda x: x.invoice_ids in record)
@@ -326,7 +327,7 @@ class FlemingsSalesAccountMove(models.Model):
 
                 if not exist_price_book:
                     self.env['vendor.price.book.details'].create({
-                        'partner_id': record.partner_id.id,
+                        'partner_id': record.partner_id.parent_id.id or record.partner_id.id,
                         'product_id': line.product_id.id,
                         'product_sku': line.product_id.default_code,
                         'purchase_order_id': purchase_order[0].id if purchase_order else False,
@@ -337,7 +338,7 @@ class FlemingsSalesAccountMove(models.Model):
                         'price_unit': line.price_unit
                     })
                 else:
-                    if (exist_price_book.price_unit != line.price_unit) or (purchase_order_id and exist_price_book.purchase_order_id == purchase_order_id):
+                    if (exist_price_book.price_unit != line.price_unit) or (purchase_order_id and exist_price_book.purchase_order_id != purchase_order_id):
                         exist_price_book.write({
                             'purchase_order_id': purchase_order[0].id if purchase_order else False,
                             'purchase_order_number': purchase_order[0].name if purchase_order else False,
@@ -423,6 +424,7 @@ class FlemingsStockPicking(models.Model):
     _inherit = 'stock.picking'
 
     fg_purchase_order_no = fields.Char('Purchase Order No.')
+    customer_service_id = fields.Many2one('res.users', string='Customer Service')
     fg_remarks = fields.Text('Remarks')
 
     def button_validate(self):
