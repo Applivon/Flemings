@@ -466,7 +466,7 @@
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='owner_id']" position="after">
 					<field name="fg_purchase_order_no"/>
-					<field name="customer_service_id" options="{'no_create':True}"/>
+					<field name="process_by_id" options="{'no_create':True}"/>
 					<field name="fg_remarks"/>
                 </xpath>
             </field>

@@ -180,7 +180,7 @@ class FlemingsSalesOrder(models.Model):
             for picking in order.picking_ids:
                 picking.write({
                     'fg_purchase_order_no': order.fg_purchase_order_no,
-                    'customer_service_id': order.customer_service_id.id,
+                    'process_by_id': self.env.user.id,
                     'fg_remarks': order.fg_remarks,
                 })
         return res
@@ -424,7 +424,7 @@ class FlemingsStockPicking(models.Model):
     _inherit = 'stock.picking'
 
     fg_purchase_order_no = fields.Char('Purchase Order No.')
-    customer_service_id = fields.Many2one('res.users', string='Customer Service')
+    process_by_id = fields.Many2one('res.users', string='Process By')
     fg_remarks = fields.Text('Remarks')
 
     def button_validate(self):

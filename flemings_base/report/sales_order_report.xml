@@ -33,7 +33,7 @@
                                         <td style="width:12%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
                                         <td style="width:12%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Unit Price</td>
                                         <td style="width:10%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Disc</td>
-                                        <td style="width:13%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Total Amount</td>
+                                        <td style="width:13%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
                                     </tr>
                                 </thead>
                                 <t t-foreach="o.order_line.sorted(key=lambda x: x.fg_sno)" t-as="line">
@@ -101,11 +101,7 @@
 
                                 <tr>
                                     <td style="width:22%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
-                                    <td style="width:12%; padding:5px; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3"/>
-                                    <td style="width:12%; padding:1px !important; border-top:1px solid black; border-bottom:1px solid black; outline-offset:-2px;"/>
+                                    <td style="width:12%; padding:5px; text-align:right; font-weight:bold; border-bottom:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
                                 </tr>
                             </table>
 
@@ -115,13 +111,9 @@
                                     <td style="width:50%;"/>
                                 </tr>
                                 <tr>
-                                    <td style="width:50%; padding:5px;">
+                                    <td style="width:50%; padding:5px; border-bottom:1px dashed black;">
                                         <span t-field="o.fg_remarks"/>
                                     </td>
-                                    <td style="width:50%;"/>
-                                </tr>
-                                <tr>
-                                    <td style="width:50%; border-top:1px dashed black; border-bottom:1px dashed black; outline-offset:-2px;"/>
                                     <td style="width:50%;"/>
                                 </tr>
                             </table>
@@ -164,14 +156,14 @@
         <template id="report_fg_sales_order_custom_header_layout">
             <div class="header">
                 <style>
-                    td {word-break: break-word !important; word-spacing: 3px !important; padding:5px; page-break-inside: avoid !important;}
+                    td {word-break: break-word !important; word-spacing: 3px !important; padding:3px; page-break-inside: avoid !important;}
 
                     .non-border, .non-border > tr, .non-border > tr > td {
                         border: none !important; border-color: #ffffff !important;
                     }
                 </style>
 
-                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                     <thead>
                         <tr>
                             <td style="width:25%; text-align:left; padding-left:6px;">
@@ -221,12 +213,12 @@
                             </td>
                             </tr>
                         <tr>
-                            <td colspan="3" style="width:100%; border-bottom: 1px solid black; padding:5px;">
-                                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                            <td colspan="3" style="width:100%; border-bottom: 1px solid black; padding:3px;">
+                                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                     <tr style="height:6px;"/>
                                     <tr>
                                         <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td>Bill To: </td>
                                                 </tr>
@@ -254,7 +246,7 @@
                                             </table>
                                         </td>
                                         <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td>Deliver To: </td>
                                                 </tr>
@@ -281,46 +273,46 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                        <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td colspan="2" style="width:100%; text-align:center; font-size:15pt;"><strong>SALES ORDER</strong></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Sales Order No.</td>
-                                                    <td style="width:56%;">: <span t-field="o.name"/></td>
+                                                    <td style="width:46%;">Sales Order No.</td>
+                                                    <td style="width:54%;">: <span t-field="o.name"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Sales Order Date</td>
-                                                    <td style="width:56%;">: <span t-field="o.date_order" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
+                                                    <td style="width:46%;">Sales Order Date</td>
+                                                    <td style="width:54%;">: <span t-field="o.date_order" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Delivery Date</td>
-                                                    <td style="width:56%;">: <span t-field="o.commitment_date" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
+                                                    <td style="width:46%;">Delivery Date</td>
+                                                    <td style="width:54%;">: <span t-field="o.commitment_date" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Delivery Mode</td>
-                                                    <td style="width:56%;">: <span t-field="o.delivery_mode_id"/></td>
+                                                    <td style="width:46%;">Delivery Mode</td>
+                                                    <td style="width:54%;">: <span t-field="o.delivery_mode_id"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Currency</td>
-                                                    <td style="width:56%;">: <span t-field="o.currency_id"/></td>
+                                                    <td style="width:46%;">Currency</td>
+                                                    <td style="width:54%;">: <span t-field="o.currency_id"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Payment Term</td>
-                                                    <td style="width:56%;">: <span t-field="o.payment_term_id"/></td>
+                                                    <td style="width:46%;">Payment Term</td>
+                                                    <td style="width:54%;">: <span t-field="o.payment_term_id"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Salesperson</td>
-                                                    <td style="width:56%;">: <span t-field="o.user_id"/></td>
+                                                    <td style="width:46%;">Salesperson</td>
+                                                    <td style="width:54%;">: <span t-field="o.user_id"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Customer Service</td>
-                                                    <td style="width:56%;">: <span t-field="o.customer_service_id"/></td>
+                                                    <td style="width:46%;">Customer Service</td>
+                                                    <td style="width:54%;">: <span t-field="o.customer_service_id"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:44%;">Purchase Order No.</td>
-                                                    <td style="width:56%;">: <span t-field="o.fg_purchase_order_no"/></td>
+                                                    <td style="width:46%;">Purchase Order No.</td>
+                                                    <td style="width:54%;">: <span t-field="o.fg_purchase_order_no"/></td>
                                                 </tr>
                                             </table>
                                         </td>
@@ -331,10 +323,10 @@
                                             ATTN : <span t-field="o.user_id"/>
                                         </td>
                                         <td rowspan="3" style="width:36%; text-align:left;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
-                                                    <td style="width:45%;">Country</td>
-                                                    <td style="width:55%;">: <span t-field="o.partner_id.country_id"/></td>
+                                                    <td style="width:46%;">Country</td>
+                                                    <td style="width:54%; padding-left:12px !important;">: <span t-field="o.partner_id.country_id"/></td>
                                                 </tr>
                                             </table>
                                         </td>
