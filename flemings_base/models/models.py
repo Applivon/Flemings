@@ -438,8 +438,8 @@ class FlemingsStockPicking(models.Model):
             for line_product_id in record.move_line_ids_without_package.mapped('product_id'):
                 picking_qty = sum(record.move_line_ids_without_package.filtered(lambda x: x.product_id.id == line_product_id.id).mapped('qty_done'))
 
-                if picking_qty > line_product_id.qty_available:
-                    qty_unavailable_error_msg += '\n' + str(unavailable_sno) + '. ' + str(line_product_id.display_name) + ' - ' + str(line_product_id.qty_available)
+                if line_product_id.qty_available < 0:
+                    qty_unavailable_error_msg += '\n' + str(unavailable_sno) + '. ' + str(line_product_id.display_name) + ' - ' + str(line_product_id.qty_available + picking_qty)
 
                     is_qty_unavailable = True
                     unavailable_sno += 1
