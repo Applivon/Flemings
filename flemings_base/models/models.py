@@ -308,7 +308,7 @@ class FlemingsSalesAccountMove(models.Model):
                         'price_unit': line.price_unit
                     })
                 else:
-                    if exist_price_book.price_unit != line.price_unit:
+                    if (exist_price_book.price_unit != line.price_unit) or (sale_order_id and exist_price_book.sale_order_id == sale_order_id):
                         exist_price_book.write({
                             'sale_order_id': sale_order[0].id if sale_order else False,
                             'sale_order_number': sale_order[0].name if sale_order else False,
@@ -342,7 +342,7 @@ class FlemingsSalesAccountMove(models.Model):
                         'price_unit': line.price_unit
                     })
                 else:
-                    if exist_price_book.price_unit != line.price_unit:
+                    if (exist_price_book.price_unit != line.price_unit) or (purchase_order_id and exist_price_book.purchase_order_id == purchase_order_id):
                         exist_price_book.write({
                             'purchase_order_id': purchase_order[0].id if purchase_order else False,
                             'purchase_order_number': purchase_order[0].name if purchase_order else False,
