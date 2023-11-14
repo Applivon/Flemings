@@ -266,19 +266,23 @@ class FlemingsSalesAccountMove(models.Model):
             invoice.update_customer_price_book()
 
             # Update 'Last Sale & Invoice Date' for Customer
-            invoice.partner_id.sudo().write({
+            last_date_vals = {
                 'last_sale_date': datetime.now().date(),
                 'last_invoice_date': datetime.now().date()
-            })
+            }
+            invoice.partner_id.sudo().write(last_date_vals)
+            invoice.partner_id.parent_id.sudo().write(last_date_vals)
 
         # Update Vendor Bill Price-book for Vendor
         for invoice in self.filtered(lambda x: x.move_type == 'in_invoice'):
             invoice.update_vendor_price_book()
 
             # Update 'Last Purchase Date' for Vendor
-            invoice.partner_id.sudo().write({
+            last_date_vals = {
                 'last_purchase_date': datetime.now().date()
-            })
+            }
+            invoice.partner_id.sudo().write(last_date_vals)
+            invoice.partner_id.parent_id.sudo().write(last_date_vals)
         return res
 
     def update_customer_price_book(self):
