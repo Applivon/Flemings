@@ -27,10 +27,10 @@
                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
                                 <thead>
                                     <tr>
-                                        <td style="width:5%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
-                                        <td style="width:65%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:left;">Product Code / Description</td>
-                                        <td style="width:13%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Qty</td>
-                                        <td style="width:17%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
+                                        <td style="width:5%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
+                                        <td style="width:65%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">Product Code / Description</td>
+                                        <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Qty</td>
+                                        <td style="width:17%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
                                     </tr>
                                 </thead>
 
@@ -84,12 +84,12 @@
             <field name="page_height">0</field>
             <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">103</field>
+            <field name="margin_top">105</field>
             <field name="margin_bottom">10</field>
             <field name="margin_left">8</field>
             <field name="margin_right">8</field>
             <field name="header_line" eval="False"/>
-            <field name="header_spacing">98</field>
+            <field name="header_spacing">100</field>
             <field name="dpi">80</field>
         </record>
 
@@ -166,7 +166,7 @@
                             </td>
                             </tr>
                         <tr>
-                            <td colspan="3" style="width:100%; border-bottom: 1px solid black; padding:3px;">
+                            <td colspan="3" style="width:100%; padding:3px;">
                                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                     <tr style="height:6px;"/>
                                     <tr>
@@ -240,7 +240,7 @@
                                     </tr>
                                     <tr>
                                         <td style="width:64%; text-align:left;">
-                                            ATTN : <span t-field="o.user_id"/>
+                                            ATTN : <span t-field="o.partner_id"/>
                                         </td>
                                         <td rowspan="3" style="width:36%; text-align:left;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">

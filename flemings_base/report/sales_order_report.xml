@@ -27,13 +27,13 @@
                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
                                 <thead>
                                     <tr>
-                                        <td style="width:5%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
-                                        <td style="width:40%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:left;">Product Code / Description</td>
-                                        <td style="width:8%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Qty</td>
-                                        <td style="width:12%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
-                                        <td style="width:12%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Unit Price</td>
-                                        <td style="width:10%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right;">Disc</td>
-                                        <td style="width:13%; padding:5px; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
+                                        <td style="width:5%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
+                                        <td style="width:40%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">Product Code / Description</td>
+                                        <td style="width:8%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Qty</td>
+                                        <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
+                                        <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Unit Price</td>
+                                        <td style="width:10%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Disc</td>
+                                        <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
                                     </tr>
                                 </thead>
                                 <t t-foreach="o.order_line.sorted(key=lambda x: x.fg_sno)" t-as="line">
@@ -131,12 +131,12 @@
             <field name="page_height">0</field>
             <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">118</field>
+            <field name="margin_top">120</field>
             <field name="margin_bottom">10</field>
             <field name="margin_left">8</field>
             <field name="margin_right">8</field>
             <field name="header_line" eval="False"/>
-            <field name="header_spacing">113</field>
+            <field name="header_spacing">115</field>
             <field name="dpi">80</field>
         </record>
 
@@ -213,7 +213,7 @@
                             </td>
                             </tr>
                         <tr>
-                            <td colspan="3" style="width:100%; border-bottom: 1px solid black; padding:3px;">
+                            <td colspan="3" style="width:100%; padding:3px;">
                                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                     <tr style="height:6px;"/>
                                     <tr>
@@ -320,7 +320,7 @@
                                     <!--<tr style="height:6px;"/>-->
                                     <tr>
                                         <td colspan="2" style="width:64%; text-align:left;">
-                                            ATTN : <span t-field="o.user_id"/>
+                                            ATTN : <span t-field="o.partner_id"/>
                                         </td>
                                         <td rowspan="3" style="width:36%; text-align:left;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
