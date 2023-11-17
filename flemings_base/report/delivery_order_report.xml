@@ -24,6 +24,13 @@
                             }
                         </style>
 
+                        <t t-if="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))">
+                            <t t-set="contact_customer" t-value="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))[0]"/>
+                        </t>
+                        <t t-else="1">
+                            <t t-set="contact_customer" t-value="o.partner_id"/>
+                        </t>
+
                         <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                             <thead>
                                 <tr>
@@ -148,7 +155,10 @@
                                             </tr>
                                             <tr>
                                                 <td style="width:64%; text-align:left;">
-                                                    ATTN : <span t-field="o.partner_id"/>
+                                                    ATTN :
+                                                    <t t-if="contact_customer">
+                                                        <span t-if="contact_customer.title" t-esc="contact_customer.title.name"/> <span t-esc="contact_customer.name"/>
+                                                    </t>
                                                 </td>
                                                 <td rowspan="3" style="width:36%; text-align:left;">
                                                     <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
@@ -255,7 +265,7 @@
                         <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
                             <tr>
                                 <td style="width:53%; padding:5px; border-top:1px solid black; text-decoration:underline;">Remarks</td>
-                                <td rowspan="3" style="width:13%; padding:5px; border-top:1px solid black; text-align:right; white-space:nowrap !important;">Total Quantity:</td>
+                                <td rowspan="3" style="width:13%; padding:5px; padding-right:0px !important; border-top:1px solid black; text-align:right; white-space:nowrap !important;">Total Quantity:</td>
                                 <td rowspan="3" style="width:17%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">
                                     <span t-esc="'{0:,.0f}'.format(sum(o.move_line_ids_without_package.mapped('qty_done')))"/>
                                 </td>

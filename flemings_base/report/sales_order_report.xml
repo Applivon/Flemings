@@ -53,10 +53,12 @@
                                         </td>
                                         <td style="width:12%; padding:5px; text-align:right;">
                                             <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                            (<span t-field="line.currency_id.symbol"/>)
                                         </td>
                                         <td style="width:10%; padding:5px; text-align:right;"/>
                                         <td style="width:13%; padding:5px; text-align:right;">
                                             <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                            (<span t-field="line.currency_id.symbol"/>)
                                         </td>
                                     </tr>
                                 </t>
@@ -64,7 +66,7 @@
 
                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
                                 <tr>
-                                    <td style="width:53%; padding:5px; border-top:1px solid black; text-align:right; padding-right:3px;">Total Quantity:</td>
+                                    <td style="width:53%; padding:5px; border-top:1px solid black; text-align:right; padding-right:0px !important;">Total Quantity:</td>
                                     <td style="width:12%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;">
                                         <span t-esc="'{0:,.0f}'.format(sum(o.order_line.mapped('product_uom_qty')))"/>
                                     </td>
@@ -101,7 +103,7 @@
 
                                 <tr>
                                     <td style="width:22%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
-                                    <td style="width:12%; padding:5px; text-align:right; font-weight:bold; border-bottom:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
+                                    <td style="width:12%; padding:5px; text-align:right; font-weight:bold; border-bottom:3px double black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
                                 </tr>
                             </table>
 
@@ -162,6 +164,13 @@
                         border: none !important; border-color: #ffffff !important;
                     }
                 </style>
+
+                <t t-if="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))">
+                    <t t-set="contact_customer" t-value="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))[0]"/>
+                </t>
+                <t t-else="1">
+                    <t t-set="contact_customer" t-value="o.partner_id"/>
+                </t>
 
                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                     <thead>
@@ -320,7 +329,10 @@
                                     <!--<tr style="height:6px;"/>-->
                                     <tr>
                                         <td colspan="2" style="width:64%; text-align:left;">
-                                            ATTN : <span t-field="o.partner_id"/>
+                                            ATTN :
+                                            <t t-if="contact_customer">
+                                                <span t-if="contact_customer.title" t-esc="contact_customer.title.name"/> <span t-esc="contact_customer.name"/>
+                                            </t>
                                         </td>
                                         <td rowspan="3" style="width:36%; text-align:left;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
