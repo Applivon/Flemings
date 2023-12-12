@@ -172,6 +172,13 @@
                     <t t-set="contact_customer" t-value="o.partner_id"/>
                 </t>
 
+                <t t-if="o.partner_shipping_id">
+                    <t t-set="delivery_customer" t-value="o.partner_shipping_id"/>
+                </t>
+                <t t-else="1">
+                    <t t-set="delivery_customer" t-value="o.partner_id"/>
+                </t>
+
                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                     <thead>
                         <tr>
@@ -260,25 +267,25 @@
                                                     <td>Deliver To: </td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span t-field="o.partner_id"/></td>
+                                                    <td><span t-field="delivery_customer"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span t-field="o.partner_id.street"/></td>
+                                                    <td><span t-field="delivery_customer.street"/></td>
                                                 </tr>
-                                                <t t-if="o.partner_id.street2">
+                                                <t t-if="delivery_customer.street2">
                                                     <tr>
-                                                        <td><span t-field="o.partner_id.street2"/></td>
+                                                        <td><span t-field="delivery_customer.street2"/></td>
                                                     </tr>
                                                 </t>
-                                                <t t-if="o.partner_id.country_id and o.partner_id.country_id.code != 'SG'">
+                                                <t t-if="delivery_customer.country_id and delivery_customer.country_id.code != 'SG'">
                                                     <td>
-                                                        <span t-field="o.partner_id.city"/>
-                                                        <t t-if="o.partner_id.city and o.partner_id.state_id">,&#160;</t>
-                                                        <span t-field="o.partner_id.state_id"/>
+                                                        <span t-field="delivery_customer.city"/>
+                                                        <t t-if="delivery_customer.city and delivery_customer.state_id">,&#160;</t>
+                                                        <span t-field="delivery_customer.state_id"/>
                                                     </td>
                                                 </t>
                                                 <tr>
-                                                    <td><span t-field="o.partner_id.country_id"/> <span t-field="o.partner_id.zip"/></td>
+                                                    <td><span t-field="delivery_customer.country_id"/> <span t-field="delivery_customer.zip"/></td>
                                                 </tr>
                                             </table>
                                         </td>
@@ -345,14 +352,14 @@
                                     </tr>
                                     <tr>
                                         <td colspan="2" style="width:64%; text-align:left;">
-                                            Tel: <span t-field="company.phone"/>
-                                            Fax: <span t-field="company.fax"/>
-                                            Mob: <span t-field="company.mobile"/>
+                                            Tel: <span t-field="contact_customer.phone"/>
+                                            Fax: <span t-field="contact_customer.fax"/>
+                                            Mob: <span t-field="contact_customer.mobile"/>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td colspan="2" style="width:64%; text-align:left;">
-                                            Email: <span t-field="company.email"/>
+                                            Email: <span t-field="contact_customer.email"/>
                                         </td>
                                     </tr>
                                 </table>

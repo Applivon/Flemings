@@ -50,7 +50,7 @@ class FlemingsResPartner(models.Model):
                 for node in doc.xpath("//" + view_type + ""):
                     node.set('create', 'false')
                     node.set('delete', 'false')
-                    if view_type == 'form':
+                    if view_type == 'form' and not self.env.user.fg_purchaser_group:
                         node.set('edit', 'false')
                 res['arch'] = etree.tostring(doc)
 
