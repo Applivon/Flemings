@@ -147,7 +147,7 @@ class FlemingsSalesOrderLine(models.Model):
                 self.fg_sno = 0
 
     fg_sno = fields.Integer('S.No', default=1)
-    generate_fg_sno = fields.Boolean(string='Generate S.No.')
+    generate_fg_sno = fields.Boolean(string='Generate S.No.', default=True, copy=False)
 
     def _get_display_price(self):
         """Compute the displayed unit price for a given line.
