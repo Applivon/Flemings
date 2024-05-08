@@ -53,12 +53,12 @@
                                         </td>
                                         <td style="width:12%; padding:5px; text-align:right;">
                                             <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
-                                            (<span t-field="line.currency_id.symbol"/>)
+                                            <!--(<span t-field="line.currency_id.symbol"/>)-->
                                         </td>
                                         <td style="width:10%; padding:5px; text-align:right;"/>
                                         <td style="width:13%; padding:5px; text-align:right;">
                                             <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
-                                            (<span t-field="line.currency_id.symbol"/>)
+                                            <!--(<span t-field="line.currency_id.symbol"/>)-->
                                         </td>
                                     </tr>
                                 </t>
