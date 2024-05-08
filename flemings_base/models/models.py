@@ -31,16 +31,30 @@ class FlemingsDeliveryMode(models.Model):
 class FlemingsResPartner(models.Model):
     _inherit = 'res.partner'
 
+    def unlink(self):
+        if self.env.user.has_group('flemings_base.fg_sales_group'):
+            for record in self:
+                if record.type and record.type != 'delivery':
+                    raise UserError(_('You cannot delete this record !'))
+        return super(FlemingsResPartner, self).unlink()
+
     @api.model
     def get_view(self, view_id=None, view_type='form', **options):
         res = super(FlemingsResPartner, self).get_view(view_id, view_type, **options)
 
-        if self.env.user.fg_sales_group or self.env.user.fg_purchaser_group:
+        if self.env.user.fg_purchaser_group:
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
                     node.set('create', 'false')
                     node.set('delete', 'false')
+                res['arch'] = etree.tostring(doc)
+
+        if self.env.user.fg_sales_group:
+            if view_type in ('tree', 'form', 'kanban'):
+                doc = etree.XML(res['arch'])
+                for node in doc.xpath("//" + view_type + ""):
+                    node.set('create', 'false')
                 res['arch'] = etree.tostring(doc)
 
         if (self._context.get('default_supplier_rank') and self._context.get('default_supplier_rank') == 1
