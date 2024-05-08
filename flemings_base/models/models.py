@@ -141,11 +141,13 @@ class FlemingsSalesOrderLine(models.Model):
 
     @api.onchange('order_id', 'sequence')
     def onchange_order_id_fg_sno(self):
-        self.fg_sno = len(self.order_id.order_line.filtered(lambda x: not x.display_type))
-        if self.display_type:
-            self.fg_sno = 0
+        if self.order_id and self.order_id.generate_fg_sno:
+            self.fg_sno = len(self.order_id.order_line.filtered(lambda x: not x.display_type))
+            if self.display_type:
+                self.fg_sno = 0
 
     fg_sno = fields.Integer('S.No', default=1)
+    generate_fg_sno = fields.Boolean(string='Generate S.No.')
 
     def _get_display_price(self):
         """Compute the displayed unit price for a given line.
@@ -183,10 +185,17 @@ class FlemingsSalesOrderLine(models.Model):
 class FlemingsSalesOrder(models.Model):
     _inherit = 'sale.order'
 
+    generate_fg_sno = fields.Boolean('Generate S.No.', default=True, copy=False)
+
+    @api.onchange('generate_fg_sno')
+    def onchange_generate_fg_sno(self):
+        for line in self.order_line:
+            line.generate_fg_sno = self.generate_fg_sno
+
     @api.model
     def create(self, vals):
         res = super(FlemingsSalesOrder, self).create(vals)
-        for record in res:
+        for record in res.filtered(lambda x: x.generate_fg_sno):
             asc_order_lines = record.order_line.filtered(lambda x: not x.display_type).sorted(key=lambda r: r.sequence)
             fg_sno = 1
             for asc_line in asc_order_lines:
@@ -197,7 +206,7 @@ class FlemingsSalesOrder(models.Model):
 
     def write(self, vals):
         res = super(FlemingsSalesOrder, self).write(vals)
-        for record in self:
+        for record in self.filtered(lambda x: x.generate_fg_sno):
             if 'order_line' in vals:
                 asc_order_lines = record.order_line.filtered(lambda x: not x.display_type).sorted(key=lambda r: r.sequence)
                 fg_sno = 1

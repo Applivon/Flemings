@@ -452,8 +452,12 @@
 					<field name="customer_service_id" options="{'no_create':True}"/>
 					<field name="delivery_mode_id" options="{'no_create':True}"/>
                 </xpath>
+				<xpath expr="//field[@name='partner_shipping_id']" position="after">
+					<field name="generate_fg_sno"/>
+                </xpath>
 				<xpath expr="//field[@name='order_line']/tree/field[@name='sequence']" position="before">
-					<field name="fg_sno" string="S.No." readonly="1" force_save="1"/>
+					<field name="generate_fg_sno" invisible="1"/>
+					<field name="fg_sno" string="S.No." attrs="{'readonly': [('generate_fg_sno', '=', True)]}" force_save="1"/>
                 </xpath>
 			</field>
 		</record>
