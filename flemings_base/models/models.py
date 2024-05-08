@@ -141,7 +141,9 @@ class FlemingsSalesOrderLine(models.Model):
 
     @api.onchange('order_id', 'sequence')
     def onchange_order_id_fg_sno(self):
-        self.fg_sno = len(self.order_id.order_line)
+        self.fg_sno = len(self.order_id.order_line.filtered(lambda x: not x.display_type))
+        if self.display_type:
+            self.fg_sno = 0
 
     fg_sno = fields.Integer('S.No', default=1)
 
@@ -180,6 +182,30 @@ class FlemingsSalesOrderLine(models.Model):
 
 class FlemingsSalesOrder(models.Model):
     _inherit = 'sale.order'
+
+    @api.model
+    def create(self, vals):
+        res = super(FlemingsSalesOrder, self).create(vals)
+        for record in res:
+            asc_order_lines = record.order_line.filtered(lambda x: not x.display_type).sorted(key=lambda r: r.sequence)
+            fg_sno = 1
+            for asc_line in asc_order_lines:
+                asc_line.fg_sno = fg_sno
+                fg_sno += 1
+
+        return res
+
+    def write(self, vals):
+        res = super(FlemingsSalesOrder, self).write(vals)
+        for record in self:
+            if 'order_line' in vals:
+                asc_order_lines = record.order_line.filtered(lambda x: not x.display_type).sorted(key=lambda r: r.sequence)
+                fg_sno = 1
+                for asc_line in asc_order_lines:
+                    asc_line.fg_sno = fg_sno
+                    fg_sno += 1
+
+        return res
 
     fg_purchase_order_no = fields.Char('Purchase Order No.')
     customer_service_id = fields.Many2one('res.users', string='Customer Service')

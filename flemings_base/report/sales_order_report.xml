@@ -36,10 +36,13 @@
                                         <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
                                     </tr>
                                 </thead>
-                                <t t-foreach="o.order_line.sorted(key=lambda x: x.fg_sno)" t-as="line">
+                                <t t-foreach="o.order_line.sorted(key=lambda x: x.sequence)" t-as="line">
                                     <tr>
                                         <td style="width:5%; padding:5px; text-align:left;">
-                                            <span t-field="line.fg_sno"/>
+                                            <t t-if="line.display_type"/>
+                                            <t t-else="">
+                                                <span t-field="line.fg_sno"/>
+                                            </t>
                                         </td>
                                         <td style="width:40%; padding:5px; text-align:left;">
                                             <span t-field="line.product_id.default_code"/><br/>
