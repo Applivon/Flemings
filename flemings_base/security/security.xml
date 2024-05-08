@@ -88,5 +88,26 @@
             ])]"/>
         </record>
 
+        <!-- Record Rules - Product Template - Item Category -->
+        <record id="product_template_item_category_admin_access" model="ir.rule">
+            <field name="name">Products - Item Category - Admin</field>
+            <field name="model_id" ref="flemings_base.model_product_template"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(6, 0, [ref('flemings_base.fg_admin_group')])]"/>
+        </record>
+
+        <record id="product_template_item_category_user_access" model="ir.rule">
+            <field name="name">Products - Item Category - Users</field>
+            <field name="model_id" ref="flemings_base.model_product_template"/>
+            <field name="domain_force">[('item_category_id.user_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(6, 0, [ref('flemings_base.fg_sales_group'),ref('flemings_base.fg_purchaser_group'),
+            ref('flemings_base.fg_finance_group'), ref('flemings_base.fg_business_support_group'),
+            ref('flemings_base.fg_inventory_group'), ref('flemings_base.fg_product_group'),
+            ref('flemings_base.fg_production_group'), ref('flemings_base.fg_production_controller_group'),
+            ref('flemings_base.fg_logistics_group'), ref('flemings_base.fg_operations_group'),
+            ref('flemings_base.fg_hr_group')
+            ])]"/>
+        </record>
+
 	</data>
 </odoo>
