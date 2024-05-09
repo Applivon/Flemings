@@ -201,7 +201,7 @@ class FlemingsSalesOrder(models.Model):
     def write(self, vals):
         res = super(FlemingsSalesOrder, self).write(vals)
         for record in self.filtered(lambda x: x.generate_fg_sno):
-            if 'order_line' in vals:
+            if ('generate_fg_sno' in vals and record.generate_fg_sno) or 'order_line' in vals:
                 asc_order_lines = record.order_line.filtered(lambda x: not x.display_type).sorted(key=lambda r: r.sequence)
                 fg_sno = 1
                 for asc_line in asc_order_lines:
