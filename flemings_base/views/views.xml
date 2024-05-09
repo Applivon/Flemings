@@ -456,8 +456,7 @@
 					<field name="generate_fg_sno"/>
                 </xpath>
 				<xpath expr="//field[@name='order_line']/tree/field[@name='sequence']" position="before">
-					<field name="generate_fg_sno" invisible="1"/>
-					<field name="fg_sno" string="S.No." attrs="{'readonly': [('generate_fg_sno', '=', True)]}" force_save="1"/>
+					<field name="fg_sno" string="S.No." attrs="{'readonly': [('parent.generate_fg_sno', '=', True)]}" force_save="1"/>
                 </xpath>
 			</field>
 		</record>

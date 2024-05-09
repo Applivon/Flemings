@@ -147,7 +147,6 @@ class FlemingsSalesOrderLine(models.Model):
                 self.fg_sno = 0
 
     fg_sno = fields.Integer('S.No', default=1)
-    generate_fg_sno = fields.Boolean(string='Generate S.No.', default=True, copy=False)
 
     def _get_display_price(self):
         """Compute the displayed unit price for a given line.
@@ -186,11 +185,6 @@ class FlemingsSalesOrder(models.Model):
     _inherit = 'sale.order'
 
     generate_fg_sno = fields.Boolean('Generate S.No.', default=True, copy=False)
-
-    @api.onchange('generate_fg_sno')
-    def onchange_generate_fg_sno(self):
-        for line in self.order_line:
-            line.generate_fg_sno = self.generate_fg_sno
 
     @api.model
     def create(self, vals):
