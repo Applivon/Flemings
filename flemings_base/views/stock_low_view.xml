@@ -11,6 +11,10 @@
 					<p>
 						Products that are running low in stock based on the set minimum stock level.
 					</p>
+					<group/><group/>
+					<group>
+						<field name="type" nolabel="1" widget="radio" options="{'horizontal': true}"/>
+					</group>
 					<footer>
 						<button name="get_stock_low_products" string="Fetch" type="object" class="btn-primary" data-hotkey="q"/>
 						<button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
@@ -28,7 +32,7 @@
 
 		<menuitem id="menu_fg_stock_low" parent="stock.menu_warehouse_report" action="fg_stock_low_scheduler_action" sequence="310"/>
 
-		<!-- Flemings - Stock Running Low -->
+		<!-- Flemings - Stock Running Low - By Location -->
 		<record id="fg_stock_low_list_view" model="ir.ui.view">
 	        <field name="name">fg.stock.low.tree</field>
 	        <field name="model">stock.quant</field>
@@ -66,6 +70,40 @@
 	        <field name="context">{'action_stock_running_low': True}</field>
 			<field name="search_view_id" ref="fg_stock_low_search_view"/>
             <field name="view_id" ref="fg_stock_low_list_view"/>
+	    </record>
+
+		<!-- Flemings - Stock Running Low - By Consolidation-->
+		<record id="fg_stock_low_by_consolidation_list_view" model="ir.ui.view">
+	        <field name="name">fg.stock.low.by.consolidation.tree</field>
+	        <field name="model">stock.quant.by.consolidation</field>
+	        <field name="arch" type="xml">
+	            <tree string="Stock Running Low" create="0" edit="0" delete="0" duplicate="0">
+	                <field name="product_id" options="{'no_open': True, 'no_create':True}"/>
+	                <field name="available_quantity"/>
+	                <field name="quantity" string="On Hand Quantity"/>
+	                <field name="min_stock_quantity"/>
+	            </tree>
+	        </field>
+	    </record>
+
+		<record id="fg_stock_low_by_consolidation_search_view" model="ir.ui.view">
+            <field name="name">fg.stock.low.by.consolidation.search</field>
+            <field name="model">stock.quant.by.consolidation</field>
+            <field name="arch" type="xml">
+                <search string="Stock Running Low">
+                    <field name="product_id"/>
+					<group expand="0" string="Group By..."/>
+                </search>
+            </field>
+        </record>
+
+	    <record id="fg_stock_low_by_consolidation_action" model="ir.actions.act_window">
+	        <field name="name">Stock Running Low</field>
+	        <field name="type">ir.actions.act_window</field>
+	        <field name="res_model">stock.quant.by.consolidation</field>
+	        <field name="domain">[('id', '=', 0)]</field>
+			<field name="search_view_id" ref="fg_stock_low_by_consolidation_search_view"/>
+            <field name="view_id" ref="fg_stock_low_by_consolidation_list_view"/>
 	    </record>
 
 		<!-- Product - Variant - Form View Inherit -->
