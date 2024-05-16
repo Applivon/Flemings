@@ -184,7 +184,37 @@ class FlemingsSalesOrderLine(models.Model):
 class FlemingsSalesOrder(models.Model):
     _inherit = 'sale.order'
 
+    @api.depends('picking_ids', 'invoice_ids')
+    def _compute_so_delivery_invoice_names(self):
+        for record in self:
+            record.write({
+                'computed_delivery_order_names': ' '.join([i.name for i in record.picking_ids]),
+                'computed_customer_invoice_names': ' '.join([i.name for i in record.invoice_ids]),
+            })
+
+    computed_delivery_order_names = fields.Text(string='Delivery Order', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
+    computed_customer_invoice_names = fields.Text(string='Customer Invoice', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
+
+    delivery_order_names = fields.Text(related='computed_delivery_order_names', string='Delivery Order', store=True, readonly=True)
+    customer_invoice_names = fields.Text(related='computed_customer_invoice_names', string='Customer Invoice', store=True, readonly=True)
+
     generate_fg_sno = fields.Boolean('Generate S.No.', default=True, copy=False)
+    manufacturing_order_ids = fields.Many2many('mrp.production', string='Manufacturing Order(s)')
+
+    @api.onchange('manufacturing_order_ids')
+    def onchange_manufacturing_order_ids(self):
+        self.order_line = False
+        order_line = []
+        for manufacturing_order_id in self.manufacturing_order_ids:
+            fg_sno = 1
+            for move_line in manufacturing_order_id.move_raw_ids:
+                order_line += [(0, 0, {
+                    'fg_sno': fg_sno,
+                    'product_id': move_line.product_id.id,
+                    'product_uom_qty': move_line.quantity_done,
+                })]
+                fg_sno += 1
+        self.order_line = order_line
 
     @api.model
     def create(self, vals):
@@ -301,6 +331,27 @@ class FlemingsPurchaseOrder(models.Model):
 
 class FlemingsSalesAccountMove(models.Model):
     _inherit = 'account.move'
+
+    @api.depends('amount_untaxed', 'amount_tax', 'amount_total', 'currency_id', 'invoice_line_ids.price_total')
+    def _compute_sgd_equivalent_amount(self):
+        for record in self:
+            record.write({
+                'computed_sgd_amount_untaxed': record.currency_id._convert(record.amount_untaxed, record.sgd_currency_id, record.company_id, record.invoice_date or record.create_date) if (record.invoice_date or record.create_date) else 0,
+                'computed_sgd_amount_tax': record.currency_id._convert(record.amount_tax, record.sgd_currency_id, record.company_id, record.invoice_date or record.create_date) if (record.invoice_date or record.create_date) else 0,
+                'computed_sgd_amount_total': record.currency_id._convert(record.amount_total, record.sgd_currency_id, record.company_id, record.invoice_date or record.create_date) if (record.invoice_date or record.create_date) else 0,
+                'computed_sgd_exchange_rate': record.currency_id.with_context(date=record.invoice_date or record.create_date).inverse_rate or 1.0
+            })
+
+    sgd_currency_id = fields.Many2one('res.currency', string='SGD Currency', default=lambda self: self.env['res.currency'].search([('name', '=', 'SGD')], limit=1))
+    computed_sgd_amount_untaxed = fields.Float(string='SGD Untaxed Amount', store=False, readonly=True, compute='_compute_sgd_equivalent_amount')
+    computed_sgd_amount_tax = fields.Float(string='SGD GST', store=False, readonly=True, compute='_compute_sgd_equivalent_amount')
+    computed_sgd_amount_total = fields.Float(string='SGD Total', store=False, readonly=True, compute='_compute_sgd_equivalent_amount')
+    computed_sgd_exchange_rate = fields.Float(string='SGD Exchange Rate', store=False, readonly=True, compute='_compute_sgd_equivalent_amount', digits=0)
+
+    sgd_amount_untaxed = fields.Float(related='computed_sgd_amount_untaxed', string='SGD Untaxed Amount', store=True, readonly=True)
+    sgd_amount_tax = fields.Float(related='computed_sgd_amount_tax', string='SGD GST', store=True, readonly=True)
+    sgd_amount_total = fields.Float(related='computed_sgd_amount_total', string='SGD Total', store=True, readonly=True)
+    sgd_exchange_rate = fields.Float(related='computed_sgd_exchange_rate', string='SGD Exchange Rate', store=True, readonly=True)
 
     def action_post(self):
         res = super(FlemingsSalesAccountMove, self).action_post()
@@ -495,3 +546,41 @@ class FlemingsStockPicking(models.Model):
                 raise UserError(_("%s") % qty_unavailable_error_msg)
 
         return res
+
+
+class FlemingsStockRoute(models.Model):
+    _inherit = 'stock.route'
+
+    is_buy_external = fields.Boolean('Buy - External', default=False, copy=False)
+    is_buy_internal = fields.Boolean('Buy - Internal', default=False, copy=False)
+    is_access_restrict = fields.Boolean('Access Restrict ?', default=False, copy=False)
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if not self._context.get('user_routes_selection', False):
+            is_buy_external = self.env.user.route_ids.filtered(lambda x: x.is_buy_external)
+            is_buy_internal = self.env.user.route_ids.filtered(lambda x: x.is_buy_internal)
+            if not is_buy_external:
+                args += [('is_buy_external', '=', False)]
+            if not is_buy_internal:
+                args += [('is_buy_internal', '=', False)]
+
+        return super(FlemingsStockRoute, self)._search(args, offset, limit, order, count=count, access_rights_uid=access_rights_uid)
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if not self._context.get('user_routes_selection', False):
+            is_buy_external = self.env.user.route_ids.filtered(lambda x: x.is_buy_external)
+            is_buy_internal = self.env.user.route_ids.filtered(lambda x: x.is_buy_internal)
+            if not is_buy_external:
+                domain += [('is_buy_external', '=', False)]
+            if not is_buy_internal:
+                domain += [('is_buy_internal', '=', False)]
+
+        return super(FlemingsStockRoute, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+
+
+class FlemingMrpProduction(models.Model):
+    _inherit = 'mrp.production'
+
+    remarks = fields.Text('Remarks')

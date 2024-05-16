@@ -79,6 +79,9 @@ class FlemingsResUsers(models.Model):
     fg_hr_group = fields.Boolean(string='HR')
     fg_admin_group = fields.Boolean(string='Admin')
 
+    route_ids = fields.Many2many('stock.route', string='Routes')
+    journal_ids = fields.Many2many('account.journal', string='Allowed Journals')
+
     @api.model
     def create(self, vals):
         res = super(FlemingsResUsers, self).create(vals)

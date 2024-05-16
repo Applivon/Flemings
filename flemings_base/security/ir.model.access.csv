@@ -23,3 +23,6 @@ access_flemings_purchase_price_report_wizard_group_all,access_flemings_purchase_
 access_fg_stock_low_scheduler_group_all,access_fg_stock_low_scheduler_group_all,flemings_base.model_fg_stock_low_scheduler,,1,1,1,1
 access_stock_quant_by_consolidation_group_all,access_stock_quant_by_consolidation_group_all,flemings_base.model_stock_quant_by_consolidation,,1,1,1,1
 ,,,,,,,
+access_pre_purchase_order_group_all,access_pre_purchase_order_group_all,flemings_base.model_pre_purchase_order,,1,1,1,1
+access_pre_purchase_order_line_group_all,access_pre_purchase_order_line_group_all,flemings_base.model_pre_purchase_order_line,,1,1,1,1
+,,,,,,,

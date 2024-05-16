@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+		<!-- Pre-RFQ -->
+		<record id="fg_pre_purchase_order_list_view" model="ir.ui.view">
+	        <field name="name">fg.pre.purchase.order.tree</field>
+	        <field name="model">pre.purchase.order</field>
+	        <field name="arch" type="xml">
+	            <tree string="Pre-RFQ" duplicate="0">
+	                <field name="create_date"/>
+					<field name="sale_id"/>
+					<field name="company_id"/>
+					<field name="currency_id" invisible="1"/>
+	                <field name="amount_untaxed"/>
+	                <field name="amount_tax"/>
+	                <field name="amount_total"/>
+	            </tree>
+	        </field>
+	    </record>
+
+		<record id="fg_pre_purchase_order_form_view" model="ir.ui.view">
+	        <field name="name">fg.pre.purchase.order.form</field>
+	        <field name="model">pre.purchase.order</field>
+	        <field name="arch" type="xml">
+	            <form string="Pre-RFQ" duplicate="0">
+					<header>
+						<button name="button_create_po" states="draft" string="Create PO" type="object"/>
+						<button name="button_cancel" states="draft,po_created" string="Cancel" type="object"/>
+						<field name="state" widget="statusbar" statusbar_visible="draft,po_created,cancel" readonly="1"/>
+					</header>
+	                <sheet>
+						<div class="oe_button_box" name="button_box">
+							<button type="object" name="action_view_pre_rfq_purchases" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible':[('purchase_count', '=', 0)]}">
+								<field name="purchase_count" widget="statinfo" string="Purchase(s)"/>
+								<field name="purchase_ids" invisible="1"/>
+							</button>
+						</div>
+						<group>
+							<group>
+								<field name="sale_id" required="1" options="{'no_create': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+							</group>
+							<group>
+								<field name="create_date" readonly="1" force_save="1"/>
+								<field name="currency_id" invisible="1"/>
+							</group>
+						</group>
+						<notebook>
+							<page string="Products" name="products">
+								<field name="order_line" context="{'default_state': 'draft'}" attrs="{'readonly': [('state', '!=', 'draft')]}">
+									<tree string="Order Lines" editable="bottom">
+										<field name="company_id" invisible="1"/>
+										<field name="currency_id" invisible="1"/>
+										<field name="partner_id" required="1" force_save="1" options="{'no_create': True}" context="{'pre_rfq_company_id': company_id}"/>
+										<field name="product_id" required="1" context="{'partner_id':partner_id, 'quantity':product_qty,'uom':product_uom, 'company_id': parent.company_id}" force_save="1" domain="[('purchase_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"/>
+										<field name="name" widget="section_and_note_text"/>
+										<field name="route_id" invisible="1"/>
+										<field name="product_uom_category_id" invisible="1"/>
+										<field name="product_qty"/>
+										<field name="product_uom" string="UoM" attrs="{'required': [('product_id', '!=', False)]}" force_save="1" optional="show"/>
+										<field name="price_unit"/>
+										<field name="taxes_id" widget="many2many_tags" domain="[('type_tax_use','=','purchase'), ('company_id', '=', parent.company_id)]" context="{'default_type_tax_use': 'purchase', 'search_view_ref': 'account.account_tax_view_search'}" options="{'no_create': True}" optional="show"/>
+										<field name="price_subtotal" widget="monetary"/>
+										<field name="price_total" invisible="1"/>
+										<field name="price_tax" invisible="1"/>
+									</tree>
+								</field>
+								<group>
+                                	<group>
+										<field colspan="2" name="notes" nolabel="1" placeholder="Define your terms and conditions ..."/>
+									</group>
+									<group class="oe_subtotal_footer oe_right">
+										<field name="tax_totals" widget="account-tax-totals-field" nolabel="1" colspan="2" readonly="1"/>
+									</group>
+								</group>
+								<div class="clearfix"/>
+							</page>
+							<page string="Other Information" name="other_info">
+								<group>
+									<group>
+										<field name="company_id" options="{'no_create': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+									</group>
+								</group>
+							</page>
+						</notebook>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids"/>
+						<field name="activity_ids"/>
+						<field name="message_ids"/>
+					</div>
+	            </form>
+	        </field>
+	    </record>
+
+		<record id="fg_pre_purchase_order_search_view" model="ir.ui.view">
+            <field name="name">fg.pre.purchase.order.search</field>
+            <field name="model">pre.purchase.order</field>
+            <field name="arch" type="xml">
+                <search string="Pre-RFQ">
+                    <field name="sale_id"/>
+                    <field name="company_id"/>
+                </search>
+            </field>
+        </record>
+
+	    <record id="fg_pre_purchase_order_action" model="ir.actions.act_window">
+	        <field name="name">Pre-RFQ</field>
+	        <field name="type">ir.actions.act_window</field>
+	        <field name="res_model">pre.purchase.order</field>
+			<field name="search_view_id" ref="fg_pre_purchase_order_search_view"/>
+            <field name="view_id" ref="fg_pre_purchase_order_list_view"/>
+	    </record>
+
+		<menuitem id="menu_fg_pre_purchase_order" parent="purchase.menu_procurement_management" action="fg_pre_purchase_order_action" sequence="-1"/>
+
+    </data>
+</odoo>

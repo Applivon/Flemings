@@ -12,7 +12,7 @@
     'company': 'Applivon',
     'website': 'https://www.applivon.com',
     'depends': ['base', 'base_setup', 'web', 'crm', 'sale', 'purchase', 'account', 'stock',
-                'l10n_sg', 'point_of_sale', 'delivery', 'report_xlsx'],
+                'l10n_sg', 'point_of_sale', 'delivery', 'report_xlsx', 'mrp'],
     'data': [
         # Data
         'data/data.xml',
@@ -24,6 +24,7 @@
         # Views
         'views/res_users_view.xml',
         'views/views.xml',
+        'views/purchase_view.xml',
         'views/stock_low_view.xml',
 
         # Wizard

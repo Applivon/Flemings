@@ -444,9 +444,16 @@
 			<field name="model">sale.order</field>
 			<field name="inherit_id" ref="sale.view_order_form"/>
 			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_shipping_id']" position="after">
+					<field name="manufacturing_order_ids" widget="many2many_tags" domain="[('state', '=', 'done')]" attrs="{'readonly': [('state', '!=', 'draft')]}" options="{'no_create':True}"/>
+                </xpath>
 				<xpath expr="//field[@name='payment_term_id']" position="after">
 					<field name="fg_purchase_order_no"/>
 					<field name="fg_remarks"/>
+					<field name="computed_delivery_order_names" invisible="1"/>
+					<field name="computed_customer_invoice_names" invisible="1"/>
+					<field name="delivery_order_names" invisible="not context.get('sale_orders_to_invoice')" attrs="{'invisible': [('delivery_order_names', '=', '')]}" readonly="1" force_save="1"/>
+					<field name="customer_invoice_names" invisible="not context.get('sale_orders_to_invoice')" attrs="{'invisible': [('customer_invoice_names', '=', '')]}" readonly="1" force_save="1"/>
                 </xpath>
 				<xpath expr="//group[@name='sales_person']/field[@name='user_id']" position="after">
 					<field name="customer_service_id" options="{'no_create':True}"/>
@@ -461,6 +468,26 @@
 			</field>
 		</record>
 
+		<!-- Sales Order - List View Inherit -->
+		<record id="fg_sale_order_sno_tree_view_inherit" model="ir.ui.view">
+			<field name="name">fg.sale.order.sno.tree.view.inherit</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_order_tree"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='company_id']" position="after">
+					<field name="computed_delivery_order_names" invisible="1"/>
+					<field name="computed_customer_invoice_names" invisible="1"/>
+					<field name="delivery_order_names" invisible="not context.get('sale_orders_to_invoice')"/>
+					<field name="customer_invoice_names" invisible="not context.get('sale_orders_to_invoice')"/>
+                </xpath>
+			</field>
+		</record>
+
+		<!-- Sales Order - Order to Invoice - Action View Inherit -->
+		<record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
+			<field name="context">{'create': False, 'sale_orders_to_invoice': True}</field>
+		</record>
+
         <!-- Stock Picking - Form View Inherit -->
 		<record id="fg_stock_picking_remarks_form_view_inherit" model="ir.ui.view">
 			<field name="name">fg.stock.picking.remarks.form.view.inherit</field>
@@ -471,6 +498,51 @@
 					<field name="fg_purchase_order_no"/>
 					<field name="process_by_id" options="{'no_create':True}"/>
 					<field name="fg_remarks"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Customer Invoice - Form View Inherit -->
+		<record id="fg_customer_invoice_sgd_equivalent_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.customer.invoice.sgd.equivalent.form.view.inherit</field>
+			<field name="model">account.move</field>
+			<field name="inherit_id" ref="account.view_move_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='narration']" position="before">
+					<separator string="SGD EQUIVALENT" invisible="context.get('default_move_type') != 'out_invoice'"/>
+					<field name="sgd_currency_id" invisible="1"/>
+					<field name="computed_sgd_amount_untaxed" invisible="1"/>
+					<field name="computed_sgd_amount_tax" invisible="1"/>
+					<field name="computed_sgd_amount_total" invisible="1"/>
+
+					<field name="sgd_amount_untaxed" string="Net Amount" widget="monetary" options="{'currency_field': 'sgd_currency_id'}" invisible="context.get('default_move_type') != 'out_invoice'"/>
+					<field name="sgd_amount_tax" string="GST" widget="monetary" options="{'currency_field': 'sgd_currency_id'}" invisible="context.get('default_move_type') != 'out_invoice'"/>
+					<field name="sgd_amount_total" string="Total" widget="monetary" options="{'currency_field': 'sgd_currency_id'}" invisible="context.get('default_move_type') != 'out_invoice'"/>
+					<field name="sgd_exchange_rate" string="Exchange Rate" digits="[12,12]" invisible="context.get('default_move_type') != 'out_invoice'"/>
+                </xpath>
+            </field>
+        </record>
+
+		<!-- Stock Routes - Form View Inherit -->
+		<record id="fg_stock_route_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.stock.route.form.view.inherit</field>
+			<field name="model">stock.route</field>
+			<field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='packaging_selectable']" position="after">
+					<field name="is_access_restrict"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Manufacturing Order - Form View Inherit -->
+		<record id="fg_mrp_production_remarks_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.mrp.production.remarks.form.view.inherit</field>
+			<field name="model">mrp.production</field>
+			<field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='move_raw_ids']" position="after">
+					<field name="remarks" placeholder="Enter Remarks Here ...."/>
                 </xpath>
             </field>
         </record>
