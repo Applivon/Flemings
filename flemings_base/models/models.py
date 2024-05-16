@@ -332,6 +332,22 @@ class FlemingsPurchaseOrder(models.Model):
 class FlemingsSalesAccountMove(models.Model):
     _inherit = 'account.move'
 
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if self._context.get('default_move_type', False) and self._context.get('default_move_type') == 'entry':
+            if not (self.env.user.has_group('flemings_base.fg_admin_group') or self.env.user.has_group('flemings_base.fg_finance_group')):
+                args += [('journal_id', 'in', self.env.user.journal_ids.ids or [])]
+
+        return super(FlemingsSalesAccountMove, self)._search(args, offset, limit, order, count=count, access_rights_uid=access_rights_uid)
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if self._context.get('default_move_type', False) and self._context.get('default_move_type') == 'entry':
+            if not (self.env.user.has_group('flemings_base.fg_admin_group') or self.env.user.has_group('flemings_base.fg_finance_group')):
+                domain += [('journal_id', 'in', self.env.user.journal_ids.ids or [])]
+
+        return super(FlemingsSalesAccountMove, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+
     @api.depends('amount_untaxed', 'amount_tax', 'amount_total', 'currency_id', 'invoice_line_ids.price_total')
     def _compute_sgd_equivalent_amount(self):
         for record in self:
@@ -447,6 +463,25 @@ class FlemingsSalesAccountMove(models.Model):
                             'price_unit': line.price_unit
                         })
 
+
+class FlemingsSalesAccountMoveLines(models.Model):
+    _inherit = 'account.move.line'
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if self._context.get('journal_type', False) and self._context.get('journal_type') == 'general':
+            if not (self.env.user.has_group('flemings_base.fg_admin_group') or self.env.user.has_group('flemings_base.fg_finance_group')):
+                args += [('journal_id', 'in', self.env.user.journal_ids.ids or [])]
+
+        return super(FlemingsSalesAccountMoveLines, self)._search(args, offset, limit, order, count=count, access_rights_uid=access_rights_uid)
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if self._context.get('journal_type', False) and self._context.get('journal_type') == 'general':
+            if not (self.env.user.has_group('flemings_base.fg_admin_group') or self.env.user.has_group('flemings_base.fg_finance_group')):
+                domain += [('journal_id', 'in', self.env.user.journal_ids.ids or [])]
+
+        return super(FlemingsSalesAccountMoveLines, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
 class FlemingsProductTemplate(models.Model):
     _inherit = 'product.template'
