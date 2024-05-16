@@ -280,7 +280,7 @@ class FlemingsSalesOrder(models.Model):
                     if exist_price_book.price_unit != line.price_unit:
                         exist_price_book.write({
                             'sale_order_id': record.id,
-                            'sale_order_number': record.nme,
+                            'sale_order_number': record.name,
                             'invoice_id': 0,
                             'invoice_number': False,
                             'product_sku': line.product_id.default_code,
@@ -320,7 +320,7 @@ class FlemingsPurchaseOrder(models.Model):
                     if exist_price_book.price_unit != line.price_unit:
                         exist_price_book.write({
                             'purchase_order_id': record.id,
-                            'purchase_order_number': record.nme,
+                            'purchase_order_number': record.name,
                             'bill_id': 0,
                             'bill_number': False,
                             'product_sku': line.product_id.default_code,
