@@ -12,7 +12,7 @@
     'company': 'Applivon',
     'website': 'https://www.applivon.com',
     'depends': ['base', 'base_setup', 'web', 'crm', 'sale', 'purchase', 'account', 'stock',
-                'l10n_sg', 'point_of_sale', 'delivery', 'report_xlsx', 'mrp'],
+                'l10n_sg', 'point_of_sale', 'delivery', 'report_xlsx', 'mrp', 'sale_stock'],
     'data': [
         # Data
         'data/data.xml',

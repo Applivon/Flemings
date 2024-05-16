@@ -468,6 +468,17 @@
 			</field>
 		</record>
 
+		<record id="fg_view_order_form_inherit_sale_stock" model="ir.ui.view">
+            <field name="name">fg.sale.order.form.sale.stock</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree//field[@name='route_id']" position="attributes">
+					<attribute name="optional">show</attribute>
+                </xpath>
+           </field>
+        </record>
+
 		<!-- Sales Order - List View Inherit -->
 		<record id="fg_sale_order_sno_tree_view_inherit" model="ir.ui.view">
 			<field name="name">fg.sale.order.sno.tree.view.inherit</field>
@@ -519,6 +530,7 @@
 					<field name="sgd_amount_tax" string="GST" widget="monetary" options="{'currency_field': 'sgd_currency_id'}" invisible="context.get('default_move_type') != 'out_invoice'"/>
 					<field name="sgd_amount_total" string="Total" widget="monetary" options="{'currency_field': 'sgd_currency_id'}" invisible="context.get('default_move_type') != 'out_invoice'"/>
 					<field name="sgd_exchange_rate" string="Exchange Rate" digits="[12,12]" invisible="context.get('default_move_type') != 'out_invoice'"/>
+					<separator invisible="context.get('default_move_type') != 'out_invoice'"/>
                 </xpath>
             </field>
         </record>
