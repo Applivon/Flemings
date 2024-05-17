@@ -114,5 +114,17 @@
 
 		<menuitem id="menu_fg_pre_purchase_order" parent="purchase.menu_procurement_management" action="fg_pre_purchase_order_action" sequence="-1"/>
 
+		<!-- Purchase Ordr - Form View Inherit -->
+		<record id="fg_purchase_order_pre_rfq_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.purchase.order.pre.rfq.form.view.inherit</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.purchase_order_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='currency_id']" position="after">
+					<field name="pre_rfq_id" readonly="1" force_save="1" options="{'no_create':True}"/>
+				</xpath>
+			</field>
+		</record>
+
     </data>
 </odoo>

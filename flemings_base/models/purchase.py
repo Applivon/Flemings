@@ -69,6 +69,25 @@ class FlemingsPurchaseOrder(models.Model):
 
     pre_rfq_id = fields.Many2one('pre.purchase.order', string='Pre-RFQ')
 
+    def _prepare_sale_order_data(self, name, partner, company, direct_delivery_address):
+        """ Update sale order value."""
+        sale_order_data = super(FlemingsPurchaseOrder, self)._prepare_sale_order_data(name, partner, company, direct_delivery_address)
+        if sale_order_data and self and self.pre_rfq_id and self.pre_rfq_id.sale_id:
+            sale_order_data.update({
+                'origin_so_no': self.pre_rfq_id.sale_id.name,
+            })
+        return sale_order_data
+
+    @api.model
+    def _prepare_sale_order_line_data(self, line, company):
+        """ Update sale order line value."""
+        sale_order_line_data = super(FlemingsPurchaseOrder, self)._prepare_sale_order_line_data(line, company)
+        if sale_order_line_data and self and self.pre_rfq_id and self.pre_rfq_id.sale_id:
+            sale_order_line_data.update({
+                'route_id': self.env['stock.route'].sudo().search([('name', '=', 'Manufacture')], limit=1).id or False,
+            })
+        return sale_order_line_data
+
 
 class FlemingPrePurchaseOrder(models.Model):
     _name = 'pre.purchase.order'

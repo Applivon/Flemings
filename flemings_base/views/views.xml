@@ -444,6 +444,12 @@
 			<field name="model">sale.order</field>
 			<field name="inherit_id" ref="sale.view_order_form"/>
 			<field name="arch" type="xml">
+				<xpath expr="//button[@name='action_confirm'][1]" position="attributes">
+					<attribute name="context">{'validate_analytic': True, 'origin_so_no': origin_so_no}</attribute>
+                </xpath>
+				<xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+					<attribute name="context">{'validate_analytic': True, 'origin_so_no': origin_so_no}</attribute>
+                </xpath>
 				<xpath expr="//field[@name='partner_shipping_id']" position="after">
 					<field name="manufacturing_order_ids" widget="many2many_tags" domain="[('state', '=', 'done')]" attrs="{'readonly': [('state', '!=', 'draft')]}" options="{'no_create':True}"/>
                 </xpath>
@@ -460,6 +466,7 @@
 					<field name="delivery_mode_id" options="{'no_create':True}"/>
                 </xpath>
 				<xpath expr="//field[@name='partner_shipping_id']" position="after">
+					<field name="origin_so_no" readonly="1" force_save="1"/>
 					<field name="generate_fg_sno"/>
                 </xpath>
 				<xpath expr="//field[@name='order_line']/tree/field[@name='sequence']" position="before">
@@ -553,6 +560,9 @@
 			<field name="model">mrp.production</field>
 			<field name="inherit_id" ref="mrp.mrp_production_form_view"/>
 			<field name="arch" type="xml">
+				<xpath expr="//field[@name='move_finished_ids']" position="after">
+					<field name="origin_so_no" readonly="1" force_save="1"/>
+                </xpath>
 				<xpath expr="//field[@name='move_raw_ids']" position="after">
 					<field name="remarks" placeholder="Enter Remarks Here ...."/>
                 </xpath>

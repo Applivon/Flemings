@@ -198,6 +198,7 @@ class FlemingsSalesOrder(models.Model):
     delivery_order_names = fields.Text(related='computed_delivery_order_names', string='Delivery Order', store=True, readonly=True)
     customer_invoice_names = fields.Text(related='computed_customer_invoice_names', string='Customer Invoice', store=True, readonly=True)
 
+    origin_so_no = fields.Char('Origin SO No.')
     generate_fg_sno = fields.Boolean('Generate S.No.', default=True, copy=False)
     manufacturing_order_ids = fields.Many2many('mrp.production', string='Manufacturing Order(s)')
 
@@ -619,3 +620,13 @@ class FlemingMrpProduction(models.Model):
     _inherit = 'mrp.production'
 
     remarks = fields.Text('Remarks')
+    origin_so_no = fields.Char('Origin SO No.')
+
+    @api.model
+    def create(self, vals):
+        res = super(FlemingMrpProduction, self).create(vals)
+        for record in res:
+            if self._context and self._context.get('origin_so_no', False):
+                record.origin_so_no = self._context.get('origin_so_no')
+
+        return res
