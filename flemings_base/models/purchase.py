@@ -96,6 +96,24 @@ class FlemingPrePurchaseOrder(models.Model):
     _order = 'create_date desc'
     _rec_name = 'sale_id'
 
+    @api.model
+    def create(self, vals):
+        res = super(FlemingPrePurchaseOrder, self).create(vals)
+        for record in res:
+            record.partner_ids = [(6, 0, record.order_line.mapped('partner_id').ids or [])]
+
+        return res
+
+    def write(self, vals):
+        res = super(FlemingPrePurchaseOrder, self).write(vals)
+        for record in self:
+            if 'order_line' in vals:
+                record.partner_ids = [(6, 0, record.order_line.mapped('partner_id').ids or [])]
+
+        return res
+
+    partner_ids = fields.Many2many('res.partner', string='Vendors')
+
     create_date = fields.Datetime('Date & Time')
     company_id = fields.Many2one('res.company', 'Company', required=True, index=True, default=lambda self: self.env.company.id)
     sale_id = fields.Many2one('sale.order', string='Sale Order')
@@ -105,47 +123,12 @@ class FlemingPrePurchaseOrder(models.Model):
     purchase_ids = fields.One2many('purchase.order', 'pre_rfq_id', string='Purchase(s)')
     purchase_count = fields.Integer('Purchase Count', compute='_compute_purchase_count')
 
-    currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=lambda self: self.env.company.currency_id.id)
-    amount_untaxed = fields.Monetary(string='Untaxed Amount', store=True, readonly=True, compute='_amount_all', tracking=True)
-    tax_totals = fields.Binary(compute='_compute_tax_totals', exportable=False)
-    amount_tax = fields.Monetary(string='Taxes', store=True, readonly=True, compute='_amount_all')
-    amount_total = fields.Monetary(string='Total', store=True, readonly=True, compute='_amount_all')
     state = fields.Selection([('draft', 'RFQ'), ('po_created', 'PO Created'), ('cancel', 'Cancelled')], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
 
     @api.depends('purchase_ids')
     def _compute_purchase_count(self):
         for record in self:
             record.purchase_count = len(record.purchase_ids) or 0
-
-    @api.depends('order_line.price_total')
-    def _amount_all(self):
-        for order in self:
-            order_lines = order.order_line
-
-            if order.company_id.tax_calculation_rounding_method == 'round_globally':
-                tax_results = self.env['account.tax']._compute_taxes([
-                    line._convert_to_tax_base_line_dict()
-                    for line in order_lines
-                ])
-                totals = tax_results['totals']
-                amount_untaxed = totals.get(order.currency_id, {}).get('amount_untaxed', 0.0)
-                amount_tax = totals.get(order.currency_id, {}).get('amount_tax', 0.0)
-            else:
-                amount_untaxed = sum(order_lines.mapped('price_subtotal'))
-                amount_tax = sum(order_lines.mapped('price_tax'))
-
-            order.amount_untaxed = amount_untaxed
-            order.amount_tax = amount_tax
-            order.amount_total = order.amount_untaxed + order.amount_tax
-
-    @api.depends('order_line.taxes_id', 'order_line.price_subtotal', 'amount_total', 'amount_untaxed')
-    def _compute_tax_totals(self):
-        for order in self:
-            order_lines = order.order_line
-            order.tax_totals = self.env['account.tax']._prepare_tax_totals(
-                [x._convert_to_tax_base_line_dict() for x in order_lines],
-                order.currency_id or order.company_id.currency_id,
-            )
 
     def action_view_pre_rfq_purchases(self):
         result = self.env['ir.actions.act_window']._for_xml_id('purchase.purchase_form_action')
@@ -178,6 +161,7 @@ class FlemingPrePurchaseOrder(models.Model):
             for partner_id in vendors_list:
                 to_create_po_lines = record.order_line.filtered(lambda x: x.partner_id and x.partner_id == partner_id)
                 order_line = []
+                currency_id = False
                 for line_id in to_create_po_lines:
                     order_line += [(0, 0, {
                         'product_id': line_id.product_id.id,
@@ -187,11 +171,13 @@ class FlemingPrePurchaseOrder(models.Model):
                         'price_unit': line_id.price_unit,
                         'taxes_id': [(6, 0, line_id.taxes_id.ids or [])],
                     })]
+                    currency_id = line_id.currency_id
                 if order_line:
                     self.env['purchase.order'].create({
                         'pre_rfq_id': record.id,
                         'partner_id': partner_id.id,
                         'company_id': record.company_id.id,
+                        'currency_id': currency_id.id,
                         'order_line': order_line,
                     })
             record.state = 'po_created'
@@ -220,10 +206,14 @@ class FlemingPrePurchaseOrderLines(models.Model):
     price_unit = fields.Float(string='Unit Price', required=True, digits='Product Price')
     taxes_id = fields.Many2many('account.tax', string='Taxes', domain=['|', ('active', '=', False), ('active', '=', True)])
 
-    currency_id = fields.Many2one(related='order_id.currency_id', store=True, string='Currency', readonly=True)
+    currency_id = fields.Many2one('res.currency', store=True, string='Currency', required=True, default=lambda self: self.env.company.currency_id.id)
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Subtotal', store=True)
     price_total = fields.Monetary(compute='_compute_amount', string='Total', store=True)
     price_tax = fields.Float(compute='_compute_amount', string='Tax', store=True)
+
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        self.currency_id = self.partner_id.property_product_pricelist.currency_id.id or False
 
     @api.depends('product_qty', 'price_unit', 'taxes_id')
     def _compute_amount(self):
@@ -249,7 +239,7 @@ class FlemingPrePurchaseOrderLines(models.Model):
         return self.env['account.tax']._convert_to_tax_base_line_dict(
             self,
             partner=self.partner_id,
-            currency=self.order_id.currency_id,
+            currency=self.currency_id,
             product=self.product_id,
             taxes=self.taxes_id,
             price_unit=self.price_unit,

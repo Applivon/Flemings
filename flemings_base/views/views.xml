@@ -458,6 +458,8 @@
 					<field name="fg_remarks"/>
 					<field name="computed_delivery_order_names" invisible="1"/>
 					<field name="computed_customer_invoice_names" invisible="1"/>
+					<field name="computed_is_partial_delivery_done" invisible="1"/>
+					<field name="is_partial_delivery_done" invisible="0"/>
 					<field name="delivery_order_names" invisible="not context.get('sale_orders_to_invoice')" attrs="{'invisible': [('delivery_order_names', '=', '')]}" readonly="1" force_save="1"/>
 					<field name="customer_invoice_names" invisible="not context.get('sale_orders_to_invoice')" attrs="{'invisible': [('customer_invoice_names', '=', '')]}" readonly="1" force_save="1"/>
                 </xpath>
@@ -503,6 +505,7 @@
 
 		<!-- Sales Order - Order to Invoice - Action View Inherit -->
 		<record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
+			<field name="domain">[('invoice_status','=','to invoice'), ('is_partial_delivery_done', '=', True)]</field>
 			<field name="context">{'create': False, 'sale_orders_to_invoice': True}</field>
 		</record>
 
