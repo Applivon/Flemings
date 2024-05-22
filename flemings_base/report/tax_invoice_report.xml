@@ -3,7 +3,7 @@
     <data>
 
         <!-- Tax Invoice Report -->
-        <template id="report_fg_tax_invoice_doc">
+        <template id="report_fg_tax_invoice">
             <t t-if="o and 'company_id' in o">
                 <t t-set="company" t-value="o.company_id.sudo()"/>
             </t>
@@ -38,7 +38,7 @@
                     <thead>
                         <tr>
                             <td style="width:25%; text-align:left; padding-left:6px;">
-                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="width:200px; float:left !important"/>
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
                             </td>
                             <td style="width:50%; text-align:left;">
                                 <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
@@ -80,7 +80,7 @@
                                 </div>
                             </td>
                             <td style="width:25%; text-align:right; padding-right:6px;">
-                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="width:200px; float:left !important"/>
+                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
                             </td>
                             </tr>
                         <tr>
@@ -222,7 +222,7 @@
                     </thead>
                 </table>
 
-                <div class="last-page" style="position: absolute; top: 1160px; width: 96%; font-size: 8pt;">
+                <div class="last-page" style="position: absolute; top: 940px; width: 96%; font-size: 8pt;">
                     <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                         <tr>
                             <td  style="float:left; width:32%; text-align:center;">
@@ -447,7 +447,7 @@
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                 	<div class="article"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
-	                    <t t-call="flemings_base.report_fg_tax_invoice_doc" t-lang="lang"/>
+	                    <t t-call="flemings_base.report_fg_tax_invoice" t-lang="lang"/>
                 	</div>
                 </t>
             </t>
@@ -480,294 +480,6 @@
             <field name="paperformat_id" ref="paperformat_fg_tax_invoice_report"/>
             <field name="print_report_name">'Tax Invoice - %s' % (object.name or '').replace('/','_')</field>
         </record>
-
-        <!-- Tax Invoice Report - Header Layout -->
-        <template id="report_fg_tax_invoice_custom_header_layout">
-            <div class="header">
-                <style>
-                    td {word-break: break-word !important; word-spacing: 3px !important; padding:3px; page-break-inside: avoid !important;}
-
-                    .non-border, .non-border > tr, .non-border > tr > td {
-                        border: none !important; border-color: #ffffff !important;
-                    }
-                </style>
-
-                <t t-if="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))">
-                    <t t-set="contact_customer" t-value="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))[0]"/>
-                </t>
-                <t t-else="1">
-                    <t t-set="contact_customer" t-value="o.partner_id"/>
-                </t>
-
-                <t t-if="o.partner_shipping_id">
-                    <t t-set="delivery_customer" t-value="o.partner_shipping_id"/>
-                </t>
-                <t t-else="1">
-                    <t t-set="delivery_customer" t-value="o.partner_id"/>
-                </t>
-
-                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
-                    <thead>
-                        <tr>
-                            <td style="width:25%; text-align:left; padding-left:6px;">
-                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="width:200px; float:left !important"/>
-                            </td>
-                            <td style="width:50%; text-align:left;">
-                                <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
-                                    <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:14pt; font-weight:bold; padding-right:4px;"/>
-                                    <p style="margin-bottom:0px; padding-top:0px; text-align:left">
-                                        <span t-if="company.street or company.street2">
-                                            <br/>
-                                            <span t-if="company.street">
-                                                <span t-field="company.street"/>
-                                            </span>
-                                            <span t-if="company.street2">,
-                                                <span t-field="company.street2"/>
-                                            </span>
-                                            <br/>
-                                        </span>
-
-                                        <span t-if="company.country_id">
-                                            <span t-field="company.country_id.name"/>
-                                        </span>
-                                        <span t-if="company.zip">
-                                            ,
-                                            <span t-field="company.zip"/>
-                                        </span>
-                                        <span t-if="company.phone">Tel:
-                                            <span t-field="company.phone"/>
-                                        </span>
-                                        <span t-if="company.vat">Fax:
-                                            <span t-field="company.fax"/>
-                                        </span>
-                                        <br/>
-
-                                        <span t-if="company.email">Email:
-                                            <span t-field="company.email"/>
-                                        </span>
-                                        <span t-if="company.website">
-                                            <span t-field="company.website"/>
-                                        </span>
-                                    </p>
-                                </div>
-                            </td>
-                            <td style="width:25%; text-align:right; padding-right:6px;">
-                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="width:200px; float:left !important"/>
-                            </td>
-                            </tr>
-                        <tr>
-                            <td colspan="3" style="width:100%; padding:3px;">
-                                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
-                                    <tr style="height:6px;"/>
-                                    <tr>
-                                        <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
-                                                <tr>
-                                                    <td>Bill To: </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span t-field="o.partner_id"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span t-field="o.partner_id.street"/></td>
-                                                </tr>
-                                                <t t-if="o.partner_id.street2">
-                                                    <tr>
-                                                        <td><span t-field="o.partner_id.street2"/></td>
-                                                    </tr>
-                                                </t>
-                                                <t t-if="o.partner_id.country_id and o.partner_id.country_id.code != 'SG'">
-                                                    <td>
-                                                        <span t-field="o.partner_id.city"/>
-                                                        <t t-if="o.partner_id.city and o.partner_id.state_id">,&#160;</t>
-                                                        <span t-field="o.partner_id.state_id"/>
-                                                    </td>
-                                                </t>
-                                                <tr>
-                                                    <td><span t-field="o.partner_id.country_id"/> <span t-field="o.partner_id.zip"/></td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                        <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
-                                                <tr>
-                                                    <td>Deliver To: </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span t-esc="delivery_customer.name"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span t-field="delivery_customer.street"/></td>
-                                                </tr>
-                                                <t t-if="delivery_customer.street2">
-                                                    <tr>
-                                                        <td><span t-field="delivery_customer.street2"/></td>
-                                                    </tr>
-                                                </t>
-                                                <t t-if="delivery_customer.country_id and delivery_customer.country_id.code != 'SG'">
-                                                    <td>
-                                                        <span t-field="delivery_customer.city"/>
-                                                        <t t-if="delivery_customer.city and delivery_customer.state_id">,&#160;</t>
-                                                        <span t-field="delivery_customer.state_id"/>
-                                                    </td>
-                                                </t>
-                                                <tr>
-                                                    <td><span t-field="delivery_customer.country_id"/> <span t-field="delivery_customer.zip"/></td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                        <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
-                                                <tr>
-                                                    <td colspan="2" style="width:100%; text-align:center; font-size:17pt;"><strong>TAX INVOICE</strong></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Co Reg. No.</td>
-                                                    <td style="width:54%;">: <span t-field="company.l10n_sg_unique_entity_number"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">GST Reg. No.</td>
-                                                    <td style="width:54%;">: <span t-field="company.vat"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Invoice No.</td>
-                                                    <td style="width:54%;">: <span t-field="o.name"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Date</td>
-                                                    <td style="width:54%;">: <span t-field="o.invoice_date" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Due Date</td>
-                                                    <td style="width:54%;">: <span t-field="o.invoice_date_due" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Currency</td>
-                                                    <td style="width:54%;">: <span t-field="o.currency_id"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Payment Term</td>
-                                                    <td style="width:54%;">: <span t-field="o.invoice_payment_term_id"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Salesperson</td>
-                                                    <td style="width:54%;">: <span t-field="o.user_id"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Purchase Order No.</td>
-                                                    <td style="width:54%;">: <span t-field="o.fg_purchase_order_no"/></td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
-                                            ATTN :
-                                            <t t-if="contact_customer">
-                                                <span t-if="contact_customer.title" t-esc="contact_customer.title.name"/> <span t-esc="contact_customer.name"/>
-                                            </t>
-                                        </td>
-                                        <td rowspan="3" style="width:36%; text-align:left;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
-                                                <tr>
-                                                    <td style="width:46%;">Country</td>
-                                                    <td style="width:54%;">: <span t-field="o.partner_id.country_id"/></td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
-                                            Tel: <span t-field="contact_customer.phone"/>
-                                            Fax: <span t-field="contact_customer.fax"/>
-                                            Mob: <span t-field="contact_customer.mobile"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
-                                            Email: <span t-field="contact_customer.email"/>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </thead>
-                </table>
-
-                <div class="last-page" style="position: absolute; top: 1160px; width: 96%; font-size: 8pt;">
-                    <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
-                        <tr>
-                            <td  style="float:left; width:32%; text-align:center;">
-                                <strong>Received By</strong>
-                            </td>
-                            <td style="float:left; width:4%; text-align:center;"/>
-                            <td style="float:left; width:28%; text-align:center;">
-                                <strong>Date</strong>
-                            </td>
-                            <td style="float:left; width:4%; text-align:center;"/>
-                            <td style="float:right; width:32%; text-align:center;">
-                                <strong>Authorisation</strong>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="float:left; width:32%; margin-top:100px; border-bottom: 1px solid black;"/>
-                            <td style="float:left; width:4%; margin-top:100px; text-align:center;"/>
-                            <td style="float:left; width:28%; margin-top:100px; border-bottom: 1px solid black;"/>
-                            <td style="float:left; width:4%; margin-top:100px; text-align:center;"/>
-                            <td style="float:left; width:32%; margin-top:100px; border-bottom: 1px solid black;"/>
-                        </tr>
-                        <tr>
-                            <td colspan="4" style="float:left; width:68%; margin-top:10px;"/>
-                            <td style="float:left; width:32%; margin-top:10px; text-align:center;">
-                                for <span t-esc="company.name"/>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </template>
-
-		<!-- Tax Invoice Report - Footer Layout	-->
-		<template id="report_fg_tax_invoice_custom_footer_layout">
-            <div class="footer">
-                <style>
-                    td {word-break: break-word !important; word-spacing: 3px !important; page-break-inside: avoid !important;}
-
-                    .non-border, .non-border > tr, .non-border > tr > td {
-                        border: none !important; border-color: #ffffff !important;
-                    }
-                </style>
-
-                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
-                    <thead>
-                        <tr>
-                            <td style="width:66%; text-align:left; border-top:1px solid black; vertical-align:middle !important;">
-                                Print By: <span t-esc="user.name"/> /
-                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%y %I:%M:%S %p')"/>
-                            </td>
-                            <td style="width:34%; text-align:right; border-top:1px solid black; vertical-align:middle !important;">
-                                Page <span class="page"/> of <span class="topage"/>
-                            </td>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </template>
-
-		<!-- Tax Invoice Report - Layout Call -->
-		<template id="report_fg_tax_invoice_custom_layout">
-            <t t-if="o and 'company_id' in o">
-                <t t-set="company" t-value="o.company_id.sudo()"/>
-            </t>
-            <t t-if="not o or not 'company_id' in o">
-                <t t-set="company" t-value="res_company"/>
-            </t>
-            <div class="article">
-                <t t-call="flemings_base.report_fg_tax_invoice_custom_header_layout"/>
-                <t t-out="0"/>
-                <t t-call="flemings_base.report_fg_tax_invoice_custom_footer_layout"/>
-            </div>
-        </template>
 
     </data>
 </odoo>
