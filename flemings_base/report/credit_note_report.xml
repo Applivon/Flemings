@@ -3,7 +3,7 @@
     <data>
 
         <!-- Credit Note Report -->
-        <template id="report_fg_credit_note_doc">
+        <template id="report_fg_credit_note">
             <t t-if="o and 'company_id' in o">
                 <t t-set="company" t-value="o.company_id.sudo()"/>
             </t>
@@ -182,7 +182,7 @@
                     </thead>
                 </table>
 
-                <div class="last-page" style="position: absolute; top: 1160px; width: 96%; font-size: 8pt;">
+                <div class="last-page" style="position: absolute; top: 940px; width: 96%; font-size: 8pt;">
                     <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                         <tr>
                             <td  style="float:left; width:32%; text-align:center;">
@@ -398,7 +398,7 @@
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                 	<div class="article"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
-	                    <t t-call="flemings_base.report_fg_credit_note_doc" t-lang="lang"/>
+	                    <t t-call="flemings_base.report_fg_credit_note" t-lang="lang"/>
                 	</div>
                 </t>
             </t>
@@ -420,7 +420,7 @@
             <field name="dpi">80</field>
         </record>
 
-        <record id="report_fg_credit_note" model="ir.actions.report">
+        <record id="print_report_fg_credit_note" model="ir.actions.report">
             <field name="name">Credit Note</field>
             <field name="model">account.move</field>
             <field name="report_type">qweb-pdf</field>
