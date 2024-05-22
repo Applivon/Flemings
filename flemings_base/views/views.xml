@@ -351,6 +351,14 @@
 				<xpath expr="//field[@name='email']" position="before">
 					<field name="fax"/>
 				</xpath>
+				<xpath expr="//page[@name='general_info']" position="after">
+                	<page name="other_info" string="Other Info">
+                		<group>
+                			<field name="sgs_img" widget="image"/>
+                			<field name="paynow_img" widget="image"/>
+                		</group>
+                	</page>
+                </xpath>
 			</field>
 		</record>
 
@@ -459,7 +467,7 @@
 					<field name="computed_delivery_order_names" invisible="1"/>
 					<field name="computed_customer_invoice_names" invisible="1"/>
 					<field name="computed_is_partial_delivery_done" invisible="1"/>
-					<field name="is_partial_delivery_done" invisible="0"/>
+					<field name="is_partial_delivery_done" invisible="1"/>
 					<field name="delivery_order_names" invisible="not context.get('sale_orders_to_invoice')" attrs="{'invisible': [('delivery_order_names', '=', '')]}" readonly="1" force_save="1"/>
 					<field name="customer_invoice_names" invisible="not context.get('sale_orders_to_invoice')" attrs="{'invisible': [('customer_invoice_names', '=', '')]}" readonly="1" force_save="1"/>
                 </xpath>
@@ -529,6 +537,14 @@
 			<field name="model">account.move</field>
 			<field name="inherit_id" ref="account.view_move_form"/>
 			<field name="arch" type="xml">
+				<xpath expr="//div[@name='journal_div']" position="after">
+					<field name="sale_id" options="{'no_create':True}" invisible="1"/>
+					<field name="fg_purchase_order_no"/>
+					<field name="fg_remarks"/>
+                </xpath>
+				<xpath expr="//field[@name='invoice_user_id']" position="after">
+					<field name="delivery_mode_id" options="{'no_create':True}"/>
+                </xpath>
 				<xpath expr="//field[@name='narration']" position="before">
 					<separator string="SGD EQUIVALENT" invisible="context.get('default_move_type') != 'out_invoice'"/>
 					<field name="sgd_currency_id" invisible="1"/>
@@ -571,6 +587,19 @@
                 </xpath>
             </field>
         </record>
+
+		<!-- Account Payments - Form View -->
+		<record id="fg_account_payment_order_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.account.payment.order.form.view.inherit</field>
+			<field name="model">account.payment</field>
+			<field name="inherit_id" ref="account.view_account_payment_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='destination_journal_id']" position="after">
+					<field name="sale_ids" widget="many2many_tags" options="{'no_create':True}" invisible="0"/>
+					<field name="sale_id" options="{'no_create':True}" domain="[('id', 'in', sale_ids)]" attrs="{'invisible':[('payment_type', '!=', 'inbound')], 'readonly':[('state', '!=', 'draft')]}"/>
+				</xpath>
+			</field>
+		</record>
 
 		<!-- Configuration - Item Category -->
 		<record id="fg_item_category_list_view" model="ir.ui.view">

@@ -100,6 +100,8 @@ class FlemingsResCompany(models.Model):
     _inherit = 'res.company'
 
     fax = fields.Char(related='partner_id.fax', string='Fax', readonly=False)
+    sgs_img = fields.Binary('SGS Image')
+    paynow_img = fields.Binary('Paynow Image')
 
 
 class FlemingsCustomerPriceBook(models.Model):
@@ -249,6 +251,16 @@ class FlemingsSalesOrder(models.Model):
     delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
     fg_remarks = fields.Text('Remarks')
 
+    def _prepare_invoice(self):
+        res = super(FlemingsSalesOrder, self)._prepare_invoice()
+        res.update({
+            'sale_id': self.id,
+            'delivery_mode_id': self.delivery_mode_id.id or False,
+            'fg_purchase_order_no': self.fg_purchase_order_no,
+            'fg_remarks': self.fg_remarks
+        })
+        return res
+
     def action_confirm(self):
         res = super(FlemingsSalesOrder, self).action_confirm()
         for order in self:
@@ -372,6 +384,26 @@ class FlemingsSalesAccountMove(models.Model):
     sgd_amount_tax = fields.Float(related='computed_sgd_amount_tax', string='SGD GST', store=True, readonly=True)
     sgd_amount_total = fields.Float(related='computed_sgd_amount_total', string='SGD Total', store=True, readonly=True)
     sgd_exchange_rate = fields.Float(related='computed_sgd_exchange_rate', string='SGD Exchange Rate', store=True, readonly=True)
+
+    sale_id = fields.Many2one('sale.order', string='Sales Order No.')
+    delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
+    fg_purchase_order_no = fields.Char('Purchase Order No.')
+    fg_remarks = fields.Text('Remarks')
+
+    @api.model
+    def get_views(self, views, options=None):
+        res = super(FlemingsSalesAccountMove, self).get_views(views, options)
+        for view_type in ('list', 'form'):
+            if res['views'].get(view_type, {}).get('toolbar'):
+                credit_note_report_id = self.env.ref('flemings_base.report_fg_credit_note').id
+
+                if self._context and self._context.get('default_move_type') and self._context.get('default_move_type') == 'out_refund':
+                    print = [rec for rec in res['views'][view_type]['toolbar']['print'] if rec.get('id', False) == credit_note_report_id]
+                else:
+                    print = [rec for rec in res['views'][view_type]['toolbar']['print'] if rec.get('id', False) != credit_note_report_id]
+
+                res['views'][view_type]['toolbar'] = {'print': print}
+        return res
 
     def action_post(self):
         res = super(FlemingsSalesAccountMove, self).action_post()
@@ -633,3 +665,20 @@ class FlemingMrpProduction(models.Model):
                 record.origin_so_no = self._context.get('origin_so_no')
 
         return res
+
+
+class FlemingAccountPayment(models.Model):
+    _inherit = 'account.payment'
+
+    @api.depends('payment_type', 'partner_id')
+    def _compute_payment_sale_ids(self):
+        for record in self:
+            sale_ids = []
+            if record.partner_id and record.payment_type == 'inbound':
+                sale_ids = self.env['account.move'].sudo().search(
+                    [('partner_id', '=', record.partner_id.id), ('move_type', '=', 'out_invoice'), ('amount_residual', '>', 0)]
+                ).mapped('line_ids').mapped('sale_line_ids').mapped('order_id').ids
+            record.sale_ids = [(6, 0, sale_ids or [])]
+
+    sale_ids = fields.Many2many('sale.order', string='Sales Order(s)', compute='_compute_payment_sale_ids')
+    sale_id = fields.Many2one('sale.order', string='Sales Order')

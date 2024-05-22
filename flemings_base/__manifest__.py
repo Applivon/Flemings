@@ -33,6 +33,8 @@
         # Report
         'report/base_report.xml',
         'report/sales_order_report.xml',
+        'report/tax_invoice_report.xml',
+        'report/credit_note_report.xml',
         'report/delivery_order_report.xml',
 
     ],
