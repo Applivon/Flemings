@@ -3,199 +3,14 @@
     <data>
 
         <!-- Credit Note Report -->
-        <template id="report_fg_credit_note_document">
-            <t t-call="web.html_container">
-                <t t-foreach="docs" t-as="o">
-                    <t t-call="flemings_base.report_fg_credit_note_custom_layout">
-                        <div class="page" style="font-family:sans-serif !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
-
-                            <style>
-                                td {word-break: break-word !important; word-spacing: 3px !important; padding:5px; page-break-inside: avoid !important;}
-
-                                .non-border, .non-border > tr, .non-border > tr > td {
-                                    border: none !important; border-color: #ffffff !important;
-                                }
-                            </style>
-
-                            <t t-if="o and 'company_id' in o">
-                                <t t-set="company" t-value="o.company_id.sudo()"/>
-                            </t>
-                            <t t-if="not o or not 'company_id' in o">
-                                <t t-set="company" t-value="res_company"/>
-                            </t>
-
-                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
-                                <thead>
-                                    <tr>
-                                        <td style="width:5%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
-                                        <td style="width:50%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">Product Code / Description</td>
-                                        <td style="width:8%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Qty</td>
-                                        <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
-                                        <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Unit Price</td>
-                                        <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
-                                    </tr>
-                                </thead>
-                                <tr>
-                                    <td colspan="6" style="width:100%; padding:5px; font-weight:bold; text-align:left;">
-                                        D/O No. :
-                                        <span style="padding-left:5px !important;"/>S/O No. : <span t-field="o.sale_id"/>
-                                        <span style="padding-left:5px !important;"/>Delivery Mode : <span t-field="o.delivery_mode_id"/>
-                                    </td>
-                                </tr>
-
-                                <t t-set="fg_sno" t-value="1"/>
-                                <t t-foreach="o.invoice_line_ids.sorted(key=lambda x: x.sequence)" t-as="line">
-                                    <tr>
-                                        <td style="width:5%; padding:5px; text-align:left;">
-                                            <span t-esc="fg_sno"/>
-										    <span t-set="fg_sno" t-value="fg_sno+1"/>
-                                        </td>
-                                        <td style="width:50%; padding:5px; text-align:left;">
-                                            <t t-if="line.product_id.default_code">
-                                                <span t-field="line.product_id.default_code"/><br/>
-                                            </t>
-                                            <span t-field="line.name"/>
-                                        </td>
-                                        <td style="width:8%; padding:5px; text-align:right;">
-                                            <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
-                                        </td>
-                                        <td style="width:12%; padding:5px; text-align:center;">
-                                            <span t-field="line.product_uom_id"/>
-                                        </td>
-                                        <td style="width:12%; padding:5px; text-align:right;">
-                                            <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
-                                            <!--(<span t-field="line.currency_id.symbol"/>)-->
-                                        </td>
-                                        <td style="width:13%; padding:5px; text-align:right;">
-                                            <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
-                                            <!--(<span t-field="line.currency_id.symbol"/>)-->
-                                        </td>
-                                    </tr>
-                                </t>
-                            </table>
-
-                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
-                                <tr>
-                                    <td style="width:63%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">
-                                        Total Quantity : <span t-esc="'{0:,.0f}'.format(sum(o.invoice_line_ids.mapped('quantity')))"/>
-                                    </td>
-                                    <td style="width:24%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">Sub Total : <span t-field="o.currency_id"/></td>
-                                    <td style="width:13%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
-                                </tr>
-                                <tr style="height:6px;"/>
-                                <tr>
-                                    <td colspan="2"/>
-                                    <td style="width:13%; padding:5px; border-bottom:1px solid black;"/>
-                                </tr>
-
-                                <tr style="height:25px;"/>
-                                <tr>
-                                    <td rowspan="3"/>
-                                    <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Tax Base : <span t-field="o.currency_id"/></td>
-                                    <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
-                                </tr>
-
-                                <t t-set="tax_totals" t-value="o.tax_totals"/>
-                                <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
-                                    <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
-                                    <t t-foreach="tax_totals['groups_by_subtotal'][subtotal_to_show]" t-as="amount_by_group">
-                                        <tr>
-                                            <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">
-                                                <span t-esc="amount_by_group['tax_group_name']"/> : <span t-field="o.currency_id"/>
-                                            </td>
-                                            <td style="width:13%; padding:5px; text-align:right; font-weight:bold;">
-                                                <span t-esc="'{0:,.2f}'.format(amount_by_group['tax_group_amount'])"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </t>
-
-                                <tr>
-                                    <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
-                                    <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:3px double black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
-                                </tr>
-                            </table>
-
-                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
-                                <tr style="height:10px;"/>
-                                <tr>
-                                    <td style="width:50%; padding:5px; text-decoration:underline;">For GST Auditing Only (SGD)</td>
-                                    <td style="width:50%;"/>
-                                </tr>
-                                <tr>
-                                    <td style="width:50%; padding:5px;">
-                                        Net Total:
-                                        <span t-field="o.sgd_currency_id.symbol"/>
-                                        <span t-esc="'{0:,.2f}'.format(o.sgd_amount_untaxed)"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width:50%; padding:5px;">
-                                        GST:
-                                        <span t-field="o.sgd_currency_id.symbol"/>
-                                        <span t-esc="'{0:,.2f}'.format(o.sgd_amount_tax)"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width:50%; padding:5px;">
-                                        Total:
-                                        <span t-field="o.sgd_currency_id.symbol"/>
-                                        <span t-esc="'{0:,.2f}'.format(o.sgd_amount_total)"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width:50%; padding:5px;">
-                                        Exchange Rate:
-                                        <span t-field="o.sgd_currency_id.symbol"/>
-                                        <span t-esc="'{0:,.6f}'.format(o.sgd_exchange_rate)"/>
-                                    </td>
-                                </tr>
-                                <tr style="height:18px;"/>
-                                <tr>
-                                    <td colspan="2" style="width:100%; padding:5px;">
-                                        <span style="text-decoration:underline;">Remarks:</span>
-                                        <br/><span t-field="o.fg_remarks"/>
-                                    </td>
-                                </tr>
-                                <tr style="height:6px;"/>
-                            </table>
-
-                        </div>
-                    </t>
-                </t>
+        <template id="report_fg_credit_note_doc">
+            <t t-if="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
             </t>
-        </template>
+            <t t-if="not o or not 'company_id' in o">
+                <t t-set="company" t-value="res_company"/>
+            </t>
 
-        <record id="paperformat_fg_credit_note_report" model="report.paperformat">
-            <field name="name">Flemings Credit Note</field>
-            <field name="default" eval="True"/>
-            <field name="format">A4</field>
-            <field name="page_height">0</field>
-            <field name="page_width">0</field>
-            <field name="orientation">Portrait</field>
-            <field name="margin_top">100</field>
-            <field name="margin_bottom">10</field>
-            <field name="margin_left">8</field>
-            <field name="margin_right">8</field>
-            <field name="header_line" eval="False"/>
-            <field name="header_spacing">95</field>
-            <field name="dpi">80</field>
-        </record>
-
-        <record id="report_fg_credit_note" model="ir.actions.report">
-            <field name="name">Credit Note</field>
-            <field name="model">account.move</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">flemings_base.report_fg_credit_note_document</field>
-            <field name="report_file">flemings_base.report_fg_credit_note_document</field>
-            <field name="binding_type">report</field>
-            <field name="binding_model_id" ref="flemings_base.model_account_move"/>
-            <field name="paperformat_id" ref="paperformat_fg_credit_note_report"/>
-            <field name="print_report_name">'Credit Note - %s' % (object.name or '').replace('/','_')</field>
-        </record>
-
-        <!-- Credit Note Report - Header Layout -->
-        <template id="report_fg_credit_note_custom_header_layout">
             <div class="header">
                 <style>
                     td {word-break: break-word !important; word-spacing: 3px !important; padding:3px; page-break-inside: avoid !important;}
@@ -223,7 +38,7 @@
                     <thead>
                         <tr>
                             <td style="width:25%; text-align:left; padding-left:6px;">
-                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="width:200px; float:left !important"/>
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
                             </td>
                             <td style="width:50%; text-align:left;">
                                 <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
@@ -265,7 +80,7 @@
                                 </div>
                             </td>
                             <td style="width:25%; text-align:right; padding-right:6px;">
-                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="width:200px; float:left !important"/>
+                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
                             </td>
                             </tr>
                         <tr>
@@ -398,10 +213,162 @@
                     </table>
                 </div>
             </div>
-        </template>
 
-		<!-- Credit Note Report - Footer Layout	-->
-		<template id="report_fg_credit_note_custom_footer_layout">
+            <div class="page" style="font-family:sans-serif !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
+
+                <style>
+                    td {word-break: break-word !important; word-spacing: 3px !important; padding:5px; page-break-inside: avoid !important;}
+
+                    .non-border, .non-border > tr, .non-border > tr > td {
+                        border: none !important; border-color: #ffffff !important;
+                    }
+                </style>
+
+                <t t-if="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-if="not o or not 'company_id' in o">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                    <thead>
+                        <tr>
+                            <td style="width:5%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
+                            <td style="width:50%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">Product Code / Description</td>
+                            <td style="width:8%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Qty</td>
+                            <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
+                            <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Unit Price</td>
+                            <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td colspan="6" style="width:100%; padding:5px; font-weight:bold; text-align:left;">
+                            D/O No. :
+                            <span style="padding-left:5px !important;"/>S/O No. : <span t-field="o.sale_id"/>
+                            <span style="padding-left:5px !important;"/>Delivery Mode : <span t-field="o.delivery_mode_id"/>
+                        </td>
+                    </tr>
+
+                    <t t-set="fg_sno" t-value="1"/>
+                    <t t-foreach="o.invoice_line_ids.sorted(key=lambda x: x.sequence)" t-as="line">
+                        <tr>
+                            <td style="width:5%; padding:5px; text-align:left;">
+                                <span t-esc="fg_sno"/>
+                                <span t-set="fg_sno" t-value="fg_sno+1"/>
+                            </td>
+                            <td style="width:50%; padding:5px; text-align:left;">
+                                <t t-if="line.product_id.default_code">
+                                    <span t-field="line.product_id.default_code"/><br/>
+                                </t>
+                                <span t-field="line.name"/>
+                            </td>
+                            <td style="width:8%; padding:5px; text-align:right;">
+                                <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
+                            </td>
+                            <td style="width:12%; padding:5px; text-align:center;">
+                                <span t-field="line.product_uom_id"/>
+                            </td>
+                            <td style="width:12%; padding:5px; text-align:right;">
+                                <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                <!--(<span t-field="line.currency_id.symbol"/>)-->
+                            </td>
+                            <td style="width:13%; padding:5px; text-align:right;">
+                                <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                <!--(<span t-field="line.currency_id.symbol"/>)-->
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                    <tr>
+                        <td style="width:63%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">
+                            Total Quantity : <span t-esc="'{0:,.0f}'.format(sum(o.invoice_line_ids.mapped('quantity')))"/>
+                        </td>
+                        <td style="width:24%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">Sub Total : <span t-field="o.currency_id"/></td>
+                        <td style="width:13%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                    </tr>
+                    <tr style="height:6px;"/>
+                    <tr>
+                        <td colspan="2"/>
+                        <td style="width:13%; padding:5px; border-bottom:1px solid black;"/>
+                    </tr>
+
+                    <tr style="height:25px;"/>
+                    <tr>
+                        <td rowspan="3"/>
+                        <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Tax Base : <span t-field="o.currency_id"/></td>
+                        <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                    </tr>
+
+                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                    <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
+                        <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
+                        <t t-foreach="tax_totals['groups_by_subtotal'][subtotal_to_show]" t-as="amount_by_group">
+                            <tr>
+                                <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">
+                                    <span t-esc="amount_by_group['tax_group_name']"/> : <span t-field="o.currency_id"/>
+                                </td>
+                                <td style="width:13%; padding:5px; text-align:right; font-weight:bold;">
+                                    <span t-esc="'{0:,.2f}'.format(amount_by_group['tax_group_amount'])"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </t>
+
+                    <tr>
+                        <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
+                        <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:3px double black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
+                    </tr>
+                </table>
+
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                    <tr style="height:10px;"/>
+                    <tr>
+                        <td style="width:50%; padding:5px; text-decoration:underline;">For GST Auditing Only (SGD)</td>
+                        <td style="width:50%;"/>
+                    </tr>
+                    <tr>
+                        <td style="width:50%; padding:5px;">
+                            Net Total:
+                            <span t-field="o.sgd_currency_id.symbol"/>
+                            <span t-esc="'{0:,.2f}'.format(o.sgd_amount_untaxed)"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:50%; padding:5px;">
+                            GST:
+                            <span t-field="o.sgd_currency_id.symbol"/>
+                            <span t-esc="'{0:,.2f}'.format(o.sgd_amount_tax)"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:50%; padding:5px;">
+                            Total:
+                            <span t-field="o.sgd_currency_id.symbol"/>
+                            <span t-esc="'{0:,.2f}'.format(o.sgd_amount_total)"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:50%; padding:5px;">
+                            Exchange Rate:
+                            <span t-field="o.sgd_currency_id.symbol"/>
+                            <span t-esc="'{0:,.6f}'.format(o.sgd_exchange_rate)"/>
+                        </td>
+                    </tr>
+                    <tr style="height:18px;"/>
+                    <tr>
+                        <td colspan="2" style="width:100%; padding:5px;">
+                            <span style="text-decoration:underline;">Remarks:</span>
+                            <br/><span t-field="o.fg_remarks"/>
+                        </td>
+                    </tr>
+                    <tr style="height:6px;"/>
+                </table>
+
+            </div>
+
             <div class="footer">
                 <style>
                     td {word-break: break-word !important; word-spacing: 3px !important; page-break-inside: avoid !important;}
@@ -427,20 +394,43 @@
             </div>
         </template>
 
-		<!-- Credit Note Report - Layout Call -->
-		<template id="report_fg_credit_note_custom_layout">
-            <t t-if="o and 'company_id' in o">
-                <t t-set="company" t-value="o.company_id.sudo()"/>
+        <template id="report_fg_credit_note_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                	<div class="article"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+	                    <t t-call="flemings_base.report_fg_credit_note_doc" t-lang="lang"/>
+                	</div>
+                </t>
             </t>
-            <t t-if="not o or not 'company_id' in o">
-                <t t-set="company" t-value="res_company"/>
-            </t>
-            <div class="article">
-                <t t-call="flemings_base.report_fg_credit_note_custom_header_layout"/>
-                <t t-out="0"/>
-                <t t-call="flemings_base.report_fg_credit_note_custom_footer_layout"/>
-            </div>
         </template>
+
+        <record id="paperformat_fg_credit_note_report" model="report.paperformat">
+            <field name="name">Flemings Credit Note</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">100</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">8</field>
+            <field name="margin_right">8</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">95</field>
+            <field name="dpi">80</field>
+        </record>
+
+        <record id="report_fg_credit_note" model="ir.actions.report">
+            <field name="name">Credit Note</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">flemings_base.report_fg_credit_note_document</field>
+            <field name="report_file">flemings_base.report_fg_credit_note_document</field>
+            <field name="binding_type">report</field>
+            <field name="binding_model_id" ref="flemings_base.model_account_move"/>
+            <field name="paperformat_id" ref="paperformat_fg_credit_note_report"/>
+            <field name="print_report_name">'Credit Note - %s' % (object.name or '').replace('/','_')</field>
+        </record>
 
     </data>
 </odoo>
