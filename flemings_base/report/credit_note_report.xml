@@ -59,7 +59,6 @@
                                             <span t-field="company.country_id.name"/>
                                         </span>
                                         <span t-if="company.zip">
-                                            ,
                                             <span t-field="company.zip"/>
                                         </span>
                                         <span t-if="company.phone">Tel:
