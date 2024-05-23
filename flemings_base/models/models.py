@@ -618,6 +618,49 @@ class FlemingsStockPicking(models.Model):
 
         return res
 
+    @api.model
+    def get_views(self, views, options=None):
+        res = super(FlemingsStockPicking, self).get_views(views, options)
+        for view_type in ('list', 'form'):
+            if res['views'].get(view_type, {}).get('toolbar') and res['views'][view_type]['toolbar'].get('action'):
+                delivery_create_invoice_action_id = self.env.ref('flemings_base.model_stock_picking_action_create_invoices').id
+
+                if self._context and self._context.get('show_delivery_create_invoice_option', False):
+                    action = [rec for rec in res['views'][view_type]['toolbar']['action'] if rec.get('id', False)]
+                else:
+                    action = [rec for rec in res['views'][view_type]['toolbar']['action'] if rec.get('id', False) != delivery_create_invoice_action_id]
+
+                res['views'][view_type]['toolbar'] = {'action': action}
+        return res
+
+    def action_picking_create_invoice(self):
+        invoice_vals, invoice_line_vals = {}, []
+
+        if self._context and self._context.get('sale_id'):
+            sale_id = self.env['sale.order'].sudo().browse(self._context.get('sale_id'))
+            if sale_id:
+                for record in self:
+                    for move_line in record.move_ids_without_package:
+                        invoice_line_vals.append((0, 0, {
+                            'product_id': move_line.product_id.id,
+                            'name': move_line.product_id.get_product_multiline_description_sale(),
+                            'quantity': move_line.product_uom_qty,
+                            'product_uom_id': move_line.product_uom.id,
+                        }))
+                    sale_id = record.sale_id
+
+                invoice_vals.update({
+                    'move_type': 'out_invoice',
+                    'partner_id': sale_id.partner_id.id,
+                    'sale_id': sale_id.id,
+                    'delivery_mode_id': sale_id.delivery_mode_id.id or False,
+                    'fg_purchase_order_no': sale_id.fg_purchase_order_no,
+                    'fg_remarks': sale_id.fg_remarks,
+                    'invoice_line_ids': invoice_line_vals,
+                })
+                new_invoice_id = self.env['account.move'].create(invoice_vals)
+        return
+
 
 class FlemingsStockRoute(models.Model):
     _inherit = 'stock.route'

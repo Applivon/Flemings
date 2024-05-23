@@ -493,6 +493,9 @@
                 <xpath expr="//field[@name='order_line']/tree//field[@name='route_id']" position="attributes">
 					<attribute name="optional">show</attribute>
                 </xpath>
+				<xpath expr="//button[@name='action_view_delivery']" position="attributes">
+					<attribute name="context">{'show_delivery_create_invoice_option': True, 'sale_id': active_id}</attribute>
+                </xpath>
            </field>
         </record>
 
@@ -530,6 +533,17 @@
                 </xpath>
             </field>
         </record>
+
+		<!-- Stock Picking - Server Action -->
+		<record id="model_stock_picking_action_create_invoices" model="ir.actions.server">
+			<field name="name">Create Invoice</field>
+			<field name="model_id" ref="stock.model_stock_picking"/>
+			<field name="binding_model_id" ref="stock.model_stock_picking"/>
+			<field name="binding_view_types">list,form</field>
+			<field name="sequence" eval="100"/>
+			<field name="state">code</field>
+			<field name="code">action = records.action_picking_create_invoice()</field>
+		</record>
 
         <!-- Customer Invoice - Form View Inherit -->
 		<record id="fg_customer_invoice_sgd_equivalent_form_view_inherit" model="ir.ui.view">
