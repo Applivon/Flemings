@@ -241,13 +241,6 @@
                             <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
                         </tr>
                     </thead>
-                    <tr>
-                        <td colspan="6" style="width:100%; padding:5px; font-weight:bold; text-align:left;">
-                            D/O No. :
-                            <span style="padding-left:5px !important;"/>S/O No. : <span t-field="o.sale_id"/>
-                            <span style="padding-left:5px !important;"/>Delivery Mode : <span t-field="o.delivery_mode_id"/>
-                        </td>
-                    </tr>
 
                     <t t-set="fg_sno" t-value="1"/>
                     <t t-foreach="o.invoice_line_ids.sorted(key=lambda x: x.sequence)" t-as="line">
