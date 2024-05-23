@@ -43,7 +43,7 @@
                             <td style="width:50%; text-align:left;">
                                 <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
                                     <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:14pt; font-weight:bold; padding-right:4px;"/>
-                                    <p style="margin-bottom:0px; padding-top:0px; text-align:left">
+                                    <p style="margin-bottom:0px; padding-top:0px; text-align:left; white-space:nowrap;">
                                         <span t-if="company.street or company.street2">
                                             <br/>
                                             <span t-if="company.street">
