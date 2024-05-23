@@ -137,11 +137,6 @@
                                                         Mob: <span t-field="contact_customer.mobile"/>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        Email: <span t-field="contact_customer.email"/>
-                                                    </td>
-                                                </tr>
                                             </table>
                                         </td>
                                         <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important;">
@@ -294,11 +289,6 @@
                         <td style="width:24%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">Sub Total : <span t-field="o.currency_id"/></td>
                         <td style="width:13%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
                     </tr>
-                    <tr style="height:6px;"/>
-                    <tr>
-                        <td colspan="2"/>
-                        <td style="width:13%; padding:5px; border-bottom:1px solid black;"/>
-                    </tr>
 
                     <tr style="height:25px;"/>
                     <tr>
@@ -324,7 +314,7 @@
 
                     <tr>
                         <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
-                        <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:3px double black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
+                        <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:1px solid black; border-bottom:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
                     </tr>
                 </table>
 
@@ -418,12 +408,12 @@
             <field name="page_height">0</field>
             <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">100</field>
+            <field name="margin_top">90</field>
             <field name="margin_bottom">10</field>
             <field name="margin_left">8</field>
             <field name="margin_right">8</field>
             <field name="header_line" eval="False"/>
-            <field name="header_spacing">95</field>
+            <field name="header_spacing">85</field>
             <field name="dpi">80</field>
         </record>
 
