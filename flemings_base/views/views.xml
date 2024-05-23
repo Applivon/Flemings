@@ -356,6 +356,7 @@
                 		<group>
                 			<field name="sgs_img" widget="image"/>
                 			<field name="paynow_img" widget="image"/>
+							<field name="banner_report" widget="image"/>
                 		</group>
                 	</page>
                 </xpath>

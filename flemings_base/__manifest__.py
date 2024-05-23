@@ -29,6 +29,7 @@
 
         # Wizard
         'wizard/flemings_purchase_price_report_view.xml',
+        'wizard/soa_view.xml',
 
         # Report
         'report/base_report.xml',
@@ -36,6 +37,7 @@
         'report/tax_invoice_report.xml',
         'report/credit_note_report.xml',
         'report/delivery_order_report.xml',
+        'report/soa_reports.xml',
 
     ],
     'qweb': [],

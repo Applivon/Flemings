@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+	    <record id="paperformat_soa_report" model="report.paperformat">
+	        <field name="name">SOA A4 Report</field>
+	        <field name="default" eval="True"/>
+	        <field name="format">A4</field>
+	        <field name="page_height">0</field>
+	        <field name="page_width">0</field>
+	        <field name="orientation">Portrait</field>
+	        <field name="margin_top">35</field>
+	        <field name="margin_bottom">10</field>
+	        <field name="margin_left">5</field>
+	        <field name="margin_right">5</field>
+	        <field name="header_line" eval="False"/>
+	        <field name="header_spacing">30</field>
+	        <field name="dpi">80</field>
+		</record>
+        
+		<record id="action_statement_of_account" model="ir.actions.report">
+		    <field name="name">Statement of Accounts</field>
+		    <field name="model">res.partner</field>
+		    <field name="report_type">qweb-pdf</field>
+		    <field name="report_name">flemings_base.report_statement_of_account_document</field>
+		    <field name="report_file">flemings_base.report_statement_of_account_document</field>
+		    <field name="paperformat_id" ref="flemings_base.paperformat_soa_report"/>
+		</record>
+
+        <template id="report_statement_of_account">
+        	
+			<t t-set="flag" t-value="0"/>
+			<t t-foreach="datas[partner]" t-as="soa">	
+				<t t-set="outstanding" t-value="soa['amount_total']"/>				
+				<t t-if="soa['residual_amount']">
+					<t t-set="outstanding" t-value="outstanding - soa['residual_amount']"/>
+				</t>
+				<t t-if="round(outstanding, 2) != 0.0">
+					<t t-set="flag" t-value="1"/>
+				</t>
+			</t>
+			
+			<t t-if="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-if="not o or not 'company_id' in o">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+            
+			<div class="header">
+				<div class="col-12">
+					<t t-if="print_logo and company.banner_report">
+						<img t-if="company.banner_report" t-att-src="image_data_uri(company.banner_report)" style="float:left; width: 100%; "/>
+					</t>
+					<t t-else="1">
+						<p style="height: 3.4cm; width: 100%;"/>
+					</t>
+				</div>
+			</div>
+				
+			<div class="page" style="font-family:Nimbus Sans L; font-size: 10pt;">
+				<style>					
+					.infor-left {width: 35%; float: left; display: inline-block;}
+					.infor-right {width: 65%; float: left; display: inline-block;}
+					
+					.table-single {width: 100%; }
+					.table-single th {border: 1px solid black; padding: 5px; }
+					.table-single td {border: 1px solid black; padding: 5px; }
+					
+					.align-center { text-align: center; }
+					
+					.table-rp {width: 100%; }
+					.table-rp th {border: 1px solid black; background-color: #dedede; padding: 5px; }
+					.table-rp td {border: 1px solid black; padding: 5px; vertical-align: top; }
+					
+					.row {margin-bottom: 10px;}
+				</style>
+				<div class="row">
+					<div class="col-12 align-center">
+						<strong style="font-size: 20px;">STATMENT OF ACCOUNT</strong>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-5">
+						<strong>
+							<h5 style="font-size: 10pt; font-weight: bold; margin: 0; padding: 0;">
+								<t t-if="partner.name">
+								   	<span t-esc="partner.name.upper()"/>
+								</t>
+							</h5>
+							<br/>
+							<span t-esc="partner.street"/>
+							<span t-esc="partner.street2"/>
+							<span t-esc="partner.city"/>
+							<span t-esc="partner.country_id.name"/>
+							<span t-esc="partner.zip"/>
+						</strong>
+						<br />
+						<strong>
+						    <span>TELL:</span>
+						    <span t-esc="partner.phone or partner.mobile"/>
+						    <br/>
+						</strong>
+					</div>
+					<div class="col-2" />
+					<div class="col-5">
+						<strong>DATE: </strong>
+						<strong t-esc="datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d.%m.%Y')"/>
+					</div>
+				</div>
+				
+				<table class="table-rp">
+					<tr>
+						<td class="align-center" width="8%"><strong>DATE</strong></td>
+						<td class="align-center" width="18%"><strong>INVOICE</strong></td>
+						<td class="align-center" width="23%"><strong>YOUR PO</strong></td>
+						<td class="align-center" width="25%"><strong>DO NO.</strong></td>
+						<td class="align-center" width="13%"><strong>TOTAL AMOUNT</strong></td>
+						<td class="align-center" width="13%"><strong>OUTSTANDING AMOUNT</strong></td>
+					</tr>
+					<t t-set="balance" t-value="0"/>
+					<t t-foreach="datas[partner]" t-as="soa">					
+						<t t-if="soa['residual_amount']">
+							<t t-set="outstanding" t-value="soa['amount_total'] - soa['residual_amount']"/>
+						</t>
+						<t t-else="1">
+							<t t-set="outstanding" t-value="soa['amount_total']"/>
+						</t>
+						<t t-set="balance" t-value="balance + outstanding"/>
+						<t t-if="outstanding != 0.0">
+							<tr>
+								<td><t t-esc="soa['invoice_date']" /></td>
+								<td><t t-esc="soa['invoice_name']" /></td>
+								<td><t t-esc="soa['fg_purchase_order_no']" /></td>
+								<td>
+									<!--<t t-esc="', '.join([item.name for item in soa['invoice_id'].picking_ids])" />-->
+								</td>
+								<td>
+									<span style="float:right;"><t t-esc="'{0:,.2f}'.format(outstanding)" /></span>
+								</td>
+								<td>
+									<span style="float:right;"><t t-esc="'{0:,.2f}'.format(balance)" /></span>
+								</td>
+							</tr>
+						</t>			
+					</t>					
+				</table>
+				<br/>
+				<br/>
+				<br/>
+				<br/>
+				<br/>
+				<br/>
+				<br/>
+				<br/>
+				<t t-value="partner.sql_to_get_payment_summary(date)" t-set="payment_summary" />
+				<table class="table-rp">
+					<tr>
+						<t t-foreach="payment_summary['key']" t-as="v">
+							<td width="16%" class="align-center" style="text-transform: uppercase;"><strong><t t-esc="payment_summary['key'][v]['desc']" /></strong></td>
+						</t>
+						<td width="20%" class="align-center"><strong>TOTAL DUE</strong></td>
+					</tr>
+					
+					<t t-foreach="payment_summary['content']" t-as="currency">
+						<t t-set="total_outstanding" t-value="0"/>
+						<tr>
+							<t t-foreach="payment_summary['content'][currency]" t-as="v">
+								<t t-set="outstanding" t-value="0" />
+								<t t-if="payment_summary['content'][currency][v]">
+									<t t-set="outstanding" t-value="payment_summary['content'][currency][v]" />
+									<t t-set="total_outstanding" t-value="total_outstanding + outstanding"/>
+								</t>
+								<td>
+									<span style="float:left;" t-esc="currency"/>
+									<span style="float:right;"><t t-esc="'{0:,.2f}'.format(outstanding)" /></span>
+								</td>
+							</t>
+							<td>
+								<span style="float:left;" t-esc="currency"/>
+								<span style="float:right;"><t t-esc="'{0:,.2f}'.format(total_outstanding)" /></span>
+							</td>
+						</tr>
+					</t>
+				</table>
+			</div>
+        </template>
+
+        <template id="report_statement_of_account_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="partner">
+                	<div class="article"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+	                    <t t-call="flemings_base.report_statement_of_account" t-lang="lang"/>
+                	</div>
+                </t>
+            </t>
+        </template>
+		
+    </data>
+</odoo>

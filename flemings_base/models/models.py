@@ -102,6 +102,7 @@ class FlemingsResCompany(models.Model):
     fax = fields.Char(related='partner_id.fax', string='Fax', readonly=False)
     sgs_img = fields.Binary('SGS Image')
     paynow_img = fields.Binary('Paynow Image')
+    banner_report = fields.Binary('Logo', attachment=True)
 
 
 class FlemingsCustomerPriceBook(models.Model):
