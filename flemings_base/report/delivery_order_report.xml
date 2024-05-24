@@ -148,7 +148,7 @@
                                                         </tr>
                                                         <tr>
                                                             <td style="width:46%;">Purchase Order No.</td>
-                                                            <td style="width:54%;">: <span t-field="o.fg_purchase_order_no"/></td>
+                                                            <td style="width:54%;">: <span t-field="o.customer_po"/></td>
                                                         </tr>
                                                     </table>
                                                 </td>

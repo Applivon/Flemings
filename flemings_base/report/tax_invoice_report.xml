@@ -182,7 +182,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td style="width:46%;">Purchase Order No.</td>
-                                                    <td style="width:54%;">: <span t-field="o.fg_purchase_order_no"/></td>
+                                                    <td style="width:54%;">: <span t-field="o.customer_po"/></td>
                                                 </tr>
                                             </table>
                                         </td>
@@ -281,42 +281,79 @@
                             <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
                         </tr>
                     </thead>
-                    <tr>
-                        <td colspan="6" style="width:100%; padding:5px; font-weight:bold; text-align:left;">
-                            D/O No. :
-                            <span style="padding-left:5px !important;"/>S/O No. : <span t-field="o.sale_id"/>
-                            <span style="padding-left:5px !important;"/>Delivery Mode : <span t-field="o.delivery_mode_id"/>
-                        </td>
-                    </tr>
 
                     <t t-set="fg_sno" t-value="1"/>
-                    <t t-foreach="o.invoice_line_ids.sorted(key=lambda x: x.sequence)" t-as="line">
-                        <tr>
-                            <td style="width:5%; padding:5px; text-align:left;">
-                                <span t-esc="fg_sno"/>
-                                <span t-set="fg_sno" t-value="fg_sno+1"/>
-                            </td>
-                            <td style="width:50%; padding:5px; text-align:left;">
-                                <t t-if="line.product_id.default_code">
-                                    <span t-field="line.product_id.default_code"/><br/>
-                                </t>
-                                <span t-field="line.name"/>
-                            </td>
-                            <td style="width:8%; padding:5px; text-align:right;">
-                                <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
-                            </td>
-                            <td style="width:12%; padding:5px; text-align:center;">
-                                <span t-field="line.product_uom_id"/>
-                            </td>
-                            <td style="width:12%; padding:5px; text-align:right;">
-                                <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
-                                <!--(<span t-field="line.currency_id.symbol"/>)-->
-                            </td>
-                            <td style="width:13%; padding:5px; text-align:right;">
-                                <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
-                                <!--(<span t-field="line.currency_id.symbol"/>)-->
-                            </td>
-                        </tr>
+                    <t t-set="line_do" t-value="o.get_line_delivery_orders()"/>
+
+                    <t t-if="line_do">
+                        <t t-foreach="line_do" t-as="do">
+                            <tr>
+                                <td colspan="6" style="width:100%; padding:5px; font-weight:bold; text-align:left;">
+                                    D/O No. : <span t-field="do.name"/>
+                                    <span style="padding-left:5px !important;"/>S/O No. : <span t-field="do.sale_id"/>
+                                    <span style="padding-left:5px !important;"/>Delivery Mode : <span t-field="o.delivery_mode_id"/>
+                                </td>
+                            </tr>
+                            <tr style="height:8px;"/>
+                            <t t-foreach="o.invoice_line_ids.filtered(lambda x: x.picking_id == do).sorted(key=lambda x: x.sequence)" t-as="line">
+                                <tr>
+                                    <td style="width:5%; padding:5px; text-align:left;">
+                                        <span t-esc="fg_sno"/>
+                                        <span t-set="fg_sno" t-value="fg_sno+1"/>
+                                    </td>
+                                    <td style="width:50%; padding:5px; text-align:left;">
+                                        <t t-if="line.product_id.default_code">
+                                            <span t-field="line.product_id.default_code"/><br/>
+                                        </t>
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td style="width:8%; padding:5px; text-align:right;">
+                                        <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
+                                    </td>
+                                    <td style="width:12%; padding:5px; text-align:center;">
+                                        <span t-field="line.product_uom_id"/>
+                                    </td>
+                                    <td style="width:12%; padding:5px; text-align:right;">
+                                        <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                        <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                    </td>
+                                    <td style="width:13%; padding:5px; text-align:right;">
+                                        <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                        <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <t t-foreach="o.invoice_line_ids.sorted(key=lambda x: x.sequence)" t-as="line">
+                            <tr>
+                                <td style="width:5%; padding:5px; text-align:left;">
+                                    <span t-esc="fg_sno"/>
+                                    <span t-set="fg_sno" t-value="fg_sno+1"/>
+                                </td>
+                                <td style="width:50%; padding:5px; text-align:left;">
+                                    <t t-if="line.product_id.default_code">
+                                        <span t-field="line.product_id.default_code"/><br/>
+                                    </t>
+                                    <span t-field="line.name"/>
+                                </td>
+                                <td style="width:8%; padding:5px; text-align:right;">
+                                    <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
+                                </td>
+                                <td style="width:12%; padding:5px; text-align:center;">
+                                    <span t-field="line.product_uom_id"/>
+                                </td>
+                                <td style="width:12%; padding:5px; text-align:right;">
+                                    <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                    <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                </td>
+                                <td style="width:13%; padding:5px; text-align:right;">
+                                    <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                    <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                </td>
+                            </tr>
+                        </t>
                     </t>
                 </table>
 

@@ -77,7 +77,7 @@
 				</style>
 				<div class="row">
 					<div class="col-12 align-center">
-						<strong style="font-size: 20px;">STATMENT OF ACCOUNT</strong>
+						<strong style="font-size: 20px;">STATEMENT OF ACCOUNT</strong>
 					</div>
 				</div>
 				<div class="row">
@@ -131,7 +131,7 @@
 							<tr>
 								<td><t t-esc="soa['invoice_date']" /></td>
 								<td><t t-esc="soa['invoice_name']" /></td>
-								<td><t t-esc="soa['fg_purchase_order_no']" /></td>
+								<td><t t-esc="soa['customer_po']" /></td>
 								<td>
 									<!--<t t-esc="', '.join([item.name for item in soa['invoice_id'].picking_ids])" />-->
 								</td>

@@ -463,12 +463,10 @@
 					<field name="manufacturing_order_ids" widget="many2many_tags" domain="[('state', '=', 'done')]" attrs="{'readonly': [('state', '!=', 'draft')]}" options="{'no_create':True}"/>
                 </xpath>
 				<xpath expr="//field[@name='payment_term_id']" position="after">
-					<field name="fg_purchase_order_no"/>
+					<field name="customer_po"/>
 					<field name="fg_remarks"/>
 					<field name="computed_delivery_order_names" invisible="1"/>
 					<field name="computed_customer_invoice_names" invisible="1"/>
-					<field name="computed_is_partial_delivery_done" invisible="1"/>
-					<field name="is_partial_delivery_done" invisible="1"/>
 					<field name="delivery_order_names" invisible="not context.get('sale_orders_to_invoice')" attrs="{'invisible': [('delivery_order_names', '=', '')]}" readonly="1" force_save="1"/>
 					<field name="customer_invoice_names" invisible="not context.get('sale_orders_to_invoice')" attrs="{'invisible': [('customer_invoice_names', '=', '')]}" readonly="1" force_save="1"/>
                 </xpath>
@@ -494,9 +492,6 @@
                 <xpath expr="//field[@name='order_line']/tree//field[@name='route_id']" position="attributes">
 					<attribute name="optional">show</attribute>
                 </xpath>
-				<xpath expr="//button[@name='action_view_delivery']" position="attributes">
-					<attribute name="context">{'show_delivery_create_invoice_option': True, 'sale_id': active_id}</attribute>
-                </xpath>
            </field>
         </record>
 
@@ -512,12 +507,34 @@
 					<field name="delivery_order_names" invisible="not context.get('sale_orders_to_invoice')"/>
 					<field name="customer_invoice_names" invisible="not context.get('sale_orders_to_invoice')"/>
                 </xpath>
+				<xpath expr="//field[@name='invoice_status']" position="attributes">
+					<attribute name="invisible">True</attribute>
+                </xpath>
+				<xpath expr="//field[@name='invoice_status']" position="after">
+					<field name="computed_fg_invoice_status" invisible="1"/>
+					<field name="fg_invoice_status" optional="show"/>
+                </xpath>
+			</field>
+		</record>
+
+		<!-- Quotation - List View Inherit -->
+		<record id="fg_sale_quotation_sno_tree_view_inherit" model="ir.ui.view">
+			<field name="name">fg.sale.quotation.sno.tree.view.inherit</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_quotation_tree"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='invoice_status']" position="attributes">
+					<attribute name="invisible">True</attribute>
+                </xpath>
+				<xpath expr="//field[@name='invoice_status']" position="after">
+					<field name="fg_invoice_status" optional="hide"/>
+                </xpath>
 			</field>
 		</record>
 
 		<!-- Sales Order - Order to Invoice - Action View Inherit -->
 		<record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
-			<field name="domain">[('invoice_status','=','to invoice'), ('is_partial_delivery_done', '=', True)]</field>
+			<field name="domain">[('fg_invoice_status', 'in', ['to invoice', 'partial_invoice'])]</field>
 			<field name="context">{'create': False, 'sale_orders_to_invoice': True}</field>
 		</record>
 
@@ -528,7 +545,7 @@
 			<field name="inherit_id" ref="stock.view_picking_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='owner_id']" position="after">
-					<field name="fg_purchase_order_no"/>
+					<field name="customer_po"/>
 					<field name="process_by_id" options="{'no_create':True}"/>
 					<field name="fg_remarks"/>
                 </xpath>
@@ -540,7 +557,7 @@
 			<field name="name">Create Invoice</field>
 			<field name="model_id" ref="stock.model_stock_picking"/>
 			<field name="binding_model_id" ref="stock.model_stock_picking"/>
-			<field name="binding_view_types">list,form</field>
+			<field name="binding_view_types">list</field>
 			<field name="sequence" eval="100"/>
 			<field name="state">code</field>
 			<field name="code">action = records.action_picking_create_invoice()</field>
@@ -554,7 +571,7 @@
 			<field name="arch" type="xml">
 				<xpath expr="//div[@name='journal_div']" position="after">
 					<field name="sale_id" options="{'no_create':True}" invisible="1"/>
-					<field name="fg_purchase_order_no"/>
+					<field name="customer_po"/>
 					<field name="fg_remarks"/>
                 </xpath>
 				<xpath expr="//field[@name='invoice_user_id']" position="after">
@@ -610,7 +627,7 @@
 			<field name="inherit_id" ref="account.view_account_payment_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='destination_journal_id']" position="after">
-					<field name="sale_ids" widget="many2many_tags" options="{'no_create':True}" invisible="0"/>
+					<field name="sale_ids" widget="many2many_tags" options="{'no_create':True}" invisible="1"/>
 					<field name="sale_id" options="{'no_create':True}" domain="[('id', 'in', sale_ids)]" attrs="{'invisible':[('payment_type', '!=', 'inbound')], 'readonly':[('state', '!=', 'draft')]}"/>
 				</xpath>
 			</field>

@@ -75,7 +75,7 @@ class ResPartner(models.Model):
             select am.id as invoice_id, am.name as invoice_name, am.move_type as move_type, to_char(am.invoice_date,'dd.mm.yyyy') as invoice_date, curr.name as currency,
                 am.amount_total_signed as amount_total,
                 CASE WHEN am.move_type = 'out_refund' THEN -sum(residual.amount_sgd) ELSE sum(residual.amount_sgd) END as residual_amount,
-                am.fg_purchase_order_no
+                am.customer_po
             from account_move am
             join account_move_line aml on aml.move_id = am.id
             join account_account acc on aml.account_id = acc.id
@@ -97,7 +97,7 @@ class ResPartner(models.Model):
             --and aml.exclude_from_invoice_tab = 't' 
             and am.partner_id = %s 
                 AND (COALESCE(am.invoice_date_due,am.invoice_date) <= '%s' OR (am.invoice_date <= '%s' and am.invoice_date_due>= '%s'))
-            group by am.id, am.name, am.amount_total_signed, am.move_type, am.invoice_date, curr.name, am.fg_purchase_order_no
+            group by am.id, am.name, am.amount_total_signed, am.move_type, am.invoice_date, curr.name, am.customer_po
             order by am.invoice_date, am.name
         ''' % (date, self.id, date, date, date))
         res = self._cr.dictfetchall()

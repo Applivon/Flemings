@@ -193,16 +193,13 @@ class FlemingsSalesOrder(models.Model):
             record.write({
                 'computed_delivery_order_names': ' '.join([i.name for i in record.picking_ids]),
                 'computed_customer_invoice_names': ' '.join([i.name for i in record.invoice_ids]),
-                'computed_is_partial_delivery_done': record.picking_ids.filtered(lambda x: x.state == 'done') or False,
             })
 
     computed_delivery_order_names = fields.Text(string='Delivery Order', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
     computed_customer_invoice_names = fields.Text(string='Customer Invoice', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
-    computed_is_partial_delivery_done = fields.Boolean(string='Partial Delivery Done ?', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
 
     delivery_order_names = fields.Text(related='computed_delivery_order_names', string='Delivery Order', store=True, readonly=True)
     customer_invoice_names = fields.Text(related='computed_customer_invoice_names', string='Customer Invoice', store=True, readonly=True)
-    is_partial_delivery_done = fields.Boolean(related='computed_is_partial_delivery_done', string='Partial Delivery Done ?', store=True, readonly=True)
 
     origin_so_no = fields.Char('Origin SO No.')
     generate_fg_sno = fields.Boolean('Generate S.No.', default=True, copy=False)
@@ -247,7 +244,17 @@ class FlemingsSalesOrder(models.Model):
 
         return res
 
-    fg_purchase_order_no = fields.Char('Purchase Order No.')
+    @api.onchange('customer_po')
+    def onchange_customer_po(self):
+        if self.customer_po:
+            exist_customer_po = self.env['account.move'].sudo().search([('customer_po', '=', self.customer_po)])
+            if exist_customer_po:
+                self.customer_po = False
+                return {'warning': {
+                    'title': _("Warning"),
+                    'message': _("The Customer PO No. already exists in another invoice !")}}
+
+    customer_po = fields.Char('Customer PO No.', copy=False)
     customer_service_id = fields.Many2one('res.users', string='Customer Service')
     delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
     fg_remarks = fields.Text('Remarks')
@@ -257,7 +264,7 @@ class FlemingsSalesOrder(models.Model):
         res.update({
             'sale_id': self.id,
             'delivery_mode_id': self.delivery_mode_id.id or False,
-            'fg_purchase_order_no': self.fg_purchase_order_no,
+            'customer_po': self.customer_po,
             'fg_remarks': self.fg_remarks
         })
         return res
@@ -269,11 +276,43 @@ class FlemingsSalesOrder(models.Model):
             # Pickings Update
             for picking in order.picking_ids:
                 picking.write({
-                    'fg_purchase_order_no': order.fg_purchase_order_no,
+                    'customer_po': order.customer_po,
                     'process_by_id': self.env.user.id,
                     'fg_remarks': order.fg_remarks,
                 })
         return res
+
+    @api.depends('order_line.invoice_lines')
+    def _get_invoiced(self):
+        # The invoice_ids are obtained thanks to the invoice lines of the SO
+        # lines, and we also search for possible refunds created directly from
+        # existing invoices. This is necessary since such a refund is not
+        # directly linked to the SO.
+        for order in self:
+            invoices = order.order_line.invoice_lines.move_id.filtered(
+                lambda r: r.move_type in ('out_invoice', 'out_refund'))
+            invoices += self.env['account.move.line'].sudo().search([('sale_id', '=', order.id)]).mapped('move_id')
+            order.invoice_ids = invoices
+            order.invoice_count = len(invoices)
+
+    @api.depends('invoice_status', 'order_line', 'order_line.invoice_status', 'picking_ids', 'picking_ids.state', 'invoice_ids')
+    def _compute_fg_invoice_status(self):
+        for record in self:
+            fg_invoice_status = 'no'
+            if record.picking_ids.filtered(lambda x: x.state == 'done') and not record.invoice_ids:
+                fg_invoice_status = 'to_invoice'
+            elif record.invoice_ids and record.invoice_status != 'invoiced':
+                fg_invoice_status = 'partial_invoice'
+
+            record.write({
+                'computed_fg_invoice_status': fg_invoice_status
+            })
+
+    computed_fg_invoice_status = fields.Selection([
+        ('no', 'Nothing to Invoice'), ('to_invoice', 'To Invoice'), ('partial_invoice', 'Partially Invoiced')
+    ], string='Invoice Status', compute='_compute_fg_invoice_status', store=False, readonly=True)
+    fg_invoice_status = fields.Selection(
+        related='computed_fg_invoice_status', string='Invoice Status', store=True, readonly=True)
 
     def update_customer_price_book(self):
         for record in self.filtered(lambda x: x.partner_id):
@@ -388,8 +427,21 @@ class FlemingsSalesAccountMove(models.Model):
 
     sale_id = fields.Many2one('sale.order', string='Sales Order No.')
     delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
-    fg_purchase_order_no = fields.Char('Purchase Order No.')
+    customer_po = fields.Char('Customer PO No.', copy=False)
     fg_remarks = fields.Text('Remarks')
+
+    @api.onchange('customer_po')
+    def onchange_customer_po(self):
+        if self.customer_po:
+            exist_customer_po = self.sudo().search([('customer_po', '=', self.customer_po)])
+            if exist_customer_po:
+                self.customer_po = False
+                return {'warning': {
+                    'title': _("Warning"),
+                    'message': _("The Customer PO No. already exists in another invoice !")}}
+
+    def get_line_delivery_orders(self):
+        return list(set(self.invoice_line_ids.mapped('picking_id')))
 
     @api.model
     def get_views(self, views, options=None):
@@ -520,6 +572,10 @@ class FlemingsSalesAccountMoveLines(models.Model):
 
         return super(FlemingsSalesAccountMoveLines, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
+    picking_id = fields.Many2one('stock.picking', string='Delivery Order', copy=False)
+    sale_id = fields.Many2one('sale.order', string='Sale Order', copy=False)
+
+
 class FlemingsProductTemplate(models.Model):
     _inherit = 'product.template'
 
@@ -593,7 +649,7 @@ class FlemingsProductProduct(models.Model):
 class FlemingsStockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    fg_purchase_order_no = fields.Char('Purchase Order No.')
+    customer_po = fields.Char('Customer PO No.', copy=False)
     process_by_id = fields.Many2one('res.users', string='Process By')
     fg_remarks = fields.Text('Remarks')
 
@@ -619,47 +675,39 @@ class FlemingsStockPicking(models.Model):
 
         return res
 
-    @api.model
-    def get_views(self, views, options=None):
-        res = super(FlemingsStockPicking, self).get_views(views, options)
-        for view_type in ('list', 'form'):
-            if res['views'].get(view_type, {}).get('toolbar') and res['views'][view_type]['toolbar'].get('action'):
-                delivery_create_invoice_action_id = self.env.ref('flemings_base.model_stock_picking_action_create_invoices').id
-
-                if self._context and self._context.get('show_delivery_create_invoice_option', False):
-                    action = [rec for rec in res['views'][view_type]['toolbar']['action'] if rec.get('id', False)]
-                else:
-                    action = [rec for rec in res['views'][view_type]['toolbar']['action'] if rec.get('id', False) != delivery_create_invoice_action_id]
-
-                res['views'][view_type]['toolbar'] = {'action': action}
-        return res
-
     def action_picking_create_invoice(self):
+        non_delivery_orders = list(set(self.filtered(lambda x: x.picking_type_id.code != 'outgoing')))
+        if non_delivery_orders:
+            raise UserError(_("Create Invoice is only allowed for 'Delivery Orders' !"))
+
+        not_done_orders = list(set(self.filtered(lambda x: x.state != 'done')))
+        if not_done_orders:
+            raise UserError(_("Create Invoice is only allowed for 'Delivery Orders' which are 'Done' !"))
+
+        partner_ids = list(set(self.mapped('partner_id')))
+        if len(partner_ids) > 1:
+            raise UserError(_('You cannot create invoice for Multiple Contacts, choose same Contact Delivery Orders !'))
+        partner_id = partner_ids[0]
+
         invoice_vals, invoice_line_vals = {}, []
+        for record in self:
+            for move_line in record.move_ids_without_package:
+                invoice_line_vals.append((0, 0, {
+                    'picking_id': record.id,
+                    'sale_id': record.sale_id.id,
+                    'product_id': move_line.product_id.id,
+                    'name': move_line.product_id.get_product_multiline_description_sale(),
+                    'quantity': move_line.quantity_done,
+                    'product_uom_id': move_line.product_uom.id,
+                }))
 
-        if self._context and self._context.get('sale_id'):
-            sale_id = self.env['sale.order'].sudo().browse(self._context.get('sale_id'))
-            if sale_id:
-                for record in self:
-                    for move_line in record.move_ids_without_package:
-                        invoice_line_vals.append((0, 0, {
-                            'product_id': move_line.product_id.id,
-                            'name': move_line.product_id.get_product_multiline_description_sale(),
-                            'quantity': move_line.product_uom_qty,
-                            'product_uom_id': move_line.product_uom.id,
-                        }))
-                    sale_id = record.sale_id
-
-                invoice_vals.update({
-                    'move_type': 'out_invoice',
-                    'partner_id': sale_id.partner_id.id,
-                    'sale_id': sale_id.id,
-                    'delivery_mode_id': sale_id.delivery_mode_id.id or False,
-                    'fg_purchase_order_no': sale_id.fg_purchase_order_no,
-                    'fg_remarks': sale_id.fg_remarks,
-                    'invoice_line_ids': invoice_line_vals,
-                })
-                new_invoice_id = self.env['account.move'].create(invoice_vals)
+        if invoice_line_vals:
+            invoice_vals.update({
+                'move_type': 'out_invoice',
+                'partner_id': partner_id.id,
+                'invoice_line_ids': invoice_line_vals,
+            })
+            new_invoice_id = self.env['account.move'].create(invoice_vals)
         return
 
 
