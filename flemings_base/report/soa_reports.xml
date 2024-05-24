@@ -133,7 +133,7 @@
 								<td><t t-esc="soa['invoice_name']" /></td>
 								<td><t t-esc="soa['customer_po']" /></td>
 								<td>
-									<!--<t t-esc="', '.join([item.name for item in soa['invoice_id'].picking_ids])" />-->
+									<t t-esc="soa['invoice_id'].delivery_order_names" />
 								</td>
 								<td>
 									<span style="float:right;"><t t-esc="'{0:,.2f}'.format(outstanding)" /></span>

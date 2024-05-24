@@ -414,6 +414,16 @@ class FlemingsSalesAccountMove(models.Model):
                 'computed_sgd_exchange_rate': record.currency_id.with_context(date=record.invoice_date or record.create_date).inverse_rate or 1.0
             })
 
+    @api.depends('invoice_line_ids', 'invoice_line_ids.picking_id')
+    def _compute_invoice_delivery_invoice_names(self):
+        for record in self:
+            record.write({
+                'computed_delivery_order_names': ', '.join([i.name for i in record.invoice_line_ids.mapped('picking_id')]),
+            })
+
+    computed_delivery_order_names = fields.Text(string='Delivery Order', store=False, readonly=True, compute='_compute_invoice_delivery_invoice_names')
+    delivery_order_names = fields.Text(related='computed_delivery_order_names', string='Delivery Order', store=True, readonly=True)
+
     sgd_currency_id = fields.Many2one('res.currency', string='SGD Currency', default=lambda self: self.env['res.currency'].search([('name', '=', 'SGD')], limit=1))
     computed_sgd_amount_untaxed = fields.Float(string='SGD Untaxed Amount', store=False, readonly=True, compute='_compute_sgd_equivalent_amount')
     computed_sgd_amount_tax = fields.Float(string='SGD GST', store=False, readonly=True, compute='_compute_sgd_equivalent_amount')
