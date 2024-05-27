@@ -9,6 +9,9 @@ from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
+import base64
+import io
+
 _logger = logging.getLogger(__name__)
 
 
@@ -37,6 +40,13 @@ class StatementAccountReportWizard(models.TransientModel):
         }
         
         return self.env.ref('flemings_base.action_statement_of_account').report_action(docids=self.ids, data=datas)
+
+    def generate_excel_report(self):
+        return {
+            'type': 'ir.actions.report',
+            'report_type': 'xlsx',
+            'report_name': 'flemings_base.statement_account_report_wizard_xlsx'
+        }
 
 
 class StatementOfAccount(models.AbstractModel):
@@ -194,3 +204,141 @@ class ResPartner(models.Model):
                     new_data['content'][item['currency']][range_title] = item['amount_total'] - item['residual_amount']
                     
         return new_data
+
+
+class FlemingsSoAReportXlsx(models.AbstractModel):
+    _name = 'report.flemings_base.statement_account_report_wizard_xlsx'
+    _inherit = 'report.report_xlsx.abstract'
+    _description = 'Statement of Account'
+
+    def generate_xlsx_report(self, workbook, data, objects):
+        sheet = workbook.add_worksheet('STATEMENT OF ACCOUNT')
+
+        align_left = workbook.add_format({'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'text_wrap': True})
+        align_right = workbook.add_format({'font_name': 'Arial', 'align': 'right', 'valign': 'vcenter', 'text_wrap': True})
+        align_center = workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'text_wrap': True})
+
+        align_bold_left = workbook.add_format({'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'text_wrap': True, 'bold': True})
+        align_bold_right = workbook.add_format({'font_name': 'Arial', 'align': 'right', 'valign': 'vcenter', 'text_wrap': True, 'bold': True})
+        align_bold_center = workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'text_wrap': True, 'border': 1})
+
+        row = 1
+        for obj in objects:
+            sheet.set_row(row, 20)
+            sheet.set_row(row + 1, 20)
+
+            sheet.set_column('A:A', 25)
+            sheet.set_column('B:B', 25)
+            sheet.set_column('C:C', 25)
+            sheet.set_column('D:D', 25)
+            sheet.set_column('E:E', 25)
+            sheet.set_column('F:F', 25)
+
+            partner_domain = []
+            if obj.partner_ids:
+                partner_domain += [('id', 'in', obj.partner_ids.ids or [])]
+
+            partner_ids = self.env['res.partner'].sudo().search(partner_domain)
+            new_partner_ids = self.env['res.partner']
+            values = {}
+            for partner in partner_ids:
+                datas = partner.get_partner_soa(datetime.strptime(str(obj.date), DEFAULT_SERVER_DATE_FORMAT))
+
+                if len(datas) > 0:
+                    new_partner_ids |= partner
+                    values.update({partner: datas})
+            datas = values
+
+            date = datetime.strftime(obj.date, '%d.%m.%Y')
+            for partner in datas:
+
+                # Insert Company Logo
+                company_id = self.env['res.company'].sudo().search([('id', 'in', obj.company_ids.ids), ('banner_report', '!=', False)], order='id asc', limit=1)
+                if obj.rp_logo and company_id and company_id.banner_report:
+                    image_width = 300.0
+                    image_height = 400.0
+                    cell_width = 128.0
+                    cell_height = 262.0
+
+                    x_scale = cell_width / image_width
+                    y_scale = cell_height / image_height
+
+                    sheet.insert_image(
+                        'A' + str(row), '', {
+                            'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
+                            'image_data': io.BytesIO(base64.b64decode(company_id.banner_report))
+                        }
+                    )
+                    row += 10
+
+                sheet.merge_range(row, 0, row, 5, 'STATEMENT OF ACCOUNT', workbook.add_format(
+                    {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True}))
+
+                row += 1
+                sheet.merge_range(row, 0, row, 3, partner.name, workbook.add_format(
+                    {'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'bold': True}))
+                sheet.merge_range(row, 4, row, 5, 'Date: ' + str(date), workbook.add_format(
+                    {'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'bold': True}))
+
+                row += 1
+                sheet.merge_range(row, 0, row, 3, str(partner.street or '') + ' ' + str(partner.street2 or ''), workbook.add_format(
+                    {'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'bold': True}))
+
+                row += 1
+                sheet.merge_range(row, 0, row, 3, str(partner.city or '') + ' ' + str(partner.country_id.name or '') + ' ' + str(partner.zip or ''), workbook.add_format(
+                    {'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'bold': True}))
+
+                row += 1
+                tell_no = partner.phone or partner.mobile
+                sheet.merge_range(row, 0, row, 3, 'TELL: ' + str(tell_no or ''), workbook.add_format(
+                    {'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'bold': True}))
+
+                row += 2
+                titles = ['DATE', 'INVOICE', 'YOUR PO', 'DO NO.', 'TOTAL AMOUNT', 'OUTSTANDING AMOUNT']
+                for index in range(0, len(titles)):
+                    sheet.write(row, index, titles[index], align_bold_center)
+                row += 1
+
+                balance = 0
+                for soa in datas[partner]:
+                    if soa['residual_amount']:
+                        outstanding = soa['amount_total'] - soa['residual_amount']
+                    else:
+                        outstanding = soa['amount_total']
+
+                    balance = balance + outstanding
+                    if outstanding != 0:
+                        sheet.write(row, 0, soa['invoice_date'], align_center)
+                        sheet.write(row, 1, soa['invoice_name'], align_left)
+                        sheet.write(row, 2, soa['customer_po'], align_left)
+                        sheet.write(row, 3, soa['invoice_id'].delivery_order_names, align_left)
+                        sheet.write(row, 4, str('{:.2f}'.format(outstanding)), align_right)
+                        sheet.write(row, 5, str('{:.2f}'.format(balance)), align_right)
+                        row += 1
+
+                row += 2
+                summary_data = partner.sql_to_get_payment_summary(str(obj.date))
+
+                titles = [str(summary_data['key'][v]['desc']).upper() for v in summary_data.get('key')]
+                titles += ['TOTAL DUE']
+                for index in range(0, len(titles)):
+                    sheet.write(row, index, titles[index], align_bold_center)
+                row += 1
+
+                for currency in summary_data.get('content'):
+                    total_outstanding = 0
+                    index = 0
+                    for v in summary_data['content'][currency]:
+                        outstanding = 0
+
+                        if summary_data['content'][currency][v]:
+                            outstanding = summary_data['content'][currency][v]
+                            total_outstanding = total_outstanding + outstanding
+
+                        sheet.write(row, index, str(currency) + ' ' + str('{:.2f}'.format(outstanding)), align_right)
+                        index += 1
+                    sheet.write(row, index, str(currency) + ' ' + str('{:.2f}'.format(total_outstanding)), align_right)
+
+                row += 6
+
+            row += 4

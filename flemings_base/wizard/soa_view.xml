@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+	<record id="statement_account_report_wizard_xlsx" model="ir.actions.report">
+		<field name="name">Statement of Account</field>
+		<field name="model">statement.account.report.wizard</field>
+		<field name="report_type">xlsx</field>
+		<field name="report_name">flemings_base.statement_account_report_wizard_xlsx</field>
+		<field name="report_file">Statement of Account</field>
+	</record>
+
 	<record id="view_statement_account_report_wizard" model="ir.ui.view">
 	    <field name="name">statement.account.report.wizard.form</field>
 	    <field name="model">statement.account.report.wizard</field>
@@ -13,7 +21,8 @@
 	            <field name="company_ids" widget="many2many_tags" invisible="1" />
 	        </group>
 	        <footer>
-	            <button name="print_report" string="Print" type="object" class="btn-primary"/>
+	            <button name="print_report" string="PDF" type="object" class="btn-primary"/>
+				<button name="generate_excel_report" string="XLS" type="object" class="oe_highlight"/>
 	            <button string="Cancel" special="cancel" class="btn-secondary"/>
 	        </footer>
 	    </form>

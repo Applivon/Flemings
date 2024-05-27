@@ -186,7 +186,7 @@
                     <thead>
                         <tr>
                             <td style="width:25%; text-align:left; padding-left:6px;">
-                                <img t-att-src="image_data_uri(company.logo)" alt="Logo" style="width:200px; float:left !important"/>
+                                <img t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
                             </td>
                             <td style="width:50%; text-align:left;">
                                 <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
@@ -228,7 +228,7 @@
                                 </div>
                             </td>
                             <td style="width:25%; text-align:right; padding-right:6px;">
-                                <img t-att-src="image_data_uri(company.logo)" alt="Logo" style="width:200px; float:left !important"/>
+                                <img t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
                             </td>
                             </tr>
                         <tr>
