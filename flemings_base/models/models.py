@@ -445,12 +445,13 @@ class FlemingsSalesAccountMove(models.Model):
         res = super(FlemingsSalesAccountMove, self).get_views(views, options)
         for view_type in ('list', 'form'):
             if res['views'].get(view_type, {}).get('toolbar'):
-                credit_note_report_id = self.env.ref('flemings_base.print_report_fg_credit_note').id
+                credit_note_report_ids = self.env.ref('flemings_base.print_report_fg_credit_note').ids
+                credit_note_report_ids += self.env.ref('flemings_base.account_move_print_credit_note_xlsx').ids
 
                 if self._context and self._context.get('default_move_type') and self._context.get('default_move_type') == 'out_refund':
-                    print = [rec for rec in res['views'][view_type]['toolbar']['print'] if rec.get('id', False) == credit_note_report_id]
+                    print = [rec for rec in res['views'][view_type]['toolbar']['print'] if rec.get('id', False) in credit_note_report_ids]
                 else:
-                    print = [rec for rec in res['views'][view_type]['toolbar']['print'] if rec.get('id', False) != credit_note_report_id]
+                    print = [rec for rec in res['views'][view_type]['toolbar']['print'] if rec.get('id', False) not in credit_note_report_ids]
 
                 res['views'][view_type]['toolbar'] = {'print': print}
         return res

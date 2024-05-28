@@ -98,7 +98,7 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
 
             row += 1
             if obj.partner_id.country_id and obj.partner_id.country_id.code != 'SG':
-                sheet.merge_range(row, 0, row, 1, str(obj.partner_id.city) + ' ' + str(obj.partner_id.state_id.name), align_left)
+                sheet.merge_range(row, 0, row, 1, str(obj.partner_id.city or '') + ' ' + str(obj.partner_id.state_id.name or ''), align_left)
                 sheet.merge_range(row + 1, 0, row + 1, 1, str(obj.partner_id.country_id.name or '') + ' ' + str(obj.partner_id.zip or ''), align_left)
             else:
                 sheet.merge_range(row, 0, row, 1, str(obj.partner_id.country_id.name or '') + ' ' + str(obj.partner_id.zip or ''), align_left)
@@ -157,9 +157,9 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
             sheet.write(row, 2, str('%.0f' % sum(obj.move_line_ids_without_package.mapped('qty_done')) or 0), align_center)
 
             row += 1
-            sheet.merge_range(row, 0, row, 1, str(obj.fg_remarks or ''), align_left)
+            sheet.merge_range(row, 0, row + 1, 1, str(obj.fg_remarks or ''), align_left)
 
-            row += 3
+            row += 4
             sheet.merge_range(row, 0, row+1, 1, 'Received in good order & condition by', align_bold_center)
             sheet.merge_range(row, 2, row+1, 3, 'Authorisation', align_bold_center)
 

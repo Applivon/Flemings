@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<!-- Accounting - Credit Note XLS - Print Menu -->
+	<record id="account_move_print_credit_note_xlsx" model="ir.actions.report">
+		<field name="name">Credit Note XLS</field>
+		<field name="model">account.move</field>
+		<field name="report_type">xlsx</field>
+		<field name="report_name">flemings_base.flemings_credit_note_report_xlsx</field>
+		<field name="report_file">flemings_base.flemings_credit_note_report_xlsx</field>
+		<field name="print_report_name">('Credit Note - %s' % (object.name))</field>
+		<field name="binding_model_id" ref="flemings_base.model_account_move"/>
+		<field name="binding_type">report</field>
+	</record>
+
+</odoo>
