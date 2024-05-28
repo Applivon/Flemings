@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<!-- Stock Picking - Delivery Order XLS - Print Menu -->
+	<record id="stock_picking_print_delivery_order_xlsx" model="ir.actions.report">
+		<field name="name">Delivery Order XLS</field>
+		<field name="model">stock.picking</field>
+		<field name="report_type">xlsx</field>
+		<field name="report_name">flemings_base.flemings_delivery_order_report_xlsx</field>
+		<field name="report_file">flemings_base.flemings_delivery_order_report_xlsx</field>
+		<field name="print_report_name">('Delivery Order - %s' % (object.name))</field>
+		<field name="binding_model_id" ref="stock.model_stock_picking"/>
+		<field name="binding_type">report</field>
+	</record>
+
+</odoo>

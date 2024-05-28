@@ -30,6 +30,7 @@
         # Wizard
         'wizard/flemings_purchase_price_report_view.xml',
         'wizard/soa_view.xml',
+        'wizard/delivery_order_xls_view.xml',
 
         # Report
         'report/base_report.xml',
