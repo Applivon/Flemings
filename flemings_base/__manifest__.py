@@ -32,6 +32,7 @@
         'wizard/soa_view.xml',
         'wizard/delivery_order_xls_view.xml',
         'wizard/credit_note_xls_view.xml',
+        'wizard/tax_invoice_xls_view.xml',
 
         # Report
         'report/base_report.xml',
