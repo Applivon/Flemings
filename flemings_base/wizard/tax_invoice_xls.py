@@ -31,10 +31,10 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
         align_bold_right = workbook.add_format({'font_name': 'Arial', 'align': 'right', 'valign': 'vcenter', 'text_wrap': True, 'bold': True})
         align_bold_center = workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'text_wrap': True})
 
-        row = 1
+        row = 0
         for obj in objects:
-            sheet.merge_range(0, 0, row + 6, 0, '', align_bold_center)
-            sheet.merge_range(0, 3, row + 6, 5, '', align_bold_center)
+            sheet.merge_range(row, 0, row + 7, 0, '', align_bold_center)
+            sheet.merge_range(row, 3, row + 7, 5, '', align_bold_center)
 
             image_width = 140.0
             image_height = 180.0
@@ -46,7 +46,7 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
 
             if obj.company_id.logo:
                 sheet.insert_image(
-                    'A' + str(row + 1), '',
+                    'A' + str(row + 2), '',
                     {'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
                      'image_data': io.BytesIO(base64.b64decode(obj.company_id.logo))
                      }
@@ -61,7 +61,7 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
                 y_scale = cell_height / image_height
 
                 sheet.insert_image(
-                    'D' + str(row + 1), '',
+                    'D' + str(row + 2), '',
                     {'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
                      'image_data': io.BytesIO(base64.b64decode(obj.company_id.sgs_img))
                      }
@@ -73,10 +73,10 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
                     'Email: ' + str(obj.company_id.email or '') + ' ' + str(obj.company_id.website or '')
             )
 
-            sheet.merge_range(0, 1, 2, 2, str(obj.company_id.name), workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'bottom', 'bold': True, 'text_wrap': True, 'font_size': 18}))
-            sheet.merge_range(3, 1, 7, 2, company_address, align_center)
+            sheet.merge_range(row, 1, row + 2, 2, str(obj.company_id.name), workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'bottom', 'bold': True, 'text_wrap': True, 'font_size': 18}))
+            sheet.merge_range(row + 3, 1, row + 7, 2, company_address, align_center)
 
-            row += 7
+            row += 8
 
             for i in range(row, row+13):
                 sheet.set_row(i, 22)
@@ -254,7 +254,7 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 0, row, 1, 'Exchange Rate: ' + str(obj.currency_id.symbol or '') + ' ' + str('%.6f' % obj.sgd_exchange_rate or 0), align_left)
 
             row += 2
-            sheet.merge_range(row, 0, row + 14, 1, str(obj.narration or ''), align_left)
+            sheet.merge_range(row, 0, row + 14, 1, str(obj.narration or ''), workbook.add_format({'font_name': 'Arial', 'align': 'left', 'valign': 'top', 'text_wrap': True}))
             sheet.merge_range(row, 2, row + 1, 5, 'For local payment, you may pay to (UEN) ' + str(obj.company_id.l10n_sg_unique_entity_number) + ' or you may scan this QR code', align_left)
 
             sheet.merge_range(row + 2, 2, row + 14, 5, '', align_bold_center)
@@ -289,3 +289,8 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 4, row, 5, 'for ' + str(obj.company_id.name), align_bold_center)
 
             row += 2
+            sheet.set_row(row, 22)
+            sheet.merge_range(row, 0, row, 3, 'Print By:  ' + str(self.env.user.name) + ' / ' + str(
+                fields.Datetime.context_timestamp(obj, datetime.now()).strftime('%d-%b-%y %I:%M:%S %p')
+            ), align_bold_left)
+            row += 6

@@ -31,10 +31,10 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
         align_bold_right = workbook.add_format({'font_name': 'Arial', 'align': 'right', 'valign': 'vcenter', 'text_wrap': True, 'bold': True})
         align_bold_center = workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'text_wrap': True})
 
-        row = 1
+        row = 0
         for obj in objects:
-            sheet.merge_range(0, 0, row + 6, 0, '', align_bold_center)
-            sheet.merge_range(0, 3, row + 6, 3, '', align_bold_center)
+            sheet.merge_range(row, 0, row + 7, 0, '', align_bold_center)
+            sheet.merge_range(row, 3, row + 7, 3, '', align_bold_center)
 
             image_width = 140.0
             image_height = 180.0
@@ -46,13 +46,13 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
 
             if obj.company_id.logo:
                 sheet.insert_image(
-                    'A' + str(row + 1), '',
+                    'A' + str(row + 2), '',
                     {'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
                      'image_data': io.BytesIO(base64.b64decode(obj.company_id.logo))
                      }
                 )
                 sheet.insert_image(
-                    'D' + str(row + 1), '',
+                    'D' + str(row + 2), '',
                     {'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
                      'image_data': io.BytesIO(base64.b64decode(obj.company_id.logo))
                      }
@@ -64,10 +64,10 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
                     'Email: ' + str(obj.company_id.email or '') + ' ' + str(obj.company_id.website or '')
             )
 
-            sheet.merge_range(0, 1, 2, 2, str(obj.company_id.name), workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'bottom', 'bold': True, 'text_wrap': True, 'font_size': 18}))
-            sheet.merge_range(3, 1, 7, 2, company_address, align_center)
+            sheet.merge_range(row, 1, row + 2, 2, str(obj.company_id.name), workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'bottom', 'bold': True, 'text_wrap': True, 'font_size': 18}))
+            sheet.merge_range(row + 3, 1, row + 7, 2, company_address, align_center)
 
-            row += 7
+            row += 8
 
             for i in range(row, row+11):
                 sheet.set_row(i, 22)
@@ -188,3 +188,8 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 2, row+1, 3, 'For ' + str(obj.company_id.name), align_bold_center)
 
             row += 2
+            sheet.set_row(row, 22)
+            sheet.merge_range(row, 0, row, 3, 'Print By:  ' + str(self.env.user.name) + ' / ' + str(
+                fields.Datetime.context_timestamp(obj, datetime.now()).strftime('%d-%b-%y %I:%M:%S %p')
+            ), align_bold_left)
+            row += 6
