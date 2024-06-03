@@ -28,16 +28,16 @@
                     <group col="2">
                         <field colspan="2" name="product_ids" options="{'no_create':True}">
                             <tree>
-                                <field name="name" strnig="Product Name"/>
-                                <field name="default_code" strnig="Internal Reference"/>
-                                <field name="uom_po_id" strnig="Purchase UOM"/>
+                                <field name="name" string="Product Name"/>
+                                <field name="default_code" string="Internal Reference"/>
+                                <field name="uom_po_id" string="Purchase UOM"/>
                             </tree>
                             <form>
                                 <group>
                                     <group>
-                                        <field name="name" strnig="Product Name"/>
-                                        <field name="default_code" strnig="Internal Reference"/>
-                                        <field name="uom_po_id" strnig="Purchase UOM"/>
+                                        <field name="name" string="Product Name"/>
+                                        <field name="default_code" string="Internal Reference"/>
+                                        <field name="uom_po_id" string="Purchase UOM"/>
                                     </group>
                                 </group>
                             </form>

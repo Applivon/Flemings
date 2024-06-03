@@ -28,3 +28,8 @@ access_pre_purchase_order_line_group_all,access_pre_purchase_order_line_group_al
 ,,,,,,,
 access_statement_account_report_wizard_group_all,access_statement_account_report_wizard_group_all,flemings_base.model_statement_account_report_wizard,,1,1,1,1
 ,,,,,,,
+access_purchase_cogs_summary_report_wizard_group_all,access_purchase_cogs_summary_report_wizard_group_all,flemings_base.model_purchase_cogs_summary_report_wizard,,1,1,1,1
+access_cogs_detailed_report_wizard_group_all,access_cogs_detailed_report_wizard_group_all,flemings_base.model_cogs_detailed_report_wizard,,1,1,1,1
+access_open_invoice_report_wizard_group_all,access_open_invoice_report_wizard_group_all,flemings_base.model_open_invoice_report_wizard,,1,1,1,1
+access_do_not_invoiced_report_wizard_group_all,access_do_not_invoiced_report_wizard_group_all,flemings_base.model_do_not_invoiced_report_wizard,,1,1,1,1
+,,,,,,,

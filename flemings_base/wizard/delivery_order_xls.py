@@ -187,7 +187,7 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 0, row+1, 1, 'Signature & Company Stamp', align_bold_center)
             sheet.merge_range(row, 2, row+1, 3, 'For ' + str(obj.company_id.name), align_bold_center)
 
-            row += 2
+            row += 3
             sheet.set_row(row, 22)
             sheet.merge_range(row, 0, row, 3, 'Print By:  ' + str(self.env.user.name) + ' / ' + str(
                 fields.Datetime.context_timestamp(obj, datetime.now()).strftime('%d-%b-%y %I:%M:%S %p')

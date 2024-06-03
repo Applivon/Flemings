@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+        <record id="open_invoice_report_wizard_xlsx" model="ir.actions.report">
+	        <field name="name">Open Invoice Report</field>
+	        <field name="model">open.invoice.report.wizard</field>
+	        <field name="report_type">xlsx</field>
+	        <field name="report_name">flemings_base.open_invoice_report_wizard_xlsx</field>
+	        <field name="report_file">Open Invoice Report</field>
+	    </record>
+	
+		<record id="view_open_invoice_report_wizard_form" model="ir.ui.view">
+			<field name="name">view.open.invoice.report.wizard.form</field>
+			<field name="model">open.invoice.report.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Open Invoice Report">
+                    <group>
+                        <group>
+                            <field name="from_date" required="1"/>
+                            <field name="to_date" required="1"/>
+                            <field name="sgd_currency_id" invisible="1"/>
+                            <field name="file_data" filename="filename" invisible="1"/>
+                            <field name="filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <group/><group/>
+
+                    <group>
+                        <field name="partner_ids" options="{'no_create':True}">
+                            <tree>
+                                <field name="name" string="Name"/>
+                                <field name="country_id" string="Country"/>
+                            </tree>
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="name" string="Name"/>
+                                        <field name="country_id" string="Country"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                    <footer>
+                        <button string="Print" name="generate_excel_report" class="oe_highlight" type="object"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+				</form>
+			</field>
+		</record>
+	
+        <record id="action_open_invoice_report_wizard" model="ir.actions.act_window">
+            <field name="name">Open Invoice Report</field>
+            <field name="res_model">open.invoice.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_open_invoice_report_wizard" parent="menu_accounting_invoicing_reports"
+                  action="action_open_invoice_report_wizard" sequence="5"/>
+
+	</data>
+</odoo>
