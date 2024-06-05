@@ -615,9 +615,58 @@
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='move_finished_ids']" position="after">
 					<field name="origin_so_no" readonly="1" force_save="1"/>
+					<button name="action_release_mrp_work_order_numbers" type="object" string="Release" class="oe_highlight" attrs="{'invisible': [('work_order_no', '=', False)]}"/>
                 </xpath>
 				<xpath expr="//field[@name='move_raw_ids']" position="after">
 					<field name="remarks" placeholder="Enter Remarks Here ...."/>
+                </xpath>
+				<xpath expr="//group/group/div[2]" position="after">
+					<field name="work_order_no" readonly="1" force_save="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Manufacturing Order - List View Inherit -->
+		<record id="fg_mrp_production_work_order_list_view_inherit" model="ir.ui.view">
+			<field name="name">fg.mrp.production.work.order.list.view.inherit</field>
+			<field name="model">mrp.production</field>
+			<field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='origin']" position="after">
+					<field name="work_order_no" readonly="1" force_save="1"/>
+                </xpath>
+            </field>
+        </record>
+
+		<!-- Manufacturing Order - Server Action -->
+		<record id="model_mrp_production_action_generate_work_order_no" model="ir.actions.server">
+			<field name="name">Generate Work Order No.</field>
+			<field name="model_id" ref="mrp.model_mrp_production"/>
+			<field name="binding_model_id" ref="mrp.model_mrp_production"/>
+			<field name="binding_view_types">list</field>
+			<field name="sequence" eval="100"/>
+			<field name="state">code</field>
+			<field name="code">action = records.action_generate_mrp_work_order_numbers()</field>
+		</record>
+
+		<record id="model_mrp_production_action_release_work_order_no" model="ir.actions.server">
+			<field name="name">Release</field>
+			<field name="model_id" ref="mrp.model_mrp_production"/>
+			<field name="binding_model_id" ref="mrp.model_mrp_production"/>
+			<field name="binding_view_types">list</field>
+			<field name="sequence" eval="100"/>
+			<field name="state">code</field>
+			<field name="code">action = records.action_release_mrp_work_order_numbers()</field>
+		</record>
+
+        <!-- Work Order - List View Inherit -->
+		<record id="fg_mrp_workorder_order_no_list_view_inherit" model="ir.ui.view">
+			<field name="name">fg.mrp.workorder.order.no.list.view.inherit</field>
+			<field name="model">mrp.workorder</field>
+			<field name="inherit_id" ref="mrp.mrp_production_workorder_tree_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='production_id']" position="after">
+					<field name="work_order_no"/>
                 </xpath>
             </field>
         </record>

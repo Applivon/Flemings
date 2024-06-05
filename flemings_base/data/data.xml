@@ -20,5 +20,16 @@
 			<field name="sale_selectable" eval="True"/>
 		</record>
 
+		<!-- Sequences -->
+		<record id="ir_sequence_mrp_production_work_order_number" model="ir.sequence">
+			<field name="name">Manufacturing - Work Order No.</field>
+			<field name="code">mrp.production.work.order.no</field>
+			<field name="prefix">WO/</field>
+			<field name="padding">4</field>
+			<field name="number_increment">1</field>
+			<field name="number_next_actual">1</field>
+			<field name="implementation">standard</field>
+		</record>
+
 	</data>
 </odoo>

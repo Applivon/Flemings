@@ -33,6 +33,7 @@
         'wizard/cogs_detailed_report_view.xml',
         'wizard/open_invoice_report_view.xml',
         'wizard/do_not_invoiced_report_view.xml',
+        'wizard/gross_profit_report_view.xml',
         'wizard/soa_view.xml',
         'wizard/delivery_order_xls_view.xml',
         'wizard/credit_note_xls_view.xml',

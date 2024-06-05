@@ -89,16 +89,16 @@ class FlemingsDoNotInvoicedReportXlsx(models.AbstractModel):
                 sheet.write(row, index, titles[index], align_bold_center)
 
             domain = [
-                ('fg_invoice_status', 'in', ['to invoice', 'partial_invoice']),
-                ('date_order', '>=', obj.from_date), ('date_order', '<=', obj.to_date)
+                ('sale_id', '!=', False), ('sale_id.fg_invoice_status', 'in', ['to invoice', 'partial_invoice']),
+                ('scheduled_date', '>=', obj.from_date), ('scheduled_date', '<=', obj.to_date)
             ]
             if obj.partner_ids:
-                domain += [('partner_id', 'in', obj.partner_ids.ids or [])]
+                domain += ['', ('sale_id.partner_id', 'in', obj.partner_ids.ids or []), ('partner_id', 'in', obj.partner_ids.ids or [])]
 
             row += 1
             sno = 1
 
-            line_data = self.env['sale.order'].sudo().search(domain, order='date_order')
+            line_data = self.env['stock.picking'].sudo().search(domain, order='scheduled_date').mapped('sale_id')
             for order_id in line_data:
                 do_dates = order_id.picking_ids.mapped('scheduled_date')
                 utc_do_date_times = [obj.get_utc_datetime(i) for i in do_dates]

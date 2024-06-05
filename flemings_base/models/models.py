@@ -460,6 +460,10 @@ class FlemingsSalesAccountMove(models.Model):
         res = super(FlemingsSalesAccountMove, self).action_post()
         # Update Invoice Price-book for Customer
         for invoice in self.filtered(lambda x: x.move_type == 'out_invoice'):
+            # Update Unit Cost Price for Profit Report
+            for invoice_line in invoice.invoice_line_ids:
+                invoice_line.unit_cost_price = invoice_line.product_id.standard_price
+
             invoice.update_customer_price_book()
 
             # Update 'Last Sale & Invoice Date' for Customer
@@ -572,6 +576,7 @@ class FlemingsSalesAccountMoveLines(models.Model):
 
     picking_id = fields.Many2one('stock.picking', string='Delivery Order', copy=False)
     sale_id = fields.Many2one('sale.order', string='Sale Order', copy=False)
+    unit_cost_price = fields.Float('Unit Cost Price', required=True, default=0.0)
 
 
 class FlemingsProductTemplate(models.Model):
@@ -747,6 +752,26 @@ class FlemingMrpProduction(models.Model):
 
     remarks = fields.Text('Remarks')
     origin_so_no = fields.Char('Origin SO No.')
+    work_order_no = fields.Char('Work Order No.')
+
+    def action_generate_mrp_work_order_numbers(self):
+        non_confirmed_progress_orders = list(set(self.filtered(lambda x: x.state not in ('confirmed', 'progress'))))
+        if non_confirmed_progress_orders:
+            raise UserError(_("Only 'Confirmed & In Progress' Orders are applicable for Generating Work Order No. !"))
+
+        already_processed_orders = list(set(self.filtered(lambda x: x.work_order_no)))
+        if already_processed_orders:
+            raise UserError(_("Work Order No. already generated for one or more selected records !"))
+
+        next_sequence = self.env['ir.sequence'].next_by_code('mrp.production.work.order.no')
+        for record in self:
+            record.work_order_no = next_sequence
+        return
+
+    def action_release_mrp_work_order_numbers(self):
+        for record in self:
+            record.work_order_no = False
+        return
 
     @api.model
     def create(self, vals):
@@ -756,6 +781,12 @@ class FlemingMrpProduction(models.Model):
                 record.origin_so_no = self._context.get('origin_so_no')
 
         return res
+
+
+class FlemingMrpWorkOrder(models.Model):
+    _inherit = 'mrp.workorder'
+
+    work_order_no = fields.Char(related='production_id.work_order_no', string='Work Order No.')
 
 
 class FlemingAccountPayment(models.Model):
