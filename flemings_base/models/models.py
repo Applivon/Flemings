@@ -764,14 +764,28 @@ class FlemingMrpProduction(models.Model):
             raise UserError(_("Work Order No. already generated for one or more selected records !"))
 
         next_sequence = self.env['ir.sequence'].next_by_code('mrp.production.work.order.no')
+        self.env['mrp.production.work.order.no'].create({'work_order_no': next_sequence})
         for record in self:
             record.work_order_no = next_sequence
         return
 
     def action_release_mrp_work_order_numbers(self):
+        non_processed_orders = list(set(self.filtered(lambda x: not x.work_order_no)))
+        if non_processed_orders:
+            raise UserError(_("Work Order No. is not generated to Release for one or more selected records !"))
+
         for record in self:
             record.work_order_no = False
         return
+
+    def action_reassign_mrp_work_order_numbers(self):
+        already_processed_orders = list(set(self.filtered(lambda x: x.work_order_no)))
+        if already_processed_orders:
+            raise UserError(_("Work Order No. already generated for one or more selected records !"))
+
+        action = self.env['ir.actions.act_window']._for_xml_id('flemings_base.action_reassign_work_order_wizard')
+        action['context'] = {'default_production_ids': [(6, 0, self.ids)]}
+        return action
 
     @api.model
     def create(self, vals):
@@ -783,10 +797,54 @@ class FlemingMrpProduction(models.Model):
         return res
 
 
+class FlemingMrpProductionWorkOrder(models.Model):
+    _name = 'mrp.production.work.order.no'
+    _description = 'MO - Work Order No.'
+    _rec_name = 'work_order_no'
+    _order = 'create_date desc'
+
+    work_order_no = fields.Char(string='Work Order No.', required=True)
+
+
+class FlemingMOReassignWO(models.TransientModel):
+    _name = 'mrp.production.reassign.work.order.no'
+    _description = 'MO - Work Order No. - Reassign'
+    _rec_name = 'work_order_id'
+
+    work_order_id = fields.Many2one('mrp.production.work.order.no', string='Work Order No.')
+    production_ids = fields.Many2many('mrp.production', string='Manufacturing Order(s)')
+
+    def reassign_mo_work_order(self):
+        for record in self:
+            record.production_ids.write({'work_order_no': record.work_order_id.work_order_no})
+
+
 class FlemingMrpWorkOrder(models.Model):
     _inherit = 'mrp.workorder'
 
     work_order_no = fields.Char(related='production_id.work_order_no', string='Work Order No.')
+
+
+class FlemingMrpImageWorkOrder(models.Model):
+    _name = 'mo.image.for.work.order'
+    _description = 'MO - Image for Work Order'
+    _rec_name = 'work_order_no'
+    _order = 'create_date desc'
+
+    work_order_no = fields.Char('Work Order No.', required=True)
+    customer_name = fields.Char('Customer Name', required=True)
+    customer_ref = fields.Char('Customer Ref.')
+    sale_order_no = fields.Char('Sale Order No.')
+    summary_remarks = fields.Text('Summary Remarks')
+    attachment_id = fields.Binary('Attachment', attachment=True)
+    attachment_name = fields.Char('Attachment Name', size=64, readonly=True)
+
+    @api.constrains('work_order_no')
+    def check_work_order_no_exists(self):
+        for record in self:
+            if record.work_order_no:
+                if not self.env['mrp.production.work.order.no'].sudo().search([('work_order_no', '=', record.work_order_no)]):
+                    raise UserError(_('Work Order No. not exists !'))
 
 
 class FlemingAccountPayment(models.Model):

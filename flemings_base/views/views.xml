@@ -659,6 +659,40 @@
 			<field name="code">action = records.action_release_mrp_work_order_numbers()</field>
 		</record>
 
+		<record id="model_mrp_production_action_reassign_work_order_no" model="ir.actions.server">
+			<field name="name">Reassign WO</field>
+			<field name="model_id" ref="mrp.model_mrp_production"/>
+			<field name="binding_model_id" ref="mrp.model_mrp_production"/>
+			<field name="binding_view_types">list</field>
+			<field name="sequence" eval="100"/>
+			<field name="state">code</field>
+			<field name="code">action = records.action_reassign_mrp_work_order_numbers()</field>
+		</record>
+
+		<record id="view_reassign_work_order_wizard_form" model="ir.ui.view">
+			<field name="name">view.reassign.work.order.wizard.form</field>
+			<field name="model">mrp.production.reassign.work.order.no</field>
+			<field name="arch" type="xml">
+				<form string="Reassign WO">
+                    <group>
+                        <field name="work_order_id" required="1" options="{'no_open':True, 'no_create':True}"/>
+                        <field name="production_ids" widget="many2many_tags" required="1" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button string="Reassign" name="reassign_mo_work_order" class="oe_highlight" type="object"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+				</form>
+			</field>
+		</record>
+
+        <record id="action_reassign_work_order_wizard" model="ir.actions.act_window">
+            <field name="name">Reassign WO</field>
+            <field name="res_model">mrp.production.reassign.work.order.no</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
         <!-- Work Order - List View Inherit -->
 		<record id="fg_mrp_workorder_order_no_list_view_inherit" model="ir.ui.view">
 			<field name="name">fg.mrp.workorder.order.no.list.view.inherit</field>
@@ -670,6 +704,82 @@
                 </xpath>
             </field>
         </record>
+
+		<!-- Image for Work Order -->
+		<record id="view_mo_image_for_work_order_list" model="ir.ui.view">
+			<field name="name">view.mo.image.for.work.order.list</field>
+			<field name="model">mo.image.for.work.order</field>
+			<field name="arch" type="xml">
+				<tree string="Image for Work Order">
+					<field name="work_order_no" required="1"/>
+					<field name="customer_name" required="1"/>
+					<field name="customer_ref"/>
+					<field name="sale_order_no"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="view_mo_image_for_work_order_form" model="ir.ui.view">
+			<field name="name">view.mo.image.for.work.order.form</field>
+			<field name="model">mo.image.for.work.order</field>
+			<field name="arch" type="xml">
+				<form string="Image for Work Order">
+					<sheet>
+						<group>
+							<group>
+								<field name="work_order_no" required="1"/>
+							</group>
+						</group>
+						<group/><group/>
+
+						<group>
+							<group>
+								<field name="customer_name" required="1"/>
+								<field name="customer_ref"/>
+							</group>
+						</group>
+						<group/><group/>
+
+						<group>
+							<group>
+								<field name="sale_order_no"/>
+								<field name="summary_remarks"/>
+							</group>
+						</group>
+						<group/><group/>
+
+						<group>
+							<group>
+								<field name="attachment_id" widget="binary" filename="attachment_name" required="1"/>
+								<field name="attachment_name" invisible="1"/>
+						</group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+        <record id="view_mo_image_for_work_order_search" model="ir.ui.view">
+			<field name="name">view.mo.image.for.work.order.search</field>
+			<field name="model">mo.image.for.work.order</field>
+			<field name="arch" type="xml">
+				<search string="Image for Work Order">
+					<field name="work_order_no"/>
+					<field name="customer_name"/>
+					<field name="customer_ref"/>
+					<field name="sale_order_no"/>
+				</search>
+			</field>
+		</record>
+
+		<record id="action_mo_image_for_work_order" model="ir.actions.act_window">
+            <field name="name">Image for Work Order</field>
+			<field name="type">ir.actions.act_window</field>
+            <field name="res_model">mo.image.for.work.order</field>
+            <field name="search_view_id" ref="view_mo_image_for_work_order_search"/>
+        </record>
+
+		<menuitem id="menu_mo_image_for_work_order" parent="mrp.menu_mrp_manufacturing" action="action_mo_image_for_work_order" sequence="10"/>
 
 		<!-- Account Payments - Form View -->
 		<record id="fg_account_payment_order_form_view_inherit" model="ir.ui.view">
