@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+	
+		<record id="view_work_order_summary_report_wizard_form" model="ir.ui.view">
+			<field name="name">view.work.order.summary.report.wizard.form</field>
+			<field name="model">work.order.summary.report.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Work Order Summary Report">
+                    <group>
+                        <group>
+                            <field name="work_order_no" required="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="print_report" string="Print" type="object" class="btn-primary"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+				</form>
+			</field>
+		</record>
+	
+        <record id="action_work_order_summary_report_wizard" model="ir.actions.act_window">
+            <field name="name">Work Order Summary Report</field>
+            <field name="res_model">work.order.summary.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_work_order_summary_report_wizard" parent="mrp.menu_mrp_reporting" action="action_work_order_summary_report_wizard" sequence="10"/>
+
+	</data>
+</odoo>

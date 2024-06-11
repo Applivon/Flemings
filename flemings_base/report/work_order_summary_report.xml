@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Work Order Summary Report -->
+        <template id="report_work_order_summary">
+            <t t-if="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-if="not o or not 'company_id' in o">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+
+            <div class="header">
+                <style>
+                    td {word-break: break-word !important; word-spacing: 3px !important; padding:3px; page-break-inside: avoid !important; vertical-align:middle !important;}
+
+                    .non-border, .non-border > tr, .non-border > tr > td {
+                        border: none !important; border-color: #ffffff !important;
+                    }
+                </style>
+
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                    <thead>
+                        <tr>
+                            <td style="width:25%; text-align:left; padding-left:6px;">
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
+                            </td>
+                            <td style="width:50%; text-align:center; font-size:12pt; font-weight:bold;">
+                                WORK ORDER SUMMARY REPORT
+                            </td>
+                            <td style="width:25%; text-align:right; padding-right:6px;"/>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div class="page" style="font-family:sans-serif !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
+
+                <style>
+                    td {word-break: break-word !important; word-spacing: 3px !important; page-break-inside: avoid !important;}
+
+                    .non-border, .non-border > tr, .non-border > tr > td {
+                        border: none !important; border-color: #ffffff !important;
+                    }
+                </style>
+
+                <t t-if="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-if="not o or not 'company_id' in o">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+
+                <t t-set="image_wo" t-value="o.get_wo_image_work_order()"/>
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                    <thead>
+                        <tr>
+                            <td colspan="2" style="width:25%; padding:5px; border:1px solid black; text-align:left;">
+                                <b>Date :</b> <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%y')"/>
+                            </td>
+                            <td colspan="3" style="width:35%; padding:5px; border:1px solid black; text-align:left;"/>
+                            <td style="width:40%; padding:5px; border:1px solid black; text-align:left;">
+                                <b>Ref No : </b><span t-field="image_wo.customer_ref"/>
+                                <span style="padding-left:10px !important;"/>
+                                <b>SO # </b><span t-field="image_wo.sale_order_no"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:5%; padding:5px; border:1px solid black; font-weight:bold; text-align:center;">S/N</td>
+                            <td style="width:20%; padding:5px; border:1px solid black; font-weight:bold; text-align:center;">DESIGN</td>
+                            <td style="width:14%; padding:5px; border:1px solid black; font-weight:bold; text-align:center;">DESCRIPTION</td>
+                            <td style="width:10%; padding:5px; border:1px solid black; font-weight:bold; text-align:center;">SIZE</td>
+                            <td style="width:11%; padding:5px; border:1px solid black; font-weight:bold; text-align:center;">QUANTITY</td>
+                            <td style="width:40%; padding:5px; border:1px solid black; font-weight:bold; text-align:center;">REMARKS</td>
+                        </tr>
+                    </thead>
+
+                    <t t-set="sno" t-value="1"/>
+                    <t t-set="line_list" t-value="o.get_wo_image_line_list()"/>
+
+                    <t t-if="line_list">
+                        <t t-foreach="line_list" t-as="fabric_line">
+                            <tr>
+                                <td style="width:5%; border:1px solid black; text-align:center; vertical-align:top !important;">
+                                    <span style="padding:5px;" t-esc="sno"/>
+                                </td>
+                                <td style="width:20%; border:1px solid black; text-align:center; font-weight:bold; vertical-align:top !important;">
+                                    <span style="padding:5px;" t-esc="fabric_line['fabric_name']"/>
+                                </td>
+                                <td colspan="4" style="width:75%; border-top:1px solid black; border-right:1px solid black; border-left:1px solid black; text-align:center;">
+                                    <t t-foreach="fabric_line['type_attribute_list']" t-as="type_line">
+                                        <t t-set="total_size_count" t-value="0"/>
+                                        <t t-set="total_size_len" t-value="len(type_line['size_attribute_list'])+2"/>
+
+                                        <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt;">
+                                            <t t-foreach="type_line['size_attribute_list']" t-as="size_line">
+                                                <tr>
+                                                    <t t-if="total_size_len == len(type_line['size_attribute_list'])+2">
+                                                        <td t-attf-rowspan="{{ total_size_len }}" style="width:18.5%; border-right:1px solid black; border-bottom:1px solid black; font-weight:bold;"><span style="padding:5px;" t-esc="type_line['type_name']"/></td>
+                                                    </t>
+                                                    <td style="width:13.2%; border-right:1px solid black; border-bottom:1px solid black; vertical-align:middle !important;"><span style="padding:5px;" t-esc="size_line['size_name']"/></td>
+                                                    <td style="width:14.9%; border-right:1px solid black; border-bottom:1px solid black; vertical-align:middle !important;"><span style="padding:5px;" t-esc="'{0:,.0f}'.format(size_line['grouped_qty'])"/></td>
+                                                    <t t-if="total_size_len == len(type_line['size_attribute_list'])+2">
+                                                        <td t-attf-rowspan="{{ total_size_len }}" style="width:54%; border-bottom:1px solid black; text-align:left; padding:5px !important;"><span style="padding:5px;" t-esc="type_line['remarks']"/></td>
+                                                    </t>
+                                                </tr>
+                                                <t t-set="total_size_count" t-value="total_size_count+size_line['grouped_qty']"/>
+                                                <t t-set="total_size_len" t-value="total_size_len-1"/>
+                                            </t>
+                                            <tr>
+                                                <td style="width:13.2%; border-right:1px solid black; border-bottom:1px solid black; vertical-align:middle !important;"/>
+                                                <td style="width:14.9%; border-right:1px solid black; border-bottom:1px solid black; font-weight:bold; vertical-align:middle !important;"><span style="padding:5px; text-decoration:underline;" t-esc="'{0:,.0f}'.format(total_size_count)"/></td>
+                                            </tr>
+                                            <tr style="height:30px !important;">
+                                                <td style="width:13.2%; border-right:1px solid black; border-bottom:1px solid black;"/>
+                                                <td style="width:14.9%; border-right:1px solid black; border-bottom:1px solid black;"/>
+                                            </tr>
+                                        </table>
+                                    </t>
+                                </td>
+
+                                <t t-set="sno" t-value="sno+1"/>
+                            </tr>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <tr style="height:30px !important;">
+                            <td colspan="6" style="width:100%; padding:5px; border:1px solid black; font-weight:bold; text-align:center;">
+                                No Record(s) found
+                            </td>
+                        </tr>
+                    </t>
+
+                    <tr style="height:30px !important;">
+                        <td style="width:5%; padding:5px; border-right:1px solid black; border-left:1px solid black;"/>
+                        <td style="width:20%; padding:5px; border-right:1px solid black;"/>
+                        <td style="width:14%; padding:5px; border-right:1px solid black;"/>
+                        <td style="width:10%; padding:5px; border-right:1px solid black;"/>
+                        <td style="width:11%; padding:5px; border-right:1px solid black;"/>
+                        <td style="width:40%; padding:5px; border-right:1px solid black;"/>
+                    </tr>
+                    <tr>
+                        <td style="width:5%; padding:5px; border:1px solid black; font-weight:bold; text-align:center;"/>
+                        <td colspan="2" style="width:34%; padding:5px; border:1px solid black; font-weight:bold; text-align:center; text-decoration:underline;">
+                            Main Label Image
+                        </td>
+                        <td style="width:10%; padding:5px; border:1px solid black;"/>
+                        <td style="width:11%; padding:5px; border:1px solid black;"/>
+                        <td style="width:40%; padding:5px; border:1px solid black;"/>
+                    </tr>
+                    <tr>
+                        <td style="width:5%; padding:5px; border:1px solid black;"/>
+                        <td colspan="2" style="width:34%; padding:5px; border:1px solid black; text-align:center;">
+                            <t t-foreach="image_wo.attachment_ids" t-as="attachment">
+                                <img t-att-src="attachment.image_src" style="max-width:200px; height:90px;"/>
+                                <br/>
+                            </t>
+                        </td>
+                        <td style="width:10%; padding:5px; border:1px solid black;"/>
+                        <td style="width:11%; padding:5px; border:1px solid black;"/>
+                        <td style="width:40%; padding:5px; border:1px solid black; vertical-align:top !important;">
+                            <span t-field="image_wo.summary_remarks"/>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+            <div class="footer">
+                <style>
+                    td {word-break: break-word !important; word-spacing: 3px !important; page-break-inside: avoid !important;}
+
+                    .non-border, .non-border > tr, .non-border > tr > td {
+                        border: none !important; border-color: #ffffff !important;
+                    }
+                </style>
+
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                    <thead>
+                        <tr>
+                            <td style="width:66%; text-align:left; border-top:1px solid black; vertical-align:middle !important;">
+                                Print By: <span t-esc="user.name"/> /
+                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%y %I:%M:%S %p')"/>
+                            </td>
+                            <td style="width:34%; text-align:right; border-top:1px solid black; vertical-align:middle !important;">
+                                Page <span class="page"/> of <span class="topage"/>
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </template>
+
+        <template id="report_work_order_summary_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                	<div class="article"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+	                    <t t-call="flemings_base.report_work_order_summary" t-lang="lang"/>
+                	</div>
+                </t>
+            </t>
+        </template>
+
+        <record id="paperformat_work_order_summary_report" model="report.paperformat">
+            <field name="name">Flemings Work Order Summary</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">25</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">8</field>
+            <field name="margin_right">8</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">20</field>
+            <field name="dpi">80</field>
+        </record>
+
+        <record id="print_report_fg_work_order_summary" model="ir.actions.report">
+            <field name="name">Work Order Summary</field>
+            <field name="model">work.order.summary.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">flemings_base.report_work_order_summary_document</field>
+            <field name="report_file">flemings_base.report_work_order_summary_document</field>
+            <field name="paperformat_id" ref="paperformat_work_order_summary_report"/>
+            <field name="print_report_name">'Work Order Summary - %s' % (object.work_order_no or '').replace('/','_')</field>
+        </record>
+
+    </data>
+</odoo>
+

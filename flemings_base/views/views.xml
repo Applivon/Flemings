@@ -380,6 +380,19 @@
             <field name="context">{'search_default_fg_only_customer': 1, 'res_partner_search_mode': 'customer', 'default_is_company': True, 'default_customer_rank': 1}</field>
         </record>
 
+		<!-- Product Attributes - Form View Inherit -->
+		<record id="fg_product_attribute_item_form_view_inherit" model="ir.ui.view">
+			<field name="name">fg.product.attribute.item.form.view.inherit</field>
+			<field name="model">product.attribute</field>
+			<field name="inherit_id" ref="product.product_attribute_view_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='create_variant']" position="after">
+					<separator/>
+					<field name="attribute_type" widget="radio" options="{'horizontal': true}"/>
+				</xpath>
+			</field>
+		</record>
+
 		<!-- Product - Form View Inherit -->
 		<record id="fg_product_template_item_form_view_inherit" model="ir.ui.view">
 			<field name="name">fg.product.template.item.form.view.inherit</field>
@@ -638,6 +651,18 @@
             </field>
         </record>
 
+        <!-- Manufacturing Order - Search View Inherit -->
+		<record id="fg_mrp_production_work_order_filter_view_inherit" model="ir.ui.view">
+			<field name="name">fg.mrp.production.work.order.filter.view.inherit</field>
+			<field name="model">mrp.production</field>
+			<field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='name']" position="attributes">
+					<attribute name="filter_domain">['|', '|', ('name', 'ilike', self), ('origin', 'ilike', self), ('work_order_no', 'ilike', self)]</attribute>
+                </xpath>
+            </field>
+        </record>
+
 		<!-- Manufacturing Order - Server Action -->
 		<record id="model_mrp_production_action_generate_work_order_no" model="ir.actions.server">
 			<field name="name">Generate Work Order No.</field>
@@ -723,7 +748,7 @@
 			<field name="name">view.mo.image.for.work.order.form</field>
 			<field name="model">mo.image.for.work.order</field>
 			<field name="arch" type="xml">
-				<form string="Image for Work Order">
+				<form string="Image for Work Order" duplicate="0">
 					<sheet>
 						<group>
 							<group>
@@ -750,8 +775,7 @@
 
 						<group>
 							<group>
-								<field name="attachment_id" widget="binary" filename="attachment_name" required="1"/>
-								<field name="attachment_name" invisible="1"/>
+								<field name="attachment_ids" widget="many2many_binary" required="1"/>
 						</group>
 						</group>
 					</sheet>

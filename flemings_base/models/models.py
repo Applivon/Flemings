@@ -12,6 +12,21 @@ from dateutil.relativedelta import relativedelta
 from odoo.exceptions import Warning
 from odoo.exceptions import UserError, ValidationError
 
+import os
+from odoo.addons.web.controllers.main import clean
+
+
+class FlemingsProductAttribute(models.Model):
+    _inherit = 'product.attribute'
+
+    attribute_type = fields.Selection([('fabric', 'Fabric'), ('type', 'Type'), ('size', 'Size')], string='Attribute Type')
+
+    @api.constrains('attribute_type')
+    def check_attribute_type_exists(self):
+        for record in self.filtered(lambda x: x.attribute_type):
+            if self.sudo().search([('attribute_type', '=', record.attribute_type), ('id', '!=', record.id)]):
+                raise UserError(_("This Attribute Type already assigned for another Attribute !"))
+
 
 class FlemingsItemCategory(models.Model):
     _name = 'fg.item.category'
@@ -831,13 +846,12 @@ class FlemingMrpImageWorkOrder(models.Model):
     _rec_name = 'work_order_no'
     _order = 'create_date desc'
 
-    work_order_no = fields.Char('Work Order No.', required=True)
+    work_order_no = fields.Char('Work Order No.', required=True, copy=False)
     customer_name = fields.Char('Customer Name', required=True)
     customer_ref = fields.Char('Customer Ref.')
     sale_order_no = fields.Char('Sale Order No.')
     summary_remarks = fields.Text('Summary Remarks')
-    attachment_id = fields.Binary('Attachment', attachment=True)
-    attachment_name = fields.Char('Attachment Name', size=64, readonly=True)
+    attachment_ids = fields.Many2many('ir.attachment', 'image_wo_attachment_rel', 'image_wo_id', 'attachment_id', string='Attachment')
 
     @api.constrains('work_order_no')
     def check_work_order_no_exists(self):
@@ -845,6 +859,34 @@ class FlemingMrpImageWorkOrder(models.Model):
             if record.work_order_no:
                 if not self.env['mrp.production.work.order.no'].sudo().search([('work_order_no', '=', record.work_order_no)]):
                     raise UserError(_('Work Order No. not exists !'))
+
+                if self.sudo().search([('work_order_no', '=', record.work_order_no), ('id', '!=', record.id)]):
+                    raise UserError(_('Image for Work Order already exists for this Work Order No. !'))
+
+    @api.constrains('attachment_ids')
+    def check_valid_attachment(self):
+        for record in self.filtered(lambda x: x.attachment_ids):
+            offending_files = []
+            for attachment in record.attachment_ids:
+                if not self.check_is_allowed_extension(attachment.name):
+                    msg = _(' - File extension not allowed \n\n Only "jpeg, jpg & png" files are allowed as Attachments !')
+                    offending_files.append({
+                        'filename': clean(attachment.name),
+                        'error': msg
+                    })
+
+            if offending_files:
+                raise UserError(_(" {0}{1}".format(offending_files[0]['filename'], offending_files[0]['error'])))
+
+    def check_is_allowed_extension(self, filename):
+        is_allowed = True
+        ext = os.path.splitext(filename)[1][1:].lower().strip()
+
+        whitelist = 'jpeg,jpg,png'
+        if whitelist and ext not in [x.lower().strip() for x in whitelist.split(',')]:
+            is_allowed = False
+
+        return is_allowed
 
 
 class FlemingAccountPayment(models.Model):
