@@ -708,7 +708,7 @@ class FlemingsStockPicking(models.Model):
         partner_id = partner_ids[0]
 
         invoice_vals, invoice_line_vals = {}, []
-        for record in self:
+        for record in self.filtered(lambda x: not x.sale_id.invoice_ids):
             for move_line in record.move_ids_without_package:
                 invoice_line_vals.append((0, 0, {
                     'picking_id': record.id,
