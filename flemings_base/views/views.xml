@@ -562,6 +562,21 @@
 					<field name="process_by_id" options="{'no_create':True}"/>
 					<field name="fg_remarks"/>
                 </xpath>
+				<xpath expr="//field[@name='backorder_id']" position="after">
+					<field name="is_fully_invoiced" attrs="{'invisible': [('picking_type_code', '!=', 'outgoing')]}" readonly="1" force_save="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Stock Picking - List View Inherit -->
+		<record id="fg_stock_picking_remarks_list_view_inherit" model="ir.ui.view">
+			<field name="name">fg.stock.picking.remarks.list.view.inherit</field>
+			<field name="model">stock.picking</field>
+			<field name="inherit_id" ref="stock.vpicktree"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='origin']" position="before">
+					<field name="is_fully_invoiced"/>
+                </xpath>
             </field>
         </record>
 

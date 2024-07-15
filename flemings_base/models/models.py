@@ -670,6 +670,7 @@ class FlemingsStockPicking(models.Model):
     customer_po = fields.Char('Customer PO No.', copy=False)
     process_by_id = fields.Many2one('res.users', string='Process By')
     fg_remarks = fields.Text('Remarks')
+    is_fully_invoiced = fields.Boolean('Fully Invoiced ?', default=False, copy=False)
 
     def button_validate(self):
         res = super(FlemingsStockPicking, self).button_validate()
@@ -708,7 +709,7 @@ class FlemingsStockPicking(models.Model):
         partner_id = partner_ids[0]
 
         invoice_vals, invoice_line_vals = {}, []
-        for record in self.filtered(lambda x: not x.sale_id.invoice_ids):
+        for record in self.filtered(lambda x: x.sale_id and not x.is_fully_invoiced):
             for move_line in record.move_ids_without_package:
                 invoice_line_vals.append((0, 0, {
                     'picking_id': record.id,
@@ -719,6 +720,7 @@ class FlemingsStockPicking(models.Model):
                     'quantity': move_line.quantity_done,
                     'product_uom_id': move_line.product_uom.id,
                 }))
+            record.is_fully_invoiced = True
 
         if invoice_line_vals:
             invoice_vals.update({
