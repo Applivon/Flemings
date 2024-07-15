@@ -897,9 +897,13 @@ class FlemingAccountPayment(models.Model):
         for record in self:
             sale_ids = []
             if record.partner_id and record.payment_type == 'inbound':
-                sale_ids = self.env['account.move'].sudo().search(
-                    [('partner_id', '=', record.partner_id.id), ('move_type', '=', 'out_invoice'), ('amount_residual', '>', 0)]
-                ).mapped('line_ids').mapped('sale_line_ids').mapped('order_id').ids
+                # sale_ids = self.env['account.move'].sudo().search(
+                #     [('partner_id', '=', record.partner_id.id), ('move_type', '=', 'out_invoice'), ('amount_residual', '>', 0)]
+                # ).mapped('line_ids').mapped('sale_line_ids').mapped('order_id').ids
+                sale_ids = self.env['sale.order'].sudo().search(
+                    [('partner_id', '=', record.partner_id.id), ('state', 'in', ['sale', 'done']),
+                     '|', ('invoice_ids', '=', False), ('invoice_ids.amount_residual', '>', 0)]
+                ).ids or []
             record.sale_ids = [(6, 0, sale_ids or [])]
 
     sale_ids = fields.Many2many('sale.order', string='Sales Order(s)', compute='_compute_payment_sale_ids')
