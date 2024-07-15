@@ -85,7 +85,7 @@
 						<strong>
 							<h5 style="font-size: 10pt; font-weight: bold; margin: 0; padding: 0;">
 								<t t-if="partner.name">
-								   	<span t-esc="partner.name.upper()"/>
+								   	<span t-esc="partner.display_name.upper()"/>
 								</t>
 							</h5>
 							<br/>
