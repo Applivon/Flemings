@@ -226,13 +226,20 @@ class FlemingsSalesOrder(models.Model):
         order_line = []
         for manufacturing_order_id in self.manufacturing_order_ids:
             fg_sno = 1
-            for move_line in manufacturing_order_id.move_raw_ids:
-                order_line += [(0, 0, {
-                    'fg_sno': fg_sno,
-                    'product_id': move_line.product_id.id,
-                    'product_uom_qty': move_line.quantity_done,
-                })]
-                fg_sno += 1
+            order_line += [(0, 0, {
+                'fg_sno': fg_sno,
+                'product_id': manufacturing_order_id.product_id.id,
+                'product_uom_qty': manufacturing_order_id.product_qty,
+            })]
+            fg_sno += 1
+
+            # for move_line in manufacturing_order_id.move_raw_ids:
+            #     order_line += [(0, 0, {
+            #         'fg_sno': fg_sno,
+            #         'product_id': move_line.product_id.id,
+            #         'product_uom_qty': move_line.quantity_done,
+            #     })]
+            #     fg_sno += 1
         self.order_line = order_line
 
     @api.model
