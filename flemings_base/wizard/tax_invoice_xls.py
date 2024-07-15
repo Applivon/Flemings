@@ -101,7 +101,7 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
             delivery_customer = obj.partner_shipping_id or obj.partner_id
 
             row += 1
-            sheet.write(row, 0, str(obj.partner_id.display_name), align_left)
+            sheet.write(row, 0, str(obj.partner_id.name), align_left)
             sheet.write(row, 1, str(delivery_customer.name), align_left)
             sheet.merge_range(row, 2, row, 3, 'CO Reg. No.', align_left)
             sheet.merge_range(row, 4, row, 5, str(obj.company_id.l10n_sg_unique_entity_number or ''), align_left)
@@ -161,13 +161,18 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
 
             row += 1
             right_column_row += 1
-            sheet.merge_range(right_column_row, 0, right_column_row, 1, 'ATTN: ' + str(contact_customer.title.name or '') + ' ' + str(contact_customer.name or ''), align_left)
+            if contact_customer and contact_customer.parent_id:
+                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'ATTN: ' + str(contact_customer.parent_id.title.name or '') + ' ' + str(contact_customer.parent_id.name or ''), align_left)
+            else:
+                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Fax: ' + str(contact_customer.fax or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
+
             sheet.merge_range(right_column_row, 2, right_column_row, 3, 'Country', align_left)
             sheet.merge_range(right_column_row, 4, right_column_row, 5, str(obj.partner_id.country_id.name or ''), align_left)
 
-            row += 1
-            right_column_row += 1
-            sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Fax: ' + str(contact_customer.fax or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
+            if contact_customer and contact_customer.parent_id:
+                row += 1
+                right_column_row += 1
+                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Fax: ' + str(contact_customer.fax or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
 
             row += 1
             sheet.set_row(row, 22)

@@ -93,7 +93,7 @@
                                                     <td>Bill To: </td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span t-field="o.partner_id"/></td>
+                                                    <td><span t-field="o.partner_id.name"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td><span t-field="o.partner_id.street"/></td>
@@ -188,12 +188,20 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
-                                            ATTN :
-                                            <t t-if="contact_customer">
-                                                <span t-if="contact_customer.title" t-esc="contact_customer.title.name"/> <span t-esc="contact_customer.name"/>
-                                            </t>
-                                        </td>
+                                        <t t-if="contact_customer and contact_customer.parent_id">
+                                            <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
+                                                ATTN :
+                                                <span t-if="contact_customer.parent_id.title" t-esc="contact_customer.parent_id.title.name"/> <span t-esc="contact_customer.parent_id.name"/>
+                                            </td>
+                                        </t>
+                                        <t t-else="">
+                                            <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
+                                                Tel: <span t-field="contact_customer.phone"/>
+                                                Fax: <span t-field="contact_customer.fax"/>
+                                                Mob: <span t-field="contact_customer.mobile"/>
+                                            </td>
+                                        </t>
+
                                         <td rowspan="3" style="width:36%; text-align:left;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
@@ -203,13 +211,15 @@
                                             </table>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
-                                            Tel: <span t-field="contact_customer.phone"/>
-                                            Fax: <span t-field="contact_customer.fax"/>
-                                            Mob: <span t-field="contact_customer.mobile"/>
-                                        </td>
-                                    </tr>
+                                    <t t-if="contact_customer and contact_customer.parent_id">
+                                        <tr>
+                                            <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
+                                                Tel: <span t-field="contact_customer.phone"/>
+                                                Fax: <span t-field="contact_customer.fax"/>
+                                                Mob: <span t-field="contact_customer.mobile"/>
+                                            </td>
+                                        </tr>
+                                    </t>
                                 </table>
                             </td>
                         </tr>
