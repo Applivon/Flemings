@@ -89,7 +89,7 @@ class FlemingsDoNotInvoicedReportXlsx(models.AbstractModel):
                 sheet.write(row, index, titles[index], align_bold_center)
 
             domain = [
-                ('sale_id', '!=', False), ('sale_id.fg_invoice_status', 'in', ['to invoice', 'partial_invoice']),
+                ('sale_id', '!=', False), ('sale_id.fg_invoice_status', 'in', ['to_invoice', 'partial_invoice']),
                 ('scheduled_date', '>=', obj.from_date), ('scheduled_date', '<=', obj.to_date)
             ]
             if obj.partner_ids:

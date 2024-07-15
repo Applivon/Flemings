@@ -547,7 +547,7 @@
 
 		<!-- Sales Order - Order to Invoice - Action View Inherit -->
 		<record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
-			<field name="domain">[('fg_invoice_status', 'in', ['to invoice', 'partial_invoice'])]</field>
+			<field name="domain">[('fg_invoice_status', 'in', ['to_invoice', 'partial_invoice'])]</field>
 			<field name="context">{'create': False, 'sale_orders_to_invoice': True}</field>
 		</record>
 
