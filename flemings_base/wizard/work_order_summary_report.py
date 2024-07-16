@@ -62,11 +62,12 @@ class WorkOrderSummaryReport(models.TransientModel):
                                     lambda x: x.id in type_grouped_product_ids.ids)
 
                                 final_mo_products = mo_orders.filtered(lambda x: x.product_id.id in size_grouped_product_ids.ids)
-                                size_attribute_list.append({
-                                    'size_name': size_value_id.name,
-                                    'grouped_qty': sum(final_mo_products.mapped('product_qty')) or 0,
-                                })
-                                remarks += ' ' + str(' '.join([i for i in final_mo_products.filtered(lambda x: x.remarks).mapped('remarks')]))
+                                if sum(final_mo_products.mapped('product_qty')):
+                                    size_attribute_list.append({
+                                        'size_name': size_value_id.name,
+                                        'grouped_qty': sum(final_mo_products.mapped('product_qty')) or 0,
+                                    })
+                                    remarks += ' ' + str(' '.join([i for i in final_mo_products.filtered(lambda x: x.remarks).mapped('remarks')]))
 
                         type_attribute_list.append({
                             'type_name': type_value_id.name,
