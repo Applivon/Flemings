@@ -77,6 +77,7 @@ class FlemingsPurchaseCOGSSummaryReportXlsx(models.AbstractModel):
                 {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 16}))
 
             stock_valuation_env = self.env['stock.valuation.layer'].sudo()
+            purchase_order_env = self.env['purchase.order'].sudo()
             from_date_time = datetime.combine(obj.from_date, time.min).replace(microsecond=0)
             from_date = obj.get_utc_datetime(from_date_time)
             opening_stocks_total = sum(stock_valuation_env.search([('create_date', '<=', from_date)]).mapped('value')) or 0
@@ -113,8 +114,10 @@ class FlemingsPurchaseCOGSSummaryReportXlsx(models.AbstractModel):
 
                 stocks_total = sum(stock_valuation_env.search(
                     [('create_date', '<=', to_date)]).mapped('value')) or 0
-                purchase_total = sum(stock_valuation_env.search(
-                    [('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '>', 0)]).mapped('value')) or 0
+                # purchase_total = sum(stock_valuation_env.search(
+                #     [('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '>', 0)]).mapped('value')) or 0
+                purchase_total = sum(purchase_order_env.search(
+                    [('date_approve', '>=', from_date), ('date_approve', '<=', to_date)]).mapped('amount_untaxed')) or 0
                 sales_total = sum(stock_valuation_env.search(
                     [('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '<', 0)]).mapped('value')) or 0
 
