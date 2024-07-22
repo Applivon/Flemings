@@ -92,38 +92,42 @@ class FlemingsCreditNoteReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 2, row, 5, 'CREDIT NOTE', workbook.add_format(
                 {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 18}))
 
+            contact_customer = obj.partner_id.parent_id or obj.partner_id
+            if obj.partner_id.parent_id:
+                attn_customer = obj.partner_id
+            else:
+                if contact_customer.child_ids.filtered(lambda x: x.type in ('contact', 'invoice', 'delivery')):
+                    attn_customer = contact_customer.child_ids.filtered(lambda x: x.type in ('contact', 'invoice', 'delivery'))[0]
+                else:
+                    attn_customer = contact_customer
+
             row += 1
-            sheet.merge_range(row, 0, row, 1, str(obj.partner_id.name), align_left)
+            sheet.merge_range(row, 0, row, 1, str(contact_customer.name), align_left)
             sheet.merge_range(row, 2, row, 3, 'CO Reg. No.', align_left)
             sheet.merge_range(row, 4, row, 5, str(obj.company_id.l10n_sg_unique_entity_number or ''), align_left)
 
             row += 1
-            sheet.merge_range(row, 0, row, 1, str(obj.partner_id.street), align_left)
+            sheet.merge_range(row, 0, row, 1, str(contact_customer.street), align_left)
             sheet.merge_range(row, 2, row, 3, 'GST Reg. No.', align_left)
             sheet.merge_range(row, 4, row, 5, str(obj.company_id.vat or ''), align_left)
 
             row += 1
-            sheet.merge_range(row, 0, row, 1, str(obj.partner_id.street2), align_left)
+            sheet.merge_range(row, 0, row, 1, str(contact_customer.street2), align_left)
             sheet.merge_range(row, 2, row, 3, 'Transaction No.', align_left)
             sheet.merge_range(row, 4, row, 5, str(obj.name or ''), align_left)
 
             row += 1
             right_column_row = row
-            if obj.partner_id.country_id and obj.partner_id.country_id.code != 'SG':
-                sheet.merge_range(row, 0, row, 1, str(obj.partner_id.city or '') + ' ' + str(obj.partner_id.state_id.name or ''), align_left)
-                sheet.merge_range(row + 1, 0, row + 1, 1, str(obj.partner_id.country_id.name or '') + ' ' + str(obj.partner_id.zip or ''), align_left)
+            if contact_customer.country_id and contact_customer.country_id.code != 'SG':
+                sheet.merge_range(row, 0, row, 1, str(contact_customer.city or '') + ' ' + str(contact_customer.state_id.name or ''), align_left)
+                sheet.merge_range(row + 1, 0, row + 1, 1, str(contact_customer.country_id.name or '') + ' ' + str(contact_customer.zip or ''), align_left)
                 row += 2
             else:
-                sheet.merge_range(right_column_row, 0, right_column_row, 1, str(obj.partner_id.country_id.name or '') + ' ' + str(obj.partner_id.zip or ''), align_left)
+                sheet.merge_range(right_column_row, 0, right_column_row, 1, str(contact_customer.country_id.name or '') + ' ' + str(contact_customer.zip or ''), align_left)
                 row += 1
 
             sheet.merge_range(right_column_row, 2, right_column_row, 3, 'Date', align_left)
             sheet.merge_range(right_column_row, 4, right_column_row, 5, str(datetime.strftime(obj.invoice_date, '%d %B %Y')) if obj.invoice_date else '', align_left)
-
-            if obj.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice')):
-                contact_customer = obj.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))[0]
-            else:
-                contact_customer = obj.partner_id
 
             row += 1
             right_column_row += 1
@@ -133,17 +137,15 @@ class FlemingsCreditNoteReportXlsx(models.AbstractModel):
 
             row += 1
             right_column_row += 1
-            if contact_customer and contact_customer.parent_id:
-                sheet.merge_range(row, 0, row, 1, 'ATTN: ' + str(contact_customer.parent_id.title.name or '') + ' ' + str(contact_customer.parent_id.name or ''), align_left)
+            if attn_customer:
+                sheet.merge_range(row, 0, row, 1, 'ATTN: ' + str(attn_customer.title.name or '') + ' ' + str(attn_customer.name or ''), align_left)
+                row += 1
+                sheet.merge_range(row, 0, row, 1, 'Tel: ' + str(attn_customer.phone or '') + '  Fax: ' + str(attn_customer.fax or '') + '  Mob: ' + str(attn_customer.mobile or ''), align_left)
             else:
                 sheet.merge_range(row, 0, row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Fax: ' + str(contact_customer.fax or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
 
             sheet.merge_range(right_column_row, 2, right_column_row, 3, 'Salesperson', align_left)
             sheet.merge_range(right_column_row, 4, right_column_row, 5, str(obj.user_id.name or ''), align_left)
-
-            if contact_customer and contact_customer.parent_id:
-                row += 1
-                sheet.merge_range(row, 0, row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Fax: ' + str(contact_customer.fax or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
 
             row += 2
             sheet.set_row(row, 22)
