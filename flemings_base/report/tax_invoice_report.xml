@@ -20,18 +20,24 @@
                     }
                 </style>
 
-                <t t-if="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))">
-                    <t t-set="contact_customer" t-value="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))[0]"/>
-                </t>
-                <t t-else="1">
-                    <t t-set="contact_customer" t-value="o.partner_id"/>
-                </t>
-
                 <t t-if="o.partner_shipping_id">
                     <t t-set="delivery_customer" t-value="o.partner_shipping_id"/>
                 </t>
                 <t t-else="1">
                     <t t-set="delivery_customer" t-value="o.partner_id"/>
+                </t>
+
+                <t t-set="contact_customer" t-value="o.partner_id.parent_id or o.partner_id"/>
+                <t t-if="o.partner_id.parent_id">
+                    <t t-set="attn_customer" t-value="o.partner_id"/>
+                </t>
+                <t t-else="">
+                    <t t-if="contact_customer.child_ids.filtered(lambda x: x.type in ('contact', 'invoice', 'delivery'))">
+                        <t t-set="attn_customer" t-value="contact_customer.child_ids.filtered(lambda x: x.type in ('contact', 'invoice', 'delivery'))[0]"/>
+                    </t>
+                    <t t-else="1">
+                        <t t-set="attn_customer" t-value="contact_customer"/>
+                    </t>
                 </t>
 
                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
@@ -93,25 +99,25 @@
                                                     <td>Bill To: </td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span t-field="o.partner_id.name"/></td>
+                                                    <td><span t-field="contact_customer.name"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span t-field="o.partner_id.street"/></td>
+                                                    <td><span t-field="contact_customer.street"/></td>
                                                 </tr>
-                                                <t t-if="o.partner_id.street2">
+                                                <t t-if="contact_customer.street2">
                                                     <tr>
-                                                        <td><span t-field="o.partner_id.street2"/></td>
+                                                        <td><span t-field="contact_customer.street2"/></td>
                                                     </tr>
                                                 </t>
-                                                <t t-if="o.partner_id.country_id and o.partner_id.country_id.code != 'SG'">
+                                                <t t-if="contact_customer.country_id and contact_customer.country_id.code != 'SG'">
                                                     <td>
-                                                        <span t-field="o.partner_id.city"/>
-                                                        <t t-if="o.partner_id.city and o.partner_id.state_id">,&#160;</t>
-                                                        <span t-field="o.partner_id.state_id"/>
+                                                        <span t-field="contact_customer.city"/>
+                                                        <t t-if="contact_customer.city and contact_customer.state_id">,&#160;</t>
+                                                        <span t-field="contact_customer.state_id"/>
                                                     </td>
                                                 </t>
                                                 <tr>
-                                                    <td><span t-field="o.partner_id.country_id"/> <span t-field="o.partner_id.zip"/></td>
+                                                    <td><span t-field="contact_customer.country_id"/> <span t-field="contact_customer.zip"/></td>
                                                 </tr>
                                             </table>
                                         </td>
@@ -121,7 +127,7 @@
                                                     <td>Deliver To: </td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span t-esc="delivery_customer.name"/></td>
+                                                    <td><span t-esc="contact_customer.name"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td><span t-field="delivery_customer.street"/></td>
@@ -188,10 +194,10 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <t t-if="contact_customer and contact_customer.parent_id">
+                                        <t t-if="attn_customer">
                                             <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
                                                 ATTN :
-                                                <span t-if="contact_customer.parent_id.title" t-esc="contact_customer.parent_id.title.name"/> <span t-esc="contact_customer.parent_id.name"/>
+                                                <span t-if="attn_customer.title" t-esc="attn_customer.title.name"/> <span t-esc="attn_customer.name"/>
                                             </td>
                                         </t>
                                         <t t-else="">
@@ -211,12 +217,12 @@
                                             </table>
                                         </td>
                                     </tr>
-                                    <t t-if="contact_customer and contact_customer.parent_id">
+                                    <t t-if="attn_customer">
                                         <tr>
                                             <td colspan="2" style="width:64%; text-align:left; padding:5px; padding-left:12px;">
-                                                Tel: <span t-field="contact_customer.phone"/>
-                                                Fax: <span t-field="contact_customer.fax"/>
-                                                Mob: <span t-field="contact_customer.mobile"/>
+                                                Tel: <span t-field="attn_customer.phone"/>
+                                                Fax: <span t-field="attn_customer.fax"/>
+                                                Mob: <span t-field="attn_customer.mobile"/>
                                             </td>
                                         </tr>
                                     </t>
