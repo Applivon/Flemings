@@ -504,6 +504,10 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree//field[@name='route_id']" position="attributes">
 					<attribute name="optional">show</attribute>
+					<attribute name="groups"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group/field[@name='route_id']" position="attributes">
+					<attribute name="groups"/>
                 </xpath>
            </field>
         </record>
