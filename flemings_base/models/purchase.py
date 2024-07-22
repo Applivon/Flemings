@@ -43,7 +43,7 @@ class FlemingsPreRFQSalesOrder(models.Model):
                     'product_qty': line_id.product_uom_qty,
                     'product_uom': line_id.product_uom.id,
                     'price_unit': 0,
-                    'taxes_id': [(6, 0, line_id.tax_id.ids or [])],
+                    # 'taxes_id': [(6, 0, line_id.tax_id.ids or [])],
                 })]
             if order_line:
                 self.env['pre.purchase.order'].create({
@@ -214,6 +214,9 @@ class FlemingPrePurchaseOrderLines(models.Model):
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         self.currency_id = self.partner_id.property_product_pricelist.currency_id.id or False
+        self.taxes_id = False
+        if self.partner_id.country_id.code == 'SG':
+            self.taxes_id = [(6, 0, self.company_id.account_purchase_tax_id.ids or [])]
 
     @api.depends('product_qty', 'price_unit', 'taxes_id')
     def _compute_amount(self):
