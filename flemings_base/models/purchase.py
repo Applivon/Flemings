@@ -69,6 +69,75 @@ class FlemingsPurchaseOrder(models.Model):
 
     pre_rfq_id = fields.Many2one('pre.purchase.order', string='Pre-RFQ')
 
+    # Inter Company Currency Mismatch Condition update
+    def inter_company_create_sale_order(self, company):
+        """ Create a Sales Order from the current PO (self)
+            Note : In this method, reading the current PO is done as sudo, and the creation of the derived
+            SO as intercompany_user, minimizing the access right required for the trigger user.
+            :param company : the company of the created PO
+            :rtype company : res.company record
+        """
+        # find user for creating and validation SO/PO from partner company
+        intercompany_uid = company.intercompany_user_id and company.intercompany_user_id.id or False
+        if not intercompany_uid:
+            raise UserError(_(
+                'Provide at least one user for inter company relation for %(name)s',
+                name=company.name,
+            ))
+        # check intercompany user access rights
+        if not self.env['sale.order'].check_access_rights('create', raise_exception=False):
+            raise UserError(_(
+                "Inter company user of company %(name)s doesn't have enough access rights",
+                name=company.name,
+            ))
+
+        for rec in self:
+            # check pricelist currency should be same with SO/PO document
+            company_partner = rec.company_id.partner_id.with_user(intercompany_uid)
+
+            # Custom Start - Inter Company Currency Issue commented
+            # if rec.currency_id.id != company_partner.property_product_pricelist.currency_id.id:
+            #     raise UserError(_(
+            #         'You cannot create SO from PO because sale price list currency is different '
+            #         'than purchase price list currency.\n'
+            #         'The currency of the SO is obtained from the pricelist of the company partner.\n\n'
+            #         '(SO currency: %(so_currency)s, Pricelist: %(pricelist)s, Partner: %(partner)s (ID: %(id)s))',
+            #         so_currency=rec.currency_id.name,
+            #         pricelist=company_partner.property_product_pricelist.display_name,
+            #         partner=company_partner.display_name,
+            #         id=company_partner.id,
+            #     ))
+            # Custom End - Inter Company Currency Issue commented
+
+            # create the SO and generate its lines from the PO lines
+            # read it as sudo, because inter-compagny user can not have the access right on PO
+            direct_delivery_address = rec.picking_type_id.warehouse_id.partner_id.id or rec.dest_address_id.id
+            sale_order_data = rec.sudo()._prepare_sale_order_data(
+                rec.name, company_partner, company,
+                direct_delivery_address or False)
+
+            # Custom Start - Inter Company Currency if mismatched updated new Pricelist
+            if rec.currency_id.id != company_partner.property_product_pricelist.currency_id.id:
+                sale_order_data.update({'pricelist_id': rec.partner_id.property_product_pricelist.id})
+            # Custom End - Inter Company Currency if mismatched updated new Pricelist
+
+            inter_user = self.env['res.users'].sudo().browse(intercompany_uid)
+            # lines are browse as sudo to access all data required to be copied on SO line (mainly for company dependent field like taxes)
+            for line in rec.order_line.sudo():
+                sale_order_data['order_line'] += [(0, 0, rec._prepare_sale_order_line_data(line, company))]
+
+            sale_order = self.env['sale.order'].with_context(allowed_company_ids=inter_user.company_ids.ids).with_user(intercompany_uid).create(sale_order_data)
+            msg = _("Automatically generated from %(origin)s of company %(company)s.", origin=self.name, company=rec.company_id.name)
+            sale_order.message_post(body=msg)
+
+            # write vendor reference field on PO
+            if not rec.partner_ref:
+                rec.partner_ref = sale_order.name
+
+            #Validation of sales order
+            if company.auto_validation:
+                sale_order.with_user(intercompany_uid).action_confirm()
+
     def _prepare_sale_order_data(self, name, partner, company, direct_delivery_address):
         """ Update sale order value."""
         sale_order_data = super(FlemingsPurchaseOrder, self)._prepare_sale_order_data(name, partner, company, direct_delivery_address)
