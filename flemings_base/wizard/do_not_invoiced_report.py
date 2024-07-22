@@ -101,8 +101,8 @@ class FlemingsDoNotInvoicedReportXlsx(models.AbstractModel):
             line_data = self.env['stock.picking'].sudo().search(domain, order='scheduled_date').mapped('sale_id')
             for order_id in line_data:
                 do_dates = order_id.picking_ids.mapped('scheduled_date')
-                utc_do_date_times = [obj.get_utc_datetime(i) for i in do_dates]
-                utc_do_dates = list(set(j.date() for j in utc_do_date_times))
+                # utc_do_date_times = [obj.get_utc_datetime(i) for i in do_dates]
+                utc_do_dates = list(set(j.date() for j in do_dates))
 
                 if len(utc_do_dates) == 1:
                     sheet.write(row, 0, str(sno), align_center)
@@ -117,7 +117,8 @@ class FlemingsDoNotInvoicedReportXlsx(models.AbstractModel):
                     for utc_do_date in utc_do_dates:
                         picking_ids = []
                         for picking_id in order_id.picking_ids:
-                            picking_utc_do_date = obj.get_utc_datetime(picking_id.scheduled_date) and obj.get_utc_datetime(picking_id.scheduled_date).date()
+                            # picking_utc_do_date = obj.get_utc_datetime(picking_id.scheduled_date) and obj.get_utc_datetime(picking_id.scheduled_date).date()
+                            picking_utc_do_date = picking_id.scheduled_date and picking_id.scheduled_date.date()
                             if utc_do_date == picking_utc_do_date:
                                 picking_ids += [picking_id]
 
