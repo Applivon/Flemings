@@ -12,3 +12,4 @@ from . import delivery_order_xls
 from . import credit_note_xls
 from . import tax_invoice_xls
 from . import work_order_summary_report
+from . import purchase_audit_list_summary

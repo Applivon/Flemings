@@ -39,6 +39,7 @@
         'wizard/credit_note_xls_view.xml',
         'wizard/tax_invoice_xls_view.xml',
         'wizard/work_order_summary_report_view.xml',
+        'wizard/purchase_audit_list_summary_view.xml',
 
         # Report
         'report/base_report.xml',
