@@ -655,6 +655,9 @@
 				<xpath expr="//group/group/div[2]" position="after">
 					<field name="work_order_no" readonly="1" force_save="1"/>
                 </xpath>
+				<xpath expr="//field[@name='components_availability_state']" position="before">
+					<field name="scheduled_production_date" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
+                </xpath>
             </field>
         </record>
 

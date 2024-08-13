@@ -777,6 +777,7 @@ class FlemingMrpProduction(models.Model):
     remarks = fields.Text('Remarks')
     origin_so_no = fields.Char('Origin SO No.')
     work_order_no = fields.Char('Work Order No.')
+    scheduled_production_date = fields.Date('Scheduled Production Date')
 
     def action_generate_mrp_work_order_numbers(self):
         non_confirmed_progress_orders = list(set(self.filtered(lambda x: x.state not in ('confirmed', 'progress'))))
