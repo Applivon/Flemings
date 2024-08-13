@@ -713,6 +713,10 @@ class FlemingsStockPicking(models.Model):
         partner_ids = list(set(self.mapped('partner_id')))
         if len(partner_ids) > 1:
             raise UserError(_('You cannot create invoice for Multiple Contacts, choose same Contact Delivery Orders !'))
+
+        sale_ids = list(set(self.mapped('sale_id')))
+        if len(sale_ids) > 1:
+            raise UserError(_('You cannot create invoice for Multiple Sales Orders, choose same SO Delivery Orders !'))
         partner_id = partner_ids[0]
 
         invoice_vals, invoice_line_vals = {}, []
