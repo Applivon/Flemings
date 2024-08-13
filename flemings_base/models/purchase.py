@@ -32,10 +32,30 @@ class FlemingsPreRFQSalesOrder(models.Model):
     def action_confirm(self):
         res = super(FlemingsPreRFQSalesOrder, self).action_confirm()
         for order in self:
-            # Pre-RFQ Creation
-            pre_rfq_lines = order.order_line.filtered(lambda x: x.route_id.is_buy_external or x.route_id.is_buy_internal)
+            # Buy - External - Pre-RFQ Creation
+            external_pre_rfq_lines = order.order_line.filtered(lambda x: x.route_id.is_buy_external)
             order_line = []
-            for line_id in pre_rfq_lines:
+            for line_id in external_pre_rfq_lines:
+                order_line += [(0, 0, {
+                    'route_id': line_id.route_id.id,
+                    'product_id': line_id.product_id.id,
+                    'name': line_id.name,
+                    'product_qty': line_id.product_uom_qty,
+                    'product_uom': line_id.product_uom.id,
+                    'price_unit': 0,
+                    # 'taxes_id': [(6, 0, line_id.tax_id.ids or [])],
+                })]
+            if order_line:
+                self.env['pre.purchase.order'].create({
+                    'sale_id': order.id,
+                    'company_id': order.company_id.id,
+                    'order_line': order_line,
+                })
+
+            # Buy - Internal - Pre-RFQ Creation
+            internal_pre_rfq_lines = order.order_line.filtered(lambda x: x.route_id.is_buy_internal)
+            order_line = []
+            for line_id in internal_pre_rfq_lines:
                 order_line += [(0, 0, {
                     'route_id': line_id.route_id.id,
                     'product_id': line_id.product_id.id,

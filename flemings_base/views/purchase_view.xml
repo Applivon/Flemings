@@ -23,7 +23,7 @@
 	        <field name="arch" type="xml">
 	            <form string="Pre-RFQ" duplicate="0">
 					<header>
-						<button name="button_create_po" states="draft" string="Create PO" type="object"/>
+						<button name="button_create_po" states="draft" string="Create PO" type="object" class="oe_highlight"/>
 						<button name="button_cancel" states="draft,po_created" string="Cancel" type="object"/>
 						<field name="state" widget="statusbar" statusbar_visible="draft,po_created,cancel" readonly="1"/>
 					</header>
