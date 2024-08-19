@@ -467,10 +467,10 @@
 			<field name="inherit_id" ref="sale.view_order_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//button[@name='action_confirm'][1]" position="attributes">
-					<attribute name="context">{'validate_analytic': True, 'origin_so_no': origin_so_no}</attribute>
+					<attribute name="context">{'validate_analytic': True, 'origin_so_no': origin_so_no, 'so_origin_no': name}</attribute>
                 </xpath>
 				<xpath expr="//button[@name='action_confirm'][2]" position="attributes">
-					<attribute name="context">{'validate_analytic': True, 'origin_so_no': origin_so_no}</attribute>
+					<attribute name="context">{'validate_analytic': True, 'origin_so_no': origin_so_no, 'so_origin_no': name}</attribute>
                 </xpath>
 				<xpath expr="//field[@name='partner_shipping_id']" position="after">
 					<field name="manufacturing_order_ids" widget="many2many_tags" domain="[('state', '=', 'done')]" attrs="{'readonly': [('state', '!=', 'draft')]}" options="{'no_create':True}"/>

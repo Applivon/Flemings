@@ -820,8 +820,10 @@ class FlemingMrpProduction(models.Model):
     def create(self, vals):
         res = super(FlemingMrpProduction, self).create(vals)
         for record in res:
-            if self._context and self._context.get('origin_so_no', False):
+            if not record.origin_so_no and self._context and self._context.get('origin_so_no', False):
                 record.origin_so_no = self._context.get('origin_so_no')
+            if not record.origin and self._context and self._context.get('so_origin_no', False):
+                record.origin = self._context.get('so_origin_no')
 
         return res
 
