@@ -486,6 +486,7 @@
 				<xpath expr="//group[@name='sales_person']/field[@name='user_id']" position="after">
 					<field name="customer_service_id" options="{'no_create':True}"/>
 					<field name="delivery_mode_id" options="{'no_create':True}"/>
+					<field name="can_user_edit_qty" invisible="1"/>
                 </xpath>
 				<xpath expr="//field[@name='partner_shipping_id']" position="after">
 					<field name="origin_so_no" readonly="1" force_save="1"/>
@@ -493,6 +494,12 @@
                 </xpath>
 				<xpath expr="//field[@name='order_line']/tree/field[@name='sequence']" position="before">
 					<field name="fg_sno" string="S.No." attrs="{'readonly': [('parent.generate_fg_sno', '=', True)]}" force_save="1"/>
+                </xpath>
+				<xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="attributes">
+					<attribute name="attrs">{'readonly': [('parent.can_user_edit_qty', '=', False)]}</attribute>
+                </xpath>
+				<xpath expr="//field[@name='order_line']/form/group/group/div[@name='ordered_qty']/field[@name='product_uom_qty']" position="attributes">
+					<attribute name="attrs">{'readonly': [('parent.can_user_edit_qty', '=', False)]}</attribute>
                 </xpath>
 			</field>
 		</record>

@@ -353,6 +353,21 @@ class FlemingsSalesOrder(models.Model):
                             'price_unit': line.price_unit
                         })
 
+    can_user_edit_qty = fields.Boolean('Can User Edit SO Qty ?', compute='_compute_can_user_edit_qty')
+
+    @api.depends('picking_ids')
+    def _compute_can_user_edit_qty(self):
+        for record in self:
+            if not record.picking_ids:
+                record.can_user_edit_qty = True
+            elif record.picking_ids and (
+                    self.env.user.has_group('flemings_base.fg_admin_group') or
+                    self.env.user.has_group('flemings_base.fg_finance_group')
+            ):
+                record.can_user_edit_qty = True
+            else:
+                record.can_user_edit_qty = False
+
 
 class FlemingsPurchaseOrder(models.Model):
     _inherit = 'purchase.order'
