@@ -27,6 +27,11 @@
 						<group/><group/>
 
 						<group>
+							<field name="user_ids" widget="many2many_tags" options="{'no_open':True, 'no_create':True}"/>
+						</group>
+						<group/><group/>
+
+						<group>
 							<field name="product_ids" options="{'no_create':True}">
 								<tree>
 									<field name="name" string="Product Name"/>
