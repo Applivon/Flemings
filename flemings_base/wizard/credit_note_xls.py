@@ -129,9 +129,9 @@ class FlemingsCreditNoteReportXlsx(models.AbstractModel):
             sheet.merge_range(right_column_row, 2, right_column_row, 3, 'Date', align_left)
             sheet.merge_range(right_column_row, 4, right_column_row, 5, str(datetime.strftime(obj.invoice_date, '%d %B %Y')) if obj.invoice_date else '', align_left)
 
-            row += 1
+            # row += 1
             right_column_row += 1
-            sheet.merge_range(row, 0, row, 1, 'Contact Name: ' + str(contact_customer.title.name or '') + ' ' + str(contact_customer.name or ''), align_left)
+            # sheet.merge_range(row, 0, row, 1, 'Contact Name: ' + str(contact_customer.title.name or '') + ' ' + str(contact_customer.name or ''), align_left)
             sheet.merge_range(right_column_row, 2, right_column_row, 3, 'Currency', align_left)
             sheet.merge_range(right_column_row, 4, right_column_row, 5, str(obj.currency_id.name or ''), align_left)
 

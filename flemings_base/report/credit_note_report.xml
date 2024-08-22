@@ -112,14 +112,14 @@
                                                 <tr>
                                                     <td><span t-field="contact_customer.country_id"/> <span t-field="contact_customer.zip"/></td>
                                                 </tr>
-                                                <tr>
+                                                <!--<tr>
                                                     <td>
                                                         Customer Name :
                                                         <t t-if="contact_customer">
                                                             <span t-if="contact_customer.title" t-esc="contact_customer.title.name"/> <span t-esc="contact_customer.name"/>
                                                         </t>
                                                     </td>
-                                                </tr>
+                                                </tr>-->
                                                 <t t-if="attn_customer">
                                                     <tr>
                                                         <td>
