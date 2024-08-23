@@ -253,7 +253,7 @@ class FlemingsSoAReportXlsx(models.AbstractModel):
             for partner in datas:
 
                 # Insert Company Logo
-                company_id = self.env['res.company'].sudo().search([('id', 'in', obj.company_ids.ids), ('banner_report', '!=', False)], order='id asc', limit=1)
+                company_id = self.env['res.company'].sudo().search([('id', 'in', obj.company_ids.ids)], order='id asc', limit=1)
                 # if obj.rp_logo and company_id and company_id.banner_report:
                 #     image_width = 300.0
                 #     image_height = 400.0
