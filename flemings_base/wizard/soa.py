@@ -254,22 +254,68 @@ class FlemingsSoAReportXlsx(models.AbstractModel):
 
                 # Insert Company Logo
                 company_id = self.env['res.company'].sudo().search([('id', 'in', obj.company_ids.ids), ('banner_report', '!=', False)], order='id asc', limit=1)
-                if obj.rp_logo and company_id and company_id.banner_report:
-                    image_width = 300.0
-                    image_height = 400.0
-                    cell_width = 128.0
-                    cell_height = 262.0
+                # if obj.rp_logo and company_id and company_id.banner_report:
+                #     image_width = 300.0
+                #     image_height = 400.0
+                #     cell_width = 128.0
+                #     cell_height = 262.0
+                #
+                #     x_scale = cell_width / image_width
+                #     y_scale = cell_height / image_height
+                #
+                #     sheet.insert_image(
+                #         'A' + str(row), '', {
+                #             'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
+                #             'image_data': io.BytesIO(base64.b64decode(company_id.banner_report))
+                #         }
+                #     )
+                #     row += 10
+
+                if obj.rp_logo:
+                    sheet.merge_range(row, 0, row + 7, 0, '', align_bold_center)
+                    sheet.merge_range(row, 4, row + 7, 5, '', align_bold_center)
+
+                    image_width = 140.0
+                    image_height = 180.0
+                    cell_width = 80.0
+                    cell_height = 100.0
 
                     x_scale = cell_width / image_width
                     y_scale = cell_height / image_height
 
-                    sheet.insert_image(
-                        'A' + str(row), '', {
-                            'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
-                            'image_data': io.BytesIO(base64.b64decode(company_id.banner_report))
-                        }
+                    if company_id.logo:
+                        sheet.insert_image(
+                            'A' + str(row + 2), '',
+                            {'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
+                             'image_data': io.BytesIO(base64.b64decode(company_id.logo))
+                             }
+                        )
+                    if company_id.sgs_img:
+                        image_width = 240.0
+                        image_height = 300.0
+                        cell_width = 40.0
+                        cell_height = 50.0
+
+                        x_scale = cell_width / image_width
+                        y_scale = cell_height / image_height
+
+                        sheet.insert_image(
+                            'E' + str(row + 2), '',
+                            {'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
+                             'image_data': io.BytesIO(base64.b64decode(company_id.sgs_img))
+                             }
+                        )
+
+                    company_address = (
+                            str(company_id.street or '') + ' ' + str(company_id.street2 or '') + '\n' +
+                            str(company_id.country_id.name or '') + ' ' + str(company_id.zip or '') + ' Tel: ' + str(company_id.phone or '') + ' Fax: ' + str(company_id.fax or '') + '\n' +
+                            'Email: ' + str(company_id.email or '') + ' ' + str(company_id.website or '')
                     )
-                    row += 10
+
+                    sheet.merge_range(row, 1, row + 2, 3, str(company_id.name), workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'bottom', 'bold': True, 'text_wrap': True, 'font_size': 18}))
+                    sheet.merge_range(row + 3, 1, row + 7, 3, company_address, align_center)
+
+                    row += 9
 
                 sheet.merge_range(row, 0, row, 5, 'STATEMENT OF ACCOUNT', workbook.add_format(
                     {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True}))
