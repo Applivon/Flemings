@@ -21,7 +21,7 @@ class StatementAccountReportWizard(models.TransientModel):
 
     date = fields.Date(string='Date', required=True, default=fields.Date.today())
     partner_ids = fields.Many2many('res.partner', 'soa_report_rel_partner', string="Customers")
-    company_ids = fields.Many2many("res.company", string="Companies", default=lambda self: self.env.user.company_ids.ids)
+    company_ids = fields.Many2many("res.company", string="Companies", default=lambda self: self.env.company.ids)
     rp_logo = fields.Boolean('Include Logo in SOA report')
     
     def print_report(self):
