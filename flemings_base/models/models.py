@@ -493,6 +493,17 @@ class FlemingsSalesAccountMove(models.Model):
                 res['views'][view_type]['toolbar'] = {'print': print}
         return res
 
+    location_return_id = fields.Many2one(
+        'stock.location', string='Stock Return Location', domain=[('usage', '=', 'internal')], copy=False)
+    location_source_id = fields.Many2one(
+        'stock.location', string='Stock Source Location', domain=[('usage', '=', 'supplier')], copy=False)
+    picking_return_id = fields.Many2one('stock.picking', string='Picking Reference', copy=False)
+    not_create_picking = fields.Boolean("Don\'t Create Picking", copy=False)
+
+    @api.onchange('not_create_picking')
+    def onchange_not_create_picking(self):
+        self.location_return_id = self.location_source_id = False
+
     def action_post(self):
         res = super(FlemingsSalesAccountMove, self).action_post()
         # Update Invoice Price-book for Customer
@@ -521,7 +532,56 @@ class FlemingsSalesAccountMove(models.Model):
             }
             invoice.partner_id.sudo().write(last_date_vals)
             invoice.partner_id.parent_id.sudo().write(last_date_vals)
+
+        # Create Internal Picking for Credit Note & Refunds
+        for record in self.filtered(lambda x: (x.move_type == 'out_refund' and x.location_return_id) or
+                                              (x.move_type == 'in_refund' and x.location_source_id)):
+            is_credit = is_debit = False
+            picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'internal')], limit=1)
+
+            if record.move_type == 'out_refund':
+                location_id = record.partner_id.property_stock_customer
+                location_dest_id = record.location_return_id
+                is_credit = True
+            else:
+                location_id = record.location_source_id
+                location_dest_id = record.partner_id.property_stock_supplier
+                is_debit = True
+
+            record.picking_return_id = record.flemings_create_picking(picking_type_id, location_id, location_dest_id, debit=is_debit, credit=is_credit)
+            record.picking_return_id.button_validate()
         return res
+    
+    def flemings_create_picking(self, picking_type_id, location_id, location_dest_id, debit, credit):
+        move_line_ids_without_package = []
+        for move_line in self.invoice_line_ids:
+            move_line_ids_without_package.append((0, 0, {
+                'product_id': move_line.product_id.id,
+                'product_uom_id': move_line.product_uom_id.id,
+                'location_id': location_id.id,
+                'location_dest_id': location_dest_id.id,
+                'qty_done': move_line.quantity,
+            }))
+
+        picking_data = {
+            'partner_id': self.partner_id.id if self.partner_id else False,
+            'picking_type_id': picking_type_id.id,
+            'location_id': location_id.id if location_id else False,
+            'location_dest_id': location_dest_id.id if location_dest_id else False,
+            'origin': self.name,
+            'move_line_ids_without_package': move_line_ids_without_package,
+        }
+        if debit:
+            picking_data.update({'from_debit_note': True})
+        elif credit:
+            picking_data.update({'from_credit_note': True})
+
+        picking_context = self._context.copy()
+        if picking_context and picking_context.get("default_move_type"):
+            picking_context.pop("default_move_type")
+
+        picking_id = self.env['stock.picking'].with_context(picking_context).create(picking_data)
+        return picking_id
 
     def update_customer_price_book(self):
         for record in self.filtered(lambda x: x.partner_id):
@@ -693,6 +753,8 @@ class FlemingsStockPicking(models.Model):
     process_by_id = fields.Many2one('res.users', string='Process By')
     fg_remarks = fields.Text('Remarks')
     is_fully_invoiced = fields.Boolean('Fully Invoiced ?', default=False, copy=False)
+    from_credit_note = fields.Boolean('From Credit Note?', default=False, copy=False)
+    from_debit_note = fields.Boolean('From Debit Note?', default=False, copy=False)
 
     def button_validate(self):
         res = super(FlemingsStockPicking, self).button_validate()
