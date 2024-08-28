@@ -355,7 +355,7 @@ class FlemingsSalesOrder(models.Model):
 
     can_user_edit_qty = fields.Boolean('Can User Edit SO Qty ?', compute='_compute_can_user_edit_qty')
 
-    @api.depends('picking_ids')
+    @api.depends('picking_ids', 'partner_id')
     def _compute_can_user_edit_qty(self):
         for record in self:
             if not record.picking_ids:
