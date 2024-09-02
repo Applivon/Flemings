@@ -870,9 +870,7 @@ class FlemingMrpProduction(models.Model):
             raise UserError(_("Work Order No. already generated for one or more selected records !"))
 
         next_sequence = self.env['ir.sequence'].next_by_code('mrp.production.work.order.no')
-        print ('\n44444444444', next_sequence)
-        ss = self.env['mrp.production.work.order.no'].create({'work_order_no': next_sequence})
-        print ('\n22222222222222', next_sequence, ss)
+        self.env['mrp.production.work.order.no'].create({'work_order_no': next_sequence})
         for record in self:
             record.work_order_no = next_sequence
         return
