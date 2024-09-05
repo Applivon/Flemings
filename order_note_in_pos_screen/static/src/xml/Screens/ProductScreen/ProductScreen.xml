@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-inherit="point_of_sale.ProductScreen" t-inherit-mode="extension" owl="1">
+        <xpath expr="//OrderWidget" position="after">
+            <t t-set="current_order" t-value="env.pos.get_order()"/>
+            <p t-if="current_order.note"><span t-esc="current_order.note"/></p>
+        </xpath>
+    </t>
+</templates>
