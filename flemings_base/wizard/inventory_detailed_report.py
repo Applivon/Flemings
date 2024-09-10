@@ -47,158 +47,205 @@ class InventoryDetailedReport(models.TransientModel):
         self.env.cr.execute(""" 
           SELECT a.company_id, a.product_id, uom.name::json->>'en_US' AS stocking_unit,
             product.default_code AS product_code, product.variant_name AS product_description,
-            COALESCE(MAX(b.beginning_balance_qty), 0) AS beginning_balance_qty, 
-            COALESCE(MAX(c.purchase_receive_qty), 0) AS purchase_receive_qty, 
-            COALESCE(ABS(MAX(d.purchase_return_qty)), 0) AS purchase_return_qty, 
-            COALESCE(ABS(MAX(e.sales_issued_qty)), 0) AS sales_issued_qty, 
-            COALESCE(MAX(f.sales_return_qty), 0) AS sales_return_qty, 
-            COALESCE(ABS(MAX(g.transfer_out_qty)), 0) AS transfer_out_qty, 
-            COALESCE(MAX(h.transfer_in_qty), 0) AS transfer_in_qty,
-            COALESCE(MAX(i.stock_adjust_qty), 0) AS stock_adjust_qty, 
-            COALESCE(ABS(MAX(j.stock_disposal_qty)), 0) AS stock_disposal_qty, 
-            COALESCE(MAX(k.ending_balance_qty), 0) AS ending_balance_qty, 
-            COALESCE(MAX(l.avg_cost), 0) AS avg_cost,
-            (COALESCE(MAX(k.ending_balance_qty), 0) * COALESCE(MAX(l.avg_cost), 0)) AS final_stock_value
+            (COALESCE(MAX(b.beginning_balance_in_qty), 0) - COALESCE(MAX(c.beginning_balance_out_qty), 0)) AS beginning_balance_qty,
+            COALESCE(MAX(d.purchase_receive_qty), 0) AS purchase_receive_qty, 
+            COALESCE(ABS(MAX(e.purchase_return_qty)), 0) AS purchase_return_qty, 
+            COALESCE(ABS(MAX(f.sales_issued_qty)), 0) AS sales_issued_qty, 
+            COALESCE(MAX(g.sales_return_qty), 0) AS sales_return_qty, 
+            COALESCE(ABS(MAX(h.transfer_out_qty)), 0) AS transfer_out_qty, 
+            COALESCE(MAX(i.transfer_in_qty), 0) AS transfer_in_qty,
+            (COALESCE(MAX(j.stock_adjust_in_qty), 0) - COALESCE(MAX(k.stock_adjust_out_qty), 0)) AS stock_adjust_qty, 
+            COALESCE(ABS(MAX(l.stock_disposal_qty)), 0) AS stock_disposal_qty, 
+            (COALESCE(MAX(m.ending_balance_in_qty), 0) - COALESCE(MAX(n.ending_balance_out_qty), 0)) AS ending_balance_qty,
+            COALESCE(MAX(o.avg_cost), 0) AS avg_cost,
+            ((COALESCE(MAX(m.ending_balance_in_qty), 0) - COALESCE(MAX(n.ending_balance_out_qty), 0)) * COALESCE(MAX(o.avg_cost), 0)) AS final_stock_value
           
           FROM (
-            SELECT layer.company_id, layer.product_id FROM stock_valuation_layer AS layer WHERE %s
+            SELECT mov_line.company_id, mov_line.product_id FROM stock_move_line AS mov_line WHERE %s AND mov_line.state = 'done'
           ) a
           
           LEFT JOIN (
-            SELECT SUM(layer.quantity) AS beginning_balance_qty, layer.company_id, layer.product_id 
-            FROM stock_valuation_layer AS layer WHERE layer.create_date < '%s'
-            GROUP BY layer.company_id, layer.product_id
+            SELECT SUM(mov_line.qty_done) AS beginning_balance_in_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            WHERE %s AND mov_line.state = 'done' AND mov_line.date < '%s'
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) b
-          ON a.company_id = b.company_id AND a.product_id = b.product_id 
+          ON a.company_id = b.company_id AND a.product_id = b.product_id
           
           LEFT JOIN (
-            SELECT SUM(layer.quantity) AS purchase_receive_qty, layer.company_id, layer.product_id
-            FROM stock_valuation_layer AS layer
-            LEFT JOIN stock_move AS mov ON mov.id = layer.stock_move_id
-            LEFT JOIN stock_picking AS picking ON picking.id = mov.picking_id
-            LEFT JOIN stock_picking_type AS picking_type ON picking_type.id = picking.picking_type_id
-            WHERE picking_type.code = 'incoming' AND layer.create_date >= '%s' and layer.create_date <= '%s'
-              AND picking.id not in (
-                SELECT sub_picking.id FROM stock_picking AS sub_picking 
-                LEFT JOIN stock_move AS sub_move ON sub_move.picking_id = sub_picking.id 
-                WHERE mov.origin_returned_move_id IS NOT NULL AND sub_picking.id = picking.id
-              )
-            GROUP BY layer.company_id, layer.product_id
+            SELECT SUM(mov_line.qty_done) AS beginning_balance_out_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            WHERE %s AND mov_line.state = 'done' AND mov_line.date < '%s'
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) c
-          ON a.company_id = c.company_id and a.product_id = c.product_id 
+          ON a.company_id = c.company_id AND a.product_id = c.product_id 
           
           LEFT JOIN (
-            SELECT SUM(layer.quantity) AS purchase_return_qty, layer.company_id, layer.product_id
-            FROM stock_valuation_layer AS layer
-            LEFT JOIN stock_move AS mov ON mov.id = layer.stock_move_id
+            SELECT SUM(mov_line.qty_done) AS purchase_receive_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
             LEFT JOIN stock_picking AS picking ON picking.id = mov.picking_id
             LEFT JOIN stock_picking_type AS picking_type ON picking_type.id = picking.picking_type_id
-            WHERE picking_type.code = 'outgoing' AND layer.create_date >= '%s' AND layer.create_date <= '%s'
-              AND picking.id not in (
-                SELECT sub_picking.id FROM stock_picking AS sub_picking 
-                LEFT JOIN stock_move AS sub_move ON sub_move.picking_id = sub_picking.id 
-                WHERE mov.origin_returned_move_id IS NULL AND sub_picking.id = picking.id
-              )
-            GROUP BY layer.company_id, layer.product_id
-          ) d
-          ON a.company_id = d.company_id AND a.product_id = d.product_id
-          
-          LEFT JOIN (
-            SELECT SUM(layer.quantity) AS sales_issued_qty, layer.company_id, layer.product_id
-            FROM stock_valuation_layer AS layer
-            LEFT JOIN stock_move AS mov ON mov.id = layer.stock_move_id
-            LEFT JOIN stock_picking AS picking ON picking.id = mov.picking_id
-            LEFT JOIN stock_picking_type AS picking_type ON picking_type.id = picking.picking_type_id
-            WHERE picking_type.code = 'outgoing' AND layer.create_date >= '%s' AND layer.create_date <= '%s'
+            WHERE %s AND mov_line.state = 'done' AND picking_type.code = 'incoming' AND mov_line.date >= '%s' AND mov_line.date <= '%s'
               AND picking.id not in (
                 SELECT sub_picking.id FROM stock_picking AS sub_picking 
                 LEFT JOIN stock_move AS sub_move ON sub_move.picking_id = sub_picking.id 
                 WHERE mov.origin_returned_move_id IS NOT NULL AND sub_picking.id = picking.id
               )
-            GROUP BY layer.company_id, layer.product_id
-          ) e
-          ON a.company_id = e.company_id and a.product_id = e.product_id
+            GROUP BY mov_line.company_id, mov_line.product_id
+          ) d
+          ON a.company_id = d.company_id and a.product_id = d.product_id 
           
           LEFT JOIN (
-            SELECT SUM(layer.quantity) AS sales_return_qty, layer.company_id, layer.product_id
-            FROM stock_valuation_layer AS layer
-            LEFT JOIN stock_move AS mov ON mov.id = layer.stock_move_id
+            SELECT SUM(mov_line.qty_done) AS purchase_return_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
             LEFT JOIN stock_picking AS picking ON picking.id = mov.picking_id
             LEFT JOIN stock_picking_type AS picking_type ON picking_type.id = picking.picking_type_id
-            WHERE picking_type.code = 'incoming' AND layer.create_date >= '%s' AND layer.create_date <= '%s'
+            WHERE %s AND mov_line.state = 'done' AND picking_type.code = 'outgoing' AND mov_line.date >= '%s' AND mov_line.date <= '%s'
               AND picking.id not in (
                 SELECT sub_picking.id FROM stock_picking AS sub_picking 
                 LEFT JOIN stock_move AS sub_move ON sub_move.picking_id = sub_picking.id 
                 WHERE mov.origin_returned_move_id IS NULL AND sub_picking.id = picking.id
               )
-            GROUP BY layer.company_id, layer.product_id
+            GROUP BY mov_line.company_id, mov_line.product_id
+          ) e
+          ON a.company_id = e.company_id AND a.product_id = e.product_id
+          
+          LEFT JOIN (
+            SELECT SUM(mov_line.qty_done) AS sales_issued_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            LEFT JOIN stock_picking AS picking ON picking.id = mov.picking_id
+            LEFT JOIN stock_picking_type AS picking_type ON picking_type.id = picking.picking_type_id
+            WHERE %s AND mov_line.state = 'done' AND picking_type.code = 'outgoing' AND mov_line.date >= '%s' AND mov_line.date <= '%s'
+              AND picking.id not in (
+                SELECT sub_picking.id FROM stock_picking AS sub_picking 
+                LEFT JOIN stock_move AS sub_move ON sub_move.picking_id = sub_picking.id 
+                WHERE mov.origin_returned_move_id IS NOT NULL AND sub_picking.id = picking.id
+              )
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) f
           ON a.company_id = f.company_id and a.product_id = f.product_id
           
           LEFT JOIN (
-            SELECT SUM(layer.quantity) AS transfer_out_qty, layer.company_id, layer.product_id
-            FROM stock_valuation_layer AS layer
-            LEFT JOIN stock_move AS mov ON mov.id = layer.stock_move_id
+            SELECT SUM(mov_line.qty_done) AS sales_return_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
             LEFT JOIN stock_picking AS picking ON picking.id = mov.picking_id
             LEFT JOIN stock_picking_type AS picking_type ON picking_type.id = picking.picking_type_id
-            WHERE %s AND picking_type.code = 'internal'
-              AND layer.create_date >= '%s' and layer.create_date <= '%s'
-            GROUP BY layer.company_id, layer.product_id
+            WHERE %s AND mov_line.state = 'done' AND picking_type.code = 'incoming' AND mov_line.date >= '%s' AND mov_line.date <= '%s'
+              AND picking.id not in (
+                SELECT sub_picking.id FROM stock_picking AS sub_picking 
+                LEFT JOIN stock_move AS sub_move ON sub_move.picking_id = sub_picking.id 
+                WHERE mov.origin_returned_move_id IS NULL AND sub_picking.id = picking.id
+              )
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) g
           ON a.company_id = g.company_id and a.product_id = g.product_id
           
           LEFT JOIN (
-            SELECT SUM(layer.quantity) AS transfer_in_qty, layer.company_id, layer.product_id
-            FROM stock_valuation_layer AS layer
-            LEFT JOIN stock_move AS mov ON mov.id = layer.stock_move_id
+            SELECT SUM(mov_line.qty_done) AS transfer_out_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
             LEFT JOIN stock_picking AS picking ON picking.id = mov.picking_id
             LEFT JOIN stock_picking_type AS picking_type ON picking_type.id = picking.picking_type_id
-            WHERE %s AND picking_type.code = 'internal'
-              AND layer.create_date >= '%s' AND layer.create_date <= '%s'
-            GROUP BY layer.company_id, layer.product_id
+            WHERE %s AND mov_line.state = 'done' AND picking_type.code = 'internal' AND mov_line.date >= '%s' and mov_line.date <= '%s'
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) h
           ON a.company_id = h.company_id and a.product_id = h.product_id
           
           LEFT JOIN (
-            SELECT SUM(layer.quantity) AS stock_adjust_qty, layer.company_id, layer.product_id
-            FROM stock_valuation_layer AS layer
-            LEFT JOIN stock_move AS mov ON mov.id = layer.stock_move_id
-            WHERE mov.is_inventory = true AND layer.create_date >= '%s' AND layer.create_date <= '%s'
-            GROUP BY layer.company_id, layer.product_id
+            SELECT SUM(mov_line.qty_done) AS transfer_in_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            LEFT JOIN stock_picking AS picking ON picking.id = mov.picking_id
+            LEFT JOIN stock_picking_type AS picking_type ON picking_type.id = picking.picking_type_id
+            WHERE %s AND mov_line.state = 'done' AND picking_type.code = 'internal' AND mov_line.date >= '%s' AND mov_line.date <= '%s'
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) i
-          ON a.company_id = i.company_id AND a.product_id = i.product_id 
+          ON a.company_id = i.company_id and a.product_id = i.product_id
           
           LEFT JOIN (
-            SELECT SUM(layer.quantity) AS stock_disposal_qty, layer.company_id, layer.product_id
-            FROM stock_valuation_layer AS layer
-            LEFT JOIN stock_move AS mov ON mov.id = layer.stock_move_id
-            WHERE mov.scrapped = true AND layer.create_date >= '%s' AND layer.create_date <= '%s'
-            GROUP BY layer.company_id, layer.product_id
+            SELECT SUM(mov_line.qty_done) AS stock_adjust_in_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            LEFT JOIN stock_location AS location_id ON location_id.id = mov_line.location_id
+            LEFT JOIN stock_location AS location_dest_id ON location_dest_id.id = mov_line.location_dest_id
+            WHERE %s AND mov.is_inventory = true AND mov_line.state = 'done' AND mov_line.date >= '%s' AND mov_line.date <= '%s'
+              AND location_id.usage not in ('internal','transit') AND location_dest_id.usage in ('internal','transit')
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) j
           ON a.company_id = j.company_id AND a.product_id = j.product_id
           
           LEFT JOIN (
-            SELECT layer.company_id, layer.product_id, SUM(layer.quantity) AS ending_balance_qty
-            FROM stock_valuation_layer AS layer WHERE layer.create_date <= '%s'
-            GROUP BY layer.product_id, layer.company_id
+            SELECT SUM(mov_line.qty_done) AS stock_adjust_out_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            LEFT JOIN stock_location AS location_id ON location_id.id = mov_line.location_id
+            LEFT JOIN stock_location AS location_dest_id ON location_dest_id.id = mov_line.location_dest_id
+            WHERE %s AND mov.is_inventory = true AND mov_line.state = 'done' AND mov_line.date >= '%s' AND mov_line.date <= '%s'
+              AND location_id.usage in ('internal','transit') AND location_dest_id.usage not in ('internal','transit')
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) k
-          ON a.company_id = k.company_id and a.product_id = k.product_id
+          ON a.company_id = k.company_id AND a.product_id = k.product_id 
           
           LEFT JOIN (
-            SELECT layer.company_id, layer.product_id, layer.unit_cost AS avg_cost
-            FROM stock_valuation_layer AS layer WHERE layer.create_date <= '%s'
-            ORDER BY layer.create_date desc LIMIT 1
+            SELECT SUM(mov_line.qty_done) AS stock_disposal_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            WHERE %s AND mov_line.state = 'done' AND mov.scrapped = true AND mov_line.date >= '%s' AND mov_line.date <= '%s'
+            GROUP BY mov_line.company_id, mov_line.product_id
           ) l
-          ON a.company_id = l.company_id and a.product_id = l.product_id
+          ON a.company_id = l.company_id AND a.product_id = l.product_id
+          
+          LEFT JOIN (
+            SELECT SUM(mov_line.qty_done) AS ending_balance_in_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            WHERE %s AND mov_line.state = 'done' AND mov_line.date <= '%s'
+            GROUP BY mov_line.company_id, mov_line.product_id
+          ) m
+          ON a.company_id = m.company_id AND a.product_id = m.product_id
+          
+          LEFT JOIN (
+            SELECT SUM(mov_line.qty_done) AS ending_balance_out_qty, mov_line.company_id, mov_line.product_id
+            FROM stock_move_line AS mov_line
+            LEFT JOIN stock_move AS mov ON mov.id = mov_line.move_id
+            WHERE %s AND mov_line.state = 'done' AND mov_line.date <= '%s'
+            GROUP BY mov_line.company_id, mov_line.product_id
+          ) n
+          ON a.company_id = n.company_id AND a.product_id = n.product_id
+          
+          LEFT JOIN (
+            SELECT company_id, product_id, unit_cost AS avg_cost
+            FROM stock_valuation_layer WHERE create_date <= '%s'
+            ORDER BY create_date desc LIMIT 1
+          ) o
+          ON a.company_id = o.company_id and a.product_id = o.product_id
         
         LEFT JOIN product_product AS product ON product.id = a.product_id
         LEFT JOIN product_template AS product_tmpl ON product_tmpl.id = product.product_tmpl_id
         LEFT JOIN uom_uom AS uom ON uom.id = product_tmpl.uom_id
         GROUP BY a.company_id, a.product_id, product.variant_name, product.default_code, uom.name 
         """ % (
-            where, from_date, from_date, to_date, from_date, to_date, from_date, to_date,
-            from_date, to_date, location_where, from_date, to_date, location_dest_where,
-            from_date, to_date, from_date, to_date, from_date, to_date, to_date, to_date
+            where,
+            location_dest_where, from_date,
+            location_where, from_date,
+            location_dest_where, from_date, to_date,
+            location_where, from_date, to_date,
+            location_where, from_date, to_date,
+            location_dest_where, from_date, to_date,
+            location_where, from_date, to_date,
+            location_dest_where, from_date, to_date,
+            location_dest_where, from_date, to_date,
+            location_where, from_date, to_date,
+            location_where, from_date, to_date,
+            location_dest_where, to_date,
+            location_where, to_date,
+            from_date
         ))
         return [i for i in self.env.cr.dictfetchall()]
 
@@ -299,25 +346,29 @@ class FlemingsInventoryDetailedReportXlsx(models.AbstractModel):
             row += 2
             product_ids = stock_valuation_env.search(product_domain).mapped('product_id')
 
-            where = "layer.company_id = %s" % company_id.id
+            where = "mov_line.company_id = %s" % company_id.id
             if product_ids:
                 products = tuple(product_ids.ids)
                 if len(products) == 1:
-                    where += "AND layer.product_id = %s" % products
+                    where += "AND mov_line.product_id = %s" % products
                 else:
-                    where += "AND layer.product_id in %s" % (products,)
+                    where += "AND mov_line.product_id in %s" % (products,)
 
             if obj.location_ids:
-                locations = tuple(obj.location_ids.ids)
-                if len(locations) == 1:
-                    location_where = "mov.location_id = %s" % locations
-                    location_dest_where = "mov.location_dest_id = %s" % locations
-                else:
-                    location_where = "mov.location_id in %s" % (locations,)
-                    location_dest_where = "mov.location_dest_id in %s" % (locations,)
+                report_location_ids = obj.location_ids
             else:
-                location_where = "mov.location_id = 0"
-                location_dest_where = "mov.location_dest_id = 0"
+                report_location_ids = self.env['stock.location'].sudo().search([('usage', '=', 'internal'), ('company_id', '=', company_id.id)])
+
+            if report_location_ids:
+                locations = tuple(report_location_ids.ids)
+                if len(locations) == 1:
+                    location_where = "mov_line.location_id = %s" % locations
+                    location_dest_where = "mov_line.location_dest_id = %s" % locations
+                else:
+                    location_where = "mov_line.location_id in %s" % (locations,)
+                    location_dest_where = "mov_line.location_dest_id in %s" % (locations,)
+            else:
+                location_where = location_dest_where = "1=1"
 
             line_list = obj.get_inventory_data(from_date, to_date, where, location_where, location_dest_where)
             if product_ids and line_list:
