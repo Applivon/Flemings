@@ -105,3 +105,8 @@ class PosSession(models.Model):
             if pos_id:
                 res = pos_id.create_date.astimezone(sgt).strftime('%d-%m-%Y %I:%M:%S %p')
         return res
+
+    def _loader_params_res_partner(self):
+        result = super()._loader_params_res_partner()
+        result['search_params']['fields'].extend(['property_payment_term_id'])
+        return result
