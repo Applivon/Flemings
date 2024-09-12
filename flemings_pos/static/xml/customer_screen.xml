@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="PartnerListScreen" t-inherit="point_of_sale.PartnerListScreen" t-inherit-mode="extension" owl="1">
+        <xpath expr="//table/thead/tr/th[@t-if='isBalanceDisplayed']" position="before">
+            <th class="payment_term_node">
+                Payment Terms
+            </th>     
+        </xpath>
+    </t>
+    <t t-name="PartnerLine" t-inherit="point_of_sale.PartnerLine" t-inherit-mode="extension" owl="1">
+         <xpath expr="//tr/td[hasclass('partner-line-balance')]" position="before">
+            <td class="payment_term_node">
+                <t t-if="props.partner.property_payment_term_id">
+                    <t t-esc="props.partner.property_payment_term_id[1]"/>
+                </t>
+            </td>
+         </xpath>
+    </t>
+    <t t-name="ActionpadWidget" t-inherit="point_of_sale.ActionpadWidget" t-inherit-mode="extension" owl="1">
+        <xpath expr="//button[hasclass('set-partner')]" position="replace">
+            <button class="button set-partner" t-att-class="{'decentered': isLongName}"
+                    t-on-click="() => this.trigger('click-partner')">
+                <t t-if="!env.isMobile"><i class="fa fa-user" role="img" aria-label="Customer" title="Customer" /></t>
+                <t t-if="props.partner">
+                    <t t-esc="props.partner.name" />
+                    <t t-if="props.partner.property_payment_term_id">
+                        <br/>Payment Terms: <strong><t t-esc="props.partner.property_payment_term_id[1]"/></strong>
+                    </t>
+                </t>
+                <t t-else="">
+                    Customer
+                </t>
+            </button>
+        </xpath>
+    </t>
+    <t t-name="PaymentScreen" t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension" owl="1">
+         <xpath expr="//div[hasclass('partner-button')]" position="replace">
+            <div class="partner-button">
+                <div class="button" t-att-class="{ highlight: currentOrder.get_partner() }" t-on-click="selectPartner">
+                    <i class="fa fa-user" role="img" title="Customer" />
+                    <t t-set="partner" t-value="currentOrder.get_partner()" />
+                    <span>
+                        <t t-if="partner">
+                            <t t-esc="partner.name" />
+                            <t t-if="partner.property_payment_term_id">
+                                <br/>Payment Terms: <strong><t t-esc="partner.property_payment_term_id[1]"/></strong>
+                            </t>
+                        </t>
+                        <t t-if="!partner">
+                            Customer
+                        </t>
+                    </span>
+                </div>
+            </div>
+         </xpath>
+    </t>
+    
+</templates>
