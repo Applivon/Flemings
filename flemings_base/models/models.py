@@ -165,6 +165,7 @@ class FlemingsSalesOrderLine(models.Model):
                 self.fg_sno = 0
 
     fg_sno = fields.Integer('S.No', default=1)
+    remarks = fields.Text('Remarks')
 
     def _get_display_price(self):
         """Compute the displayed unit price for a given line.
@@ -219,6 +220,7 @@ class FlemingsSalesOrder(models.Model):
     origin_so_no = fields.Char('Origin SO No.')
     generate_fg_sno = fields.Boolean('Generate S.No.', default=True, copy=False)
     manufacturing_order_ids = fields.Many2many('mrp.production', string='Manufacturing Order(s)')
+    summary_remarks = fields.Text('Summary Remarks')
 
     @api.onchange('manufacturing_order_ids')
     def onchange_manufacturing_order_ids(self):

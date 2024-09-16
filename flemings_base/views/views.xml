@@ -495,6 +495,15 @@
 				<xpath expr="//field[@name='order_line']/tree/field[@name='sequence']" position="before">
 					<field name="fg_sno" string="S.No." attrs="{'readonly': [('parent.generate_fg_sno', '=', True)]}" force_save="1"/>
                 </xpath>
+				<xpath expr="//field[@name='note']" position="before">
+					<field colspan="2" name="summary_remarks" nolabel="1" placeholder="Summary Remarks..."/>
+                </xpath>
+				<xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
+					<field name="remarks"/>
+                </xpath>
+				<xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_uom_readonly']" position="after">
+					<field name="remarks"/>
+                </xpath>
 				<xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="attributes">
 					<attribute name="attrs">{'readonly': [('parent.can_user_edit_qty', '=', False)]}</attribute>
                 </xpath>
