@@ -7,6 +7,9 @@ class WorkOrderSummaryReport(models.TransientModel):
     _description = 'Work Order Generation'
 
     work_order_no = fields.Char('Work Order No.', required=True)
+    report_type = fields.Selection([
+        ('work_order', 'Work Order Summary Report'), ('raw_material', 'Raw Material Summary Report'), ('design', 'Design Specification')
+    ], default='work_order', string='Report Type')
 
     @api.constrains('work_order_no')
     def check_work_order_no_exists(self):

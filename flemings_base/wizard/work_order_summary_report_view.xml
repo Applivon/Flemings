@@ -12,6 +12,12 @@
                             <field name="work_order_no" required="1"/>
                         </group>
                     </group>
+                    <group/><group/>
+                    <group>
+                        <group>
+                            <field name="report_type" required="1"/>
+                        </group>
+                    </group>
                     <footer>
                         <button name="print_report" string="Print" type="object" class="btn-primary"/>
                         <button string="Cancel" special="cancel"/>
