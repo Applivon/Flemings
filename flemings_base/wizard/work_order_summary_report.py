@@ -4,7 +4,7 @@ from odoo.exceptions import UserError, ValidationError
 
 class WorkOrderSummaryReport(models.TransientModel):
     _name = 'work.order.summary.report.wizard'
-    _description = 'Work Order Summary Report'
+    _description = 'Work Order Generation'
 
     work_order_no = fields.Char('Work Order No.', required=True)
 
