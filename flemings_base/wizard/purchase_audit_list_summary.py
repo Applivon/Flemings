@@ -93,7 +93,7 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
                 sheet.write(row + 2, 0, 'Currency : ' + str(currency_id.name), align_bold_left)
                 row += 4
 
-                currency_orders = purchase_orders.filtered(lambda x: not x.currency_id.id == currency_id.id)
+                currency_orders = purchase_orders.filtered(lambda x: x.currency_id.id == currency_id.id)
                 for order in currency_orders:
                     last_receipt = self.env['stock.picking'].sudo().search([
                         ('state', '=', 'done'), ('id', 'in', order.picking_ids.ids or [])
