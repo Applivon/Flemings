@@ -57,8 +57,12 @@ class InventoryDetailedReport(models.TransientModel):
             (COALESCE(MAX(j.stock_adjust_in_qty), 0) - COALESCE(MAX(k.stock_adjust_out_qty), 0)) AS stock_adjust_qty, 
             COALESCE(ABS(MAX(l.stock_disposal_qty)), 0) AS stock_disposal_qty, 
             (COALESCE(MAX(m.ending_balance_in_qty), 0) - COALESCE(MAX(n.ending_balance_out_qty), 0)) AS ending_balance_qty,
-            COALESCE(MAX(o.avg_cost), 0) AS avg_cost,
-            COALESCE(MAX(p.layer_line_value), 0) AS final_stock_value
+            (
+              SELECT COALESCE(unit_cost, 0) FROM stock_valuation_layer 
+              WHERE company_id = a.company_id AND product_id = a.product_id AND create_date <= '%s' 
+              ORDER BY create_date desc LIMIT 1
+            ) AS avg_cost,
+            COALESCE(MAX(o.layer_line_value), 0) AS final_stock_value
           
           FROM (
             SELECT company_id, product_id FROM stock_move_line WHERE %s AND state = 'done'
@@ -220,24 +224,18 @@ class InventoryDetailedReport(models.TransientModel):
           ON a.company_id = n.company_id AND a.product_id = n.product_id
           
           LEFT JOIN (
-            SELECT company_id, product_id, unit_cost AS avg_cost
-            FROM stock_valuation_layer WHERE %s AND create_date <= '%s'
-            ORDER BY create_date desc LIMIT 1
-          ) o
-          ON a.company_id = o.company_id AND a.product_id = o.product_id
-          
-          LEFT JOIN (
             SELECT company_id, product_id, SUM(value) AS layer_line_value
             FROM stock_valuation_layer WHERE %s AND create_date <= '%s'
             GROUP BY company_id, product_id
-          ) p
-          ON a.company_id = p.company_id AND a.product_id = p.product_id
+          ) o
+          ON a.company_id = o.company_id AND a.product_id = o.product_id
         
         LEFT JOIN product_product AS product ON product.id = a.product_id
         LEFT JOIN product_template AS product_tmpl ON product_tmpl.id = product.product_tmpl_id
         LEFT JOIN uom_uom AS uom ON uom.id = product_tmpl.uom_id
         GROUP BY a.company_id, a.product_id, product.variant_name, product.default_code, uom.name 
         """ % (
+            to_date,
             where,
             location_dest_where, from_date,
             location_where, from_date,
@@ -252,7 +250,6 @@ class InventoryDetailedReport(models.TransientModel):
             location_where, from_date, to_date,
             location_dest_where, to_date,
             location_where, to_date,
-            where, to_date,
             where, to_date
         ))
         return [i for i in self.env.cr.dictfetchall()]
