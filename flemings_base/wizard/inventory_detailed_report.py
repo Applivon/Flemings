@@ -11,7 +11,7 @@ class InventoryDetailedReport(models.TransientModel):
     _name = 'inventory.detailed.report.wizard'
     _description = 'Inventory Detailed Report'
 
-    from_date = fields.Date('FROM Date', default=lambda *a: str(datetime.now() + relativedelta(day=1))[:10])
+    from_date = fields.Date('From Date', default=lambda *a: str(datetime.now() + relativedelta(day=1))[:10])
     to_date = fields.Date('To Date', default=lambda *a: str(datetime.now() + relativedelta(months=+1, day=1, days=-1))[:10])
     company_ids = fields.Many2many('res.company', string='Companies', default=lambda self: self.env.company.ids)
     location_ids = fields.Many2many('stock.location', string='Location(s)', domain="[('usage', '=', 'internal')]")
@@ -58,10 +58,10 @@ class InventoryDetailedReport(models.TransientModel):
             COALESCE(ABS(MAX(l.stock_disposal_qty)), 0) AS stock_disposal_qty, 
             (COALESCE(MAX(m.ending_balance_in_qty), 0) - COALESCE(MAX(n.ending_balance_out_qty), 0)) AS ending_balance_qty,
             COALESCE(MAX(o.avg_cost), 0) AS avg_cost,
-            ((COALESCE(MAX(m.ending_balance_in_qty), 0) - COALESCE(MAX(n.ending_balance_out_qty), 0)) * COALESCE(MAX(o.avg_cost), 0)) AS final_stock_value
+            COALESCE(MAX(p.layer_line_value), 0) AS final_stock_value
           
           FROM (
-            SELECT mov_line.company_id, mov_line.product_id FROM stock_move_line AS mov_line WHERE %s AND mov_line.state = 'done'
+            SELECT company_id, product_id FROM stock_move_line WHERE %s AND state = 'done'
           ) a
           
           LEFT JOIN (
@@ -221,10 +221,17 @@ class InventoryDetailedReport(models.TransientModel):
           
           LEFT JOIN (
             SELECT company_id, product_id, unit_cost AS avg_cost
-            FROM stock_valuation_layer WHERE create_date <= '%s'
+            FROM stock_valuation_layer WHERE %s AND create_date <= '%s'
             ORDER BY create_date desc LIMIT 1
           ) o
-          ON a.company_id = o.company_id and a.product_id = o.product_id
+          ON a.company_id = o.company_id AND a.product_id = o.product_id
+          
+          LEFT JOIN (
+            SELECT company_id, product_id, SUM(value) AS layer_line_value
+            FROM stock_valuation_layer WHERE %s AND create_date <= '%s'
+            GROUP BY company_id, product_id
+          ) p
+          ON a.company_id = p.company_id AND a.product_id = p.product_id
         
         LEFT JOIN product_product AS product ON product.id = a.product_id
         LEFT JOIN product_template AS product_tmpl ON product_tmpl.id = product.product_tmpl_id
@@ -245,7 +252,8 @@ class InventoryDetailedReport(models.TransientModel):
             location_where, from_date, to_date,
             location_dest_where, to_date,
             location_where, to_date,
-            from_date
+            where, to_date,
+            where, to_date
         ))
         return [i for i in self.env.cr.dictfetchall()]
 
@@ -346,13 +354,13 @@ class FlemingsInventoryDetailedReportXlsx(models.AbstractModel):
             row += 2
             product_ids = stock_valuation_env.search(product_domain).mapped('product_id')
 
-            where = "mov_line.company_id = %s" % company_id.id
+            where = "company_id = %s" % company_id.id
             if product_ids:
                 products = tuple(product_ids.ids)
                 if len(products) == 1:
-                    where += "AND mov_line.product_id = %s" % products
+                    where += "AND product_id = %s" % products
                 else:
-                    where += "AND mov_line.product_id in %s" % (products,)
+                    where += "AND product_id in %s" % (products,)
 
             if obj.location_ids:
                 report_location_ids = obj.location_ids
