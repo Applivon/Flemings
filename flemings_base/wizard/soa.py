@@ -324,7 +324,7 @@ class FlemingsSoAReportXlsx(models.AbstractModel):
                 sheet.merge_range(row, 0, row, 3, partner.display_name, workbook.add_format(
                     {'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'bold': True}))
                 sheet.merge_range(row, 4, row, 5, 'Date: ' + str(date), workbook.add_format(
-                    {'font_name': 'Arial', 'align': 'left', 'valign': 'vcenter', 'bold': True}))
+                    {'font_name': 'Arial', 'align': 'right', 'valign': 'vcenter', 'bold': True}))
 
                 row += 1
                 sheet.merge_range(row, 0, row, 3, str(partner.street or '') + ' ' + str(partner.street2 or ''), workbook.add_format(
