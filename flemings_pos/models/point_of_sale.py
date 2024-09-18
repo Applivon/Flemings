@@ -50,10 +50,23 @@ class PosSession(models.Model):
             data = self.env.cr.dictfetchone()
             res = data.get('data')
         elif type == 'cash_shoule_be':
-            cash_shoule_be = self.cash_register_balance_start + self.total_payments_amount
+            all_cash_payment = 0 
+            for payment in self.payment_method_ids:
+                if payment.is_cash_count:
+                    result = self.env['pos.payment'].read_group([('session_id', '=', self.id), ('payment_method_id', '=', payment.id)], ['amount'], ['session_id'])
+                    if result:
+                        all_cash_payment += result[0]['amount']
+            cash_shoule_be = self.cash_register_balance_start + all_cash_payment
             res = 'S$ ' + str('%.2f' % cash_shoule_be)
         elif type == 'cash_diff':
-            cash_diff = self.cash_register_balance_end_real - (self.cash_register_balance_start + self.total_payments_amount)
+            all_cash_payment = 0 
+            for payment in self.payment_method_ids:
+                if payment.is_cash_count:
+                    result = self.env['pos.payment'].read_group([('session_id', '=', self.id), ('payment_method_id', '=', payment.id)], ['amount'], ['session_id'])
+                    if result:
+                        all_cash_payment += result[0]['amount']
+            cash_shoule_be = self.cash_register_balance_start + all_cash_payment
+            cash_diff = self.cash_register_balance_end_real - cash_shoule_be
             res = 'S$ ' + str('%.2f' % cash_diff)
         elif type == 'cash_in_amount':
             cash_in = self.get_total_cash('-in-')
