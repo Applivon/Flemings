@@ -859,6 +859,7 @@ class FlemingMrpProduction(models.Model):
     _inherit = 'mrp.production'
 
     remarks = fields.Text('Remarks')
+    summary_remarks = fields.Text('Summary Remarks')
     origin_so_no = fields.Char('Origin SO No.')
     work_order_no = fields.Char('Work Order No.')
     scheduled_production_date = fields.Date('Scheduled Production Date')
@@ -902,8 +903,16 @@ class FlemingMrpProduction(models.Model):
         for record in res:
             if not record.origin_so_no and self._context and self._context.get('origin_so_no', False):
                 record.origin_so_no = self._context.get('origin_so_no')
-            if not record.origin and self._context and self._context.get('so_origin_no', False):
-                record.origin = self._context.get('so_origin_no')
+            if self._context and self._context.get('so_origin_no', False):
+                if not record.origin:
+                    record.origin = self._context.get('so_origin_no')
+                sale_id = self.env['sale.order'].sudo().search([('name', '=', self._context.get('so_origin_no'))], limit=1)
+                if sale_id:
+                    update_vals = {'summary_remarks': sale_id.summary_remarks}
+                    sale_order_line_remarks = sale_id.order_line.filtered(lambda x: x.product_id.id == record.product_id.id and x.route_id.name == 'Manufacture').mapped('remarks')
+                    if sale_order_line_remarks:
+                        update_vals.update({'remarks': sale_order_line_remarks[0]})
+                    record.write(update_vals)
 
         return res
 
