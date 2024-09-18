@@ -40,6 +40,7 @@
 							</group>
 							<group>
 								<field name="create_date" readonly="1" force_save="1"/>
+								<field name="summary_remarks" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
 								<field name="partner_ids" widget="many2many_tags" invisible="1"/>
 							</group>
 						</group>
@@ -54,6 +55,7 @@
 										<field name="route_id" invisible="1"/>
 										<field name="currency_id" required="1" options="{'no_create': True}"/>
 										<field name="product_uom_category_id" invisible="1"/>
+										<field name="remarks"/>
 										<field name="product_qty"/>
 										<field name="product_uom" string="UoM" attrs="{'required': [('product_id', '!=', False)]}" force_save="1" optional="show"/>
 										<field name="price_unit"/>
@@ -72,6 +74,7 @@
 												<field name="route_id" invisible="1"/>
 												<field name="currency_id" required="1" options="{'no_create': True}"/>
 												<field name="product_uom_category_id" invisible="1"/>
+												<field name="remarks"/>
 											</group>
 											<group>
 												<field name="product_qty"/>
@@ -143,6 +146,15 @@
 				<xpath expr="//field[@name='currency_id']" position="after">
 					<field name="pre_rfq_id" readonly="1" force_save="1" options="{'no_create':True}" attrs="{'invisible': [('pre_rfq_id', '=', False)]}"/>
 				</xpath>
+				<xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="before">
+					<field name="remarks"/>
+				</xpath>
+				<xpath expr="//field[@name='order_line']/form/group/group/label[@for='product_qty']" position="before">
+					<field name="remarks"/>
+				</xpath>
+				<xpath expr="//field[@name='notes']" position="before">
+					<field colspan="2" name="summary_remarks" placeholder="Enter Summary Remarks Here ..."/>
+                </xpath>
 			</field>
 		</record>
 

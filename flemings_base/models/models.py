@@ -303,6 +303,7 @@ class FlemingsSalesOrder(models.Model):
                     'customer_po': order.customer_po,
                     'process_by_id': self.env.user.id,
                     'fg_remarks': order.fg_remarks,
+                    'summary_remarks': order.summary_remarks,
                 })
         return res
 
@@ -755,6 +756,7 @@ class FlemingsStockPicking(models.Model):
     customer_po = fields.Char('Customer PO No.', copy=False)
     process_by_id = fields.Many2one('res.users', string='Process By')
     fg_remarks = fields.Text('Remarks')
+    summary_remarks = fields.Text('Summary Remarks')
     is_fully_invoiced = fields.Boolean('Fully Invoiced ?', default=False, copy=False)
     from_credit_note = fields.Boolean('From Credit Note?', default=False, copy=False)
     from_debit_note = fields.Boolean('From Debit Note?', default=False, copy=False)

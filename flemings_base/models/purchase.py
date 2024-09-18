@@ -43,6 +43,7 @@ class FlemingsPreRFQSalesOrder(models.Model):
                     'product_qty': line_id.product_uom_qty,
                     'product_uom': line_id.product_uom.id,
                     'price_unit': 0,
+                    'remarks': line_id.remarks,
                     # 'taxes_id': [(6, 0, line_id.tax_id.ids or [])],
                 })]
             if order_line:
@@ -50,6 +51,7 @@ class FlemingsPreRFQSalesOrder(models.Model):
                     'sale_id': order.id,
                     'company_id': order.company_id.id,
                     'order_line': order_line,
+                    'summary_remarks': order.summary_remarks,
                 })
 
             # Buy - Internal - Pre-RFQ Creation
@@ -63,6 +65,7 @@ class FlemingsPreRFQSalesOrder(models.Model):
                     'product_qty': line_id.product_uom_qty,
                     'product_uom': line_id.product_uom.id,
                     'price_unit': 0,
+                    'remarks': line_id.remarks,
                     # 'taxes_id': [(6, 0, line_id.tax_id.ids or [])],
                 })]
             if order_line:
@@ -70,6 +73,7 @@ class FlemingsPreRFQSalesOrder(models.Model):
                     'sale_id': order.id,
                     'company_id': order.company_id.id,
                     'order_line': order_line,
+                    'summary_remarks': order.summary_remarks,
                 })
 
             # Manufacturing Order Creation
@@ -88,6 +92,7 @@ class FlemingsPurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     pre_rfq_id = fields.Many2one('pre.purchase.order', string='Pre-RFQ')
+    summary_remarks = fields.Text('Summary Remarks')
 
     # Inter Company Currency Mismatch Condition update
     def inter_company_create_sale_order(self, company):
@@ -164,6 +169,7 @@ class FlemingsPurchaseOrder(models.Model):
         if sale_order_data and self and self.pre_rfq_id and self.pre_rfq_id.sale_id:
             sale_order_data.update({
                 'origin_so_no': self.pre_rfq_id.sale_id.name,
+                'summary_remarks': self.summary_remarks,
             })
         return sale_order_data
 
@@ -174,8 +180,15 @@ class FlemingsPurchaseOrder(models.Model):
         if sale_order_line_data and self and self.pre_rfq_id and self.pre_rfq_id.sale_id:
             sale_order_line_data.update({
                 'route_id': self.env['stock.route'].sudo().search([('name', '=', 'Manufacture')], limit=1).id or False,
+                'remarks': line.remarks,
             })
         return sale_order_line_data
+
+
+class FlemingsPurchaseOrderLines(models.Model):
+    _inherit = 'purchase.order.line'
+
+    remarks = fields.Text('Remarks')
 
 
 class FlemingPrePurchaseOrder(models.Model):
@@ -213,6 +226,7 @@ class FlemingPrePurchaseOrder(models.Model):
     purchase_count = fields.Integer('Purchase Count', compute='_compute_purchase_count')
 
     state = fields.Selection([('draft', 'RFQ'), ('po_created', 'PO Created'), ('cancel', 'Cancelled')], string='Status', readonly=True, index=True, copy=False, default='draft', tracking=True)
+    summary_remarks = fields.Text('Summary Remarks')
 
     @api.depends('purchase_ids')
     def _compute_purchase_count(self):
@@ -259,6 +273,7 @@ class FlemingPrePurchaseOrder(models.Model):
                         'product_uom': line_id.product_uom.id,
                         'price_unit': line_id.price_unit,
                         'taxes_id': [(6, 0, line_id.taxes_id.ids or [])],
+                        'remarks': line_id.remarks,
                     })]
                     currency_id = line_id.currency_id
                 if order_line:
@@ -268,6 +283,7 @@ class FlemingPrePurchaseOrder(models.Model):
                         'company_id': record.company_id.id,
                         'currency_id': currency_id.id,
                         'order_line': order_line,
+                        'summary_remarks': record.summary_remarks,
                     })
             record.state = 'po_created'
 
@@ -299,6 +315,7 @@ class FlemingPrePurchaseOrderLines(models.Model):
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Subtotal', store=True)
     price_total = fields.Monetary(compute='_compute_amount', string='Total', store=True)
     price_tax = fields.Float(compute='_compute_amount', string='Tax', store=True)
+    remarks = fields.Text('Remarks')
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):

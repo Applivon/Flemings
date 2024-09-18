@@ -496,7 +496,7 @@
 					<field name="fg_sno" string="S.No." attrs="{'readonly': [('parent.generate_fg_sno', '=', True)]}" force_save="1"/>
                 </xpath>
 				<xpath expr="//field[@name='note']" position="before">
-					<field colspan="2" name="summary_remarks" nolabel="1" placeholder="Summary Remarks..."/>
+					<field colspan="2" name="summary_remarks" placeholder="Enter Summary Remarks Here ..."/>
                 </xpath>
 				<xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
 					<field name="remarks"/>
@@ -581,6 +581,7 @@
 					<field name="customer_po"/>
 					<field name="process_by_id" options="{'no_create':True}"/>
 					<field name="fg_remarks"/>
+					<field name="summary_remarks"/>
                 </xpath>
 				<xpath expr="//field[@name='backorder_id']" position="after">
 					<field name="is_fully_invoiced" attrs="{'invisible': [('picking_type_code', '!=', 'outgoing')]}" readonly="1" force_save="1"/>
@@ -675,10 +676,12 @@
 					<button name="action_release_mrp_work_order_numbers" type="object" string="Release" class="oe_highlight" attrs="{'invisible': [('work_order_no', '=', False)]}"/>
                 </xpath>
 				<xpath expr="//field[@name='move_raw_ids']" position="after">
-					<field name="remarks" placeholder="Enter Remarks Here ...."/>
+					<label for="summary_remarks"/>
+					<field name="summary_remarks" placeholder="Enter Summary Remarks Here ...."/>
                 </xpath>
 				<xpath expr="//group/group/div[2]" position="after">
 					<field name="work_order_no" readonly="1" force_save="1"/>
+					<field name="remarks"/>
                 </xpath>
 				<xpath expr="//field[@name='components_availability_state']" position="before">
 					<field name="scheduled_production_date" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
