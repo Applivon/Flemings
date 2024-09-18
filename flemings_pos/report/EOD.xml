@@ -106,7 +106,8 @@
                     <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
                         Cash Should Be:
                     </span>
-                    <span t-esc="o.convert_currency(o.cash_real_transaction)"/>
+                    <!-- <span t-esc="o.convert_currency(o.cash_real_transaction)"/> -->
+                    <span t-esc="o.get_session_value('cash_shoule_be')"/>
                     <br/>
                     <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
                         Total Sales:
@@ -128,7 +129,8 @@
                     <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
                         Difference:
                     </span>
-                    <span t-esc="o.convert_currency(o.cash_register_difference)"/>
+                    <span t-esc="o.get_session_value('cash_diff')"/>
+                    <!-- <span t-esc="o.convert_currency(o.cash_register_difference)"/> -->
                     <br/>
                     <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
                         Print Date/Time:

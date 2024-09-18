@@ -49,6 +49,12 @@ class PosSession(models.Model):
             self.env.cr.execute(sql)
             data = self.env.cr.dictfetchone()
             res = data.get('data')
+        elif type == 'cash_shoule_be':
+            cash_shoule_be = self.cash_register_balance_start + self.total_payments_amount
+            res = 'S$ ' + str('%.2f' % cash_shoule_be)
+        elif type == 'cash_diff':
+            cash_diff = self.cash_register_balance_end_real - (self.cash_register_balance_start + self.total_payments_amount)
+            res = 'S$ ' + str('%.2f' % cash_diff)
         elif type == 'cash_in_amount':
             cash_in = self.get_total_cash('-in-')
             res = 'S$ ' + str('%.2f' % cash_in)
