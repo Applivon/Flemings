@@ -206,3 +206,31 @@ class FlemingsStockProductProduct(models.Model):
     _inherit = 'product.product'
 
     min_stock_quantity = fields.Float('Minimum Stock Level', default=0)
+
+    def create_flemings_product_quant(self):
+        for record in self:
+            exist_product_quant = self.env['stock.quant'].sudo().search([('product_id', '=', record.id)])
+            location_id = self.env['stock.location'].sudo().search([('company_id', '=', self.env.company.id), ('usage', 'in', ['internal', 'transit'])], order='id asc', limit=1)
+            if location_id and not exist_product_quant:
+                new_product_quant = self.env['stock.quant'].sudo().create({
+                    'location_id': location_id.id,
+                    'product_id': record.id,
+                    'quantity': 0,
+                    'inventory_quantity': 0,
+                })
+                new_product_quant.action_apply_inventory()
+
+    @api.model
+    def create(self, vals):
+        res = super(FlemingsStockProductProduct, self).create(vals)
+        # Create Stock Quant for Product if not exists
+        if 'min_stock_quantity' in vals:
+            res.create_flemings_product_quant()
+        return res
+
+    def write(self, vals):
+        res = super(FlemingsStockProductProduct, self).write(vals)
+        # Create Stock Quant for Product if not exists
+        if 'min_stock_quantity' in vals:
+            self.create_flemings_product_quant()
+        return res
