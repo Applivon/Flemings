@@ -120,6 +120,60 @@ class FlemingsStockQuants(models.Model):
 
         return res
 
+    @api.model
+    def _unlink_zero_quants(self):
+        """ _update_available_quantity may leave quants with no
+        quantity and no reserved_quantity. It used to directly unlink
+        these zero quants but this proved to hurt the performance as
+        this method is often called in batch and each unlink invalidate
+        the cache. We defer the calls to unlink in this method.
+        """
+        # precision_digits = max(6, self.sudo().env.ref('product.decimal_product_uom').digits * 2)
+        # # Use a select instead of ORM search for UoM robustness.
+        # query = """SELECT id FROM stock_quant WHERE (round(quantity::numeric, %s) = 0 OR quantity IS NULL)
+        #                                              AND round(reserved_quantity::numeric, %s) = 0
+        #                                              AND (round(inventory_quantity::numeric, %s) = 0 OR inventory_quantity IS NULL)
+        #                                              AND user_id IS NULL;"""
+        # params = (precision_digits, precision_digits, precision_digits)
+        # self.env.cr.execute(query, params)
+        # quant_ids = self.env['stock.quant'].browse([quant['id'] for quant in self.env.cr.dictfetchall()])
+        # quant_ids.sudo().unlink()
+        return
+
+
+class FlemingsStockReorderingRules(models.Model):
+    _inherit = 'stock.warehouse.orderpoint'
+
+    def create_flemings_product_quant(self):
+        for record in self:
+            exist_product_quant = self.env['stock.quant'].sudo().search([
+                ('location_id', '=', record.location_id.id), ('product_id', '=', record.product_id.id)
+            ])
+            if not exist_product_quant:
+                new_product_quant = self.env['stock.quant'].sudo().create({
+                    'location_id': record.location_id.id,
+                    'product_id': record.product_id.id,
+                    'quantity': 0,
+                    'inventory_quantity': 0,
+                })
+                new_product_quant.action_apply_inventory()
+
+    @api.model
+    def create(self, vals):
+        res = super(FlemingsStockReorderingRules, self).create(vals)
+        # Create Stock Quant for Product if not exists
+        if 'location_id' in vals and 'product_id' in vals:
+            res.create_flemings_product_quant()
+        return res
+
+    def write(self, vals):
+        res = super(FlemingsStockReorderingRules, self).write(vals)
+        # Create Stock Quant for Product if not exists
+        if 'location_id' in vals and 'product_id' in vals:
+            self.create_flemings_product_quant()
+
+        return res
+
 
 class FlemingsStockProductTemplate(models.Model):
     _inherit = 'product.template'
