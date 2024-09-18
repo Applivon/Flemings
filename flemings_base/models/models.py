@@ -498,7 +498,7 @@ class FlemingsSalesAccountMove(models.Model):
     location_return_id = fields.Many2one(
         'stock.location', string='Stock Return Location', domain=[('usage', '=', 'internal')], copy=False)
     location_source_id = fields.Many2one(
-        'stock.location', string='Stock Source Location', domain=[('usage', '=', 'supplier')], copy=False)
+        'stock.location', string='Stock Source Location', domain=[('usage', '=', 'internal')], copy=False)
     picking_return_id = fields.Many2one('stock.picking', string='Picking Reference', copy=False)
     not_create_picking = fields.Boolean("Don\'t Create Picking", copy=False)
 
@@ -539,13 +539,14 @@ class FlemingsSalesAccountMove(models.Model):
         for record in self.filtered(lambda x: (x.move_type == 'out_refund' and x.location_return_id) or
                                               (x.move_type == 'in_refund' and x.location_source_id)):
             is_credit = is_debit = False
-            picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'internal')], limit=1)
 
             if record.move_type == 'out_refund':
+                picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'incoming'), ('return_picking_type_id', '!=', False)], limit=1)
                 location_id = record.partner_id.property_stock_customer
                 location_dest_id = record.location_return_id
                 is_credit = True
             else:
+                picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'outgoing'), ('return_picking_type_id', '!=', False)], limit=1)
                 location_id = record.location_source_id
                 location_dest_id = record.partner_id.property_stock_supplier
                 is_debit = True
