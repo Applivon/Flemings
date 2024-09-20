@@ -243,10 +243,10 @@
                         <tr>
                             <td style="width:5%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
                             <td style="width:50%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">Product Code / Description</td>
-                            <td style="width:8%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Qty</td>
+                            <td style="width:8%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:center;">Qty</td>
                             <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:center;">UOM</td>
-                            <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right;">Unit Price</td>
-                            <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:right; white-space:nowrap !important;">Total Amount</td>
+                            <td style="width:12%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:center;">Unit Price</td>
+                            <td style="width:13%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:center; white-space:nowrap !important;">Total Amount</td>
                         </tr>
                     </thead>
 
@@ -257,23 +257,23 @@
                                 <span t-esc="fg_sno"/>
                                 <span t-set="fg_sno" t-value="fg_sno+1"/>
                             </td>
-                            <td style="width:50%; padding:5px; text-align:left;">
+                            <td style="width:50%; padding:5px; padding-right:0px !important; text-align:left;">
                                 <t t-if="line.product_id.default_code">
                                     <span t-field="line.product_id.default_code"/><br/>
                                 </t>
                                 <span t-field="line.name"/>
                             </td>
-                            <td style="width:8%; padding:5px; text-align:right;">
+                            <td style="width:8%; padding:5px; text-align:center;">
                                 <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
                             </td>
                             <td style="width:12%; padding:5px; text-align:center;">
                                 <span t-field="line.product_uom_id"/>
                             </td>
-                            <td style="width:12%; padding:5px; text-align:right;">
+                            <td style="width:12%; padding:5px; text-align:center;">
                                 <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
                                 <!--(<span t-field="line.currency_id.symbol"/>)-->
                             </td>
-                            <td style="width:13%; padding:5px; text-align:right;">
+                            <td style="width:13%; padding:5px; text-align:center;">
                                 <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
                                 <!--(<span t-field="line.currency_id.symbol"/>)-->
                             </td>
@@ -287,14 +287,14 @@
                             Total Quantity : <span t-esc="'{0:,.0f}'.format(sum(o.invoice_line_ids.mapped('quantity')))"/>
                         </td>
                         <td style="width:24%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">Sub Total : <span t-field="o.currency_id"/></td>
-                        <td style="width:13%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                        <td style="width:13%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
                     </tr>
 
                     <tr style="height:25px;"/>
                     <tr>
                         <td rowspan="3"/>
                         <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Tax Base : <span t-field="o.currency_id"/></td>
-                        <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                        <td style="width:13%; padding:5px; text-align:center; font-weight:bold; border-top:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
                     </tr>
 
                     <t t-set="tax_totals" t-value="o.tax_totals"/>
@@ -305,7 +305,7 @@
                                 <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">
                                     <span t-esc="amount_by_group['tax_group_name']"/> : <span t-field="o.currency_id"/>
                                 </td>
-                                <td style="width:13%; padding:5px; text-align:right; font-weight:bold;">
+                                <td style="width:13%; padding:5px; text-align:center; font-weight:bold;">
                                     <span t-esc="'{0:,.2f}'.format(amount_by_group['tax_group_amount'])"/>
                                 </td>
                             </tr>
@@ -314,7 +314,7 @@
 
                     <tr>
                         <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
-                        <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:1px solid black; border-bottom:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
+                        <td style="width:13%; padding:5px; text-align:center; font-weight:bold; border-top:1px solid black; border-bottom:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
                     </tr>
                 </table>
 

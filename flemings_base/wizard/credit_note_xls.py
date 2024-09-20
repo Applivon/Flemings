@@ -159,7 +159,7 @@ class FlemingsCreditNoteReportXlsx(models.AbstractModel):
                 sheet.write(row, 0, fg_sno, align_center)
                 sheet.write(row, 1, str(line.product_id.default_code or '') + '\n' + str(line.name or ''), align_left)
                 sheet.write(row, 2, str('%.0f' % line.quantity or 0), align_center)
-                sheet.write(row, 3, str(line.product_uom_id.name or ''), align_left)
+                sheet.write(row, 3, str(line.product_uom_id.name or ''), align_center)
                 sheet.write(row, 4, str('%.2f' % line.price_unit or 0), align_center)
                 sheet.write(row, 5, str('%.2f' % line.price_subtotal or 0), align_center)
 

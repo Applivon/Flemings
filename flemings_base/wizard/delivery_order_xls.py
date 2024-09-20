@@ -155,7 +155,7 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
                 sheet.write(row, 0, fg_sno, align_center)
                 sheet.write(row, 1, str(line.product_id.default_code or '') + '\n' + str(line.product_id.description_sale or ''), align_left)
                 sheet.write(row, 2, str('%.0f' % line.qty_done or 0), align_center)
-                sheet.write(row, 3, str(line.product_uom_id.name or ''), align_left)
+                sheet.write(row, 3, str(line.product_uom_id.name or ''), align_center)
 
                 fg_sno += 1
                 row += 1
