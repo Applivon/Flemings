@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
+
+        <record id="work_order_summary_report_wizard_xlsx" model="ir.actions.report">
+	        <field name="name">Work Order Generation</field>
+	        <field name="model">work.order.summary.report.wizard</field>
+	        <field name="report_type">xlsx</field>
+	        <field name="report_name">flemings_base.work_order_summary_report_wizard_xlsx</field>
+	        <field name="report_file">Work Order Generation Report</field>
+            <field name="print_report_name">(object.report_type == 'work_order' and 'Work Order Summary Report - %s' % (object.work_order_no or '').replace('/','_')) or (object.report_type == 'raw_material' and 'Raw Material Summary Report - %s' % (object.work_order_no or '').replace('/','_')) or 'Design Specification - %s' % (object.work_order_no or '').replace('/','_')</field>
+	    </record>
 	
 		<record id="view_work_order_summary_report_wizard_form" model="ir.ui.view">
 			<field name="name">view.work.order.summary.report.wizard.form</field>
@@ -16,10 +25,12 @@
                     <group>
                         <group>
                             <field name="report_type" required="1"/>
+                            <field name="company_id" invisible="1"/>
                         </group>
                     </group>
                     <footer>
-                        <button name="print_report" string="Print" type="object" class="btn-primary"/>
+                        <!--<button name="print_report" string="Print" type="object" class="btn-primary"/>-->
+                        <button string="Print" name="generate_excel_report" class="oe_highlight" type="object"/>
                         <button string="Cancel" special="cancel"/>
                     </footer>
 				</form>
