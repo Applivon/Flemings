@@ -39,13 +39,13 @@ class PosSession(models.Model):
                 result = self.env['pos.payment'].read_group([('session_id', '=', self.id), ('payment_method_id', '=', payment.id)], ['amount'], ['session_id'])
                 if result:
                     all_cash_payment += result[0]['amount']
-        return_paid = 0
-        for order in self.order_ids:
-            if order.refunded_orders_count > 0:
-                for payment in order.payment_ids:
-                    if payment.payment_method_id.is_cash_count:
-                        return_paid += payment.amount
-        cash_shoule_be = (cash_in + cash_out + self.cash_register_balance_start + all_cash_payment + return_paid)
+        # return_paid = 0
+        # for order in self.order_ids:
+        #     if order.refunded_orders_count > 0:
+        #         for payment in order.payment_ids:
+        #             if payment.payment_method_id.is_cash_count:
+        #                 return_paid += payment.amount
+        cash_shoule_be = (cash_in + cash_out + self.cash_register_balance_start + all_cash_payment)
         return cash_shoule_be
     def get_session_value(self,type):
         res = ''
