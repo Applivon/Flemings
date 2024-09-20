@@ -136,12 +136,12 @@
             <field name="page_height">0</field>
             <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">133</field>
+            <field name="margin_top">120</field>
             <field name="margin_bottom">10</field>
             <field name="margin_left">8</field>
             <field name="margin_right">8</field>
             <field name="header_line" eval="False"/>
-            <field name="header_spacing">128</field>
+            <field name="header_spacing">115</field>
             <field name="dpi">80</field>
         </record>
 
@@ -186,12 +186,12 @@
                     <thead>
                         <tr>
                             <td style="width:25%; text-align:left; padding-left:6px;">
-                                <img t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
                             </td>
                             <td style="width:50%; text-align:left;">
                                 <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
                                     <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:14pt; font-weight:bold; padding-right:4px;"/>
-                                    <p style="margin-bottom:0px; padding-top:0px; text-align:left">
+                                    <p style="margin-bottom:0px; padding-top:0px; text-align:left; white-space:nowrap;">
                                         <span t-if="company.street or company.street2">
                                             <br/>
                                             <span t-if="company.street">
@@ -228,7 +228,7 @@
                                 </div>
                             </td>
                             <td style="width:25%; text-align:right; padding-right:6px;">
-                                <img t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
+                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
                             </td>
                             </tr>
                         <tr>

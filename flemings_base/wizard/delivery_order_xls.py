@@ -51,10 +51,19 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
                      'image_data': io.BytesIO(base64.b64decode(obj.company_id.logo))
                      }
                 )
+            if obj.company_id.sgs_img:
+                image_width = 240.0
+                image_height = 300.0
+                cell_width = 40.0
+                cell_height = 50.0
+
+                x_scale = cell_width / image_width
+                y_scale = cell_height / image_height
+
                 sheet.insert_image(
                     'D' + str(row + 2), '',
                     {'x_scale': x_scale, 'y_scale': y_scale, 'align': 'center',
-                     'image_data': io.BytesIO(base64.b64decode(obj.company_id.logo))
+                     'image_data': io.BytesIO(base64.b64decode(obj.company_id.sgs_img))
                      }
                 )
 
