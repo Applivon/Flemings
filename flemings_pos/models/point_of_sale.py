@@ -29,6 +29,24 @@ class PosSession(models.Model):
     def convert_currency(self,value):
         res = 'S$ ' + str('%.2f' % value)
         return res
+    def cash_should_be_func(self):
+        cash_shoule_be = 0
+        cash_in = self.get_total_cash('-in-')
+        cash_out = self.get_total_cash('-out-')
+        all_cash_payment = 0 
+        for payment in self.payment_method_ids:
+            if payment.is_cash_count:
+                result = self.env['pos.payment'].read_group([('session_id', '=', self.id), ('payment_method_id', '=', payment.id)], ['amount'], ['session_id'])
+                if result:
+                    all_cash_payment += result[0]['amount']
+        # return_paid = 0
+        # for order in self.order_ids:
+        #     if order.refunded_orders_count > 0:
+        #         for payment in order.payment_ids:
+        #             if payment.payment_method_id.is_cash_count:
+        #                 return_paid += payment.amount
+        cash_shoule_be = (cash_in + cash_out + self.cash_register_balance_start + all_cash_payment)
+        return cash_shoule_be
     def get_session_value(self,type):
         res = ''
         if type == 'total_cash_value':
@@ -50,22 +68,10 @@ class PosSession(models.Model):
             data = self.env.cr.dictfetchone()
             res = data.get('data')
         elif type == 'cash_shoule_be':
-            all_cash_payment = 0 
-            for payment in self.payment_method_ids:
-                if payment.is_cash_count:
-                    result = self.env['pos.payment'].read_group([('session_id', '=', self.id), ('payment_method_id', '=', payment.id)], ['amount'], ['session_id'])
-                    if result:
-                        all_cash_payment += result[0]['amount']
-            cash_shoule_be = self.cash_register_balance_start + all_cash_payment
+            cash_shoule_be = self.cash_should_be_func()
             res = 'S$ ' + str('%.2f' % cash_shoule_be)
         elif type == 'cash_diff':
-            all_cash_payment = 0 
-            for payment in self.payment_method_ids:
-                if payment.is_cash_count:
-                    result = self.env['pos.payment'].read_group([('session_id', '=', self.id), ('payment_method_id', '=', payment.id)], ['amount'], ['session_id'])
-                    if result:
-                        all_cash_payment += result[0]['amount']
-            cash_shoule_be = self.cash_register_balance_start + all_cash_payment
+            cash_shoule_be = self.cash_should_be_func()
             cash_diff = self.cash_register_balance_end_real - cash_shoule_be
             res = 'S$ ' + str('%.2f' % cash_diff)
         elif type == 'cash_in_amount':
@@ -84,7 +90,6 @@ class PosSession(models.Model):
 
             else:
                 res = ''
-
             # account_cashbox = self.cash_register_id.cashbox_end_id
             # if account_cashbox:
             #     cashbox_line_ids = self.env['account.cashbox.line'].search([('cashbox_id','=',account_cashbox.id)], order="coin_value desc")
@@ -99,10 +104,11 @@ class PosSession(models.Model):
                     sum_value = result[0]['amount']
                 res.append(str(payment.name) + ' : S$ ' + str('%.2f' % sum_value))
         elif type == 'void_sales':
-            res = 'S$ 0.00'
-            order_cancel = self.env['pos.order'].read_group([('session_id', '=', self.id),('state','=','cancel')],['amount_paid'], ['session_id'])
-            if order_cancel:
-                res = 'S$ ' + str('%.2f' % order_cancel[0]['amount_paid'])
+            amount_paid = 0
+            for order in self.order_ids:
+                if order.refunded_orders_count > 0:
+                    amount_paid += order.amount_paid
+            res = 'S$ ' + str('%.2f' % amount_paid)
         return res
     def get_sale_data(self,type):
         res = ''
