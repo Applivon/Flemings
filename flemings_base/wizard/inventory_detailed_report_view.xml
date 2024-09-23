@@ -19,15 +19,13 @@
                         <group>
                             <field name="from_date" required="1"/>
                             <field name="to_date" required="1"/>
-                            <field name="sgd_currency_id" invisible="1"/>
-                            <field name="file_data" filename="filename" invisible="1"/>
-                            <field name="filename" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
 
                     <group/><group/>
                     <group>
-                        <field name="company_ids" widget="many2many_tags" options="{'no_create':True}" invisible="1"/>
+                        <field name="company_id" options="{'no_create':True}" invisible="1"/>
                         <field name="location_ids" widget="many2many_tags" options="{'no_create':True}"/>
                     </group>
                     <group/><group/>

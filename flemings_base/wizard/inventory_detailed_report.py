@@ -13,13 +13,10 @@ class InventoryDetailedReport(models.TransientModel):
 
     from_date = fields.Date('From Date', default=lambda *a: str(datetime.now() + relativedelta(day=1))[:10])
     to_date = fields.Date('To Date', default=lambda *a: str(datetime.now() + relativedelta(months=+1, day=1, days=-1))[:10])
-    company_ids = fields.Many2many('res.company', string='Companies', default=lambda self: self.env.company.ids)
+    company_id = fields.Many2one('res.company', string='Companies', default=lambda self: self.env.company.id)
     location_ids = fields.Many2many('stock.location', string='Location(s)', domain="[('usage', '=', 'internal')]")
     product_ids = fields.Many2many('product.product', string='Product(s)')
-    sgd_currency_id = fields.Many2one('res.currency', string='SGD Currency', default=lambda self: self.env['res.currency'].search([('name', '=', 'SGD')], limit=1))
-
-    file_data = fields.Binary('Download file', readonly=True)
-    filename = fields.Char('Filename', size=64, readonly=True)
+    currency_id = fields.Many2one(related='company_id.currency_id', string='Currency')
 
     @api.onchange('from_date', 'to_date')
     def onchange_to_date(self):
@@ -290,8 +287,8 @@ class FlemingsInventoryDetailedReportXlsx(models.AbstractModel):
                 sheet.set_column('E:H', 14)
                 sheet.set_column('I:M', 18)
 
-            company_id = obj.company_ids and obj.company_ids[0]
-            currency_id = company_id.currency_id or obj.sgd_currency_id
+            company_id = obj.company_id
+            currency_id = obj.currency_id
 
             row = 0
             sheet.merge_range(row, 0, row, 4, 'INVENTORY DETAILED REPORT', workbook.add_format(
