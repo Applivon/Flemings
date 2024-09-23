@@ -25,6 +25,8 @@
         "point_of_sale.assets": [
             "flemings_pos/static/xml/pos_button.xml",
             "flemings_pos/static/xml/customer_screen.xml",
+            "flemings_pos/static/xml/pos_receipt.xml",
+            "flemings_pos/static/css/style.css",
             ],
         },
 

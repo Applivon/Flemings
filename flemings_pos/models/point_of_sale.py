@@ -3,6 +3,10 @@ from datetime import datetime,date
 import pytz
 from odoo.exceptions import UserError
 array_coin = [10,5,2,1,0.5,0.2,0,1,0.05]
+class posConfig(models.Model):
+    _inherit = "pos.config"
+    address = fields.Char(string='Address')
+
 class PosSession(models.Model):
     _inherit = 'pos.session'
 

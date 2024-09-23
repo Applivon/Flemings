@@ -1,0 +1,23 @@
+.pos-receipt .pos-receipt-logo {
+    width: 40%;
+    display: block;
+    margin: 0 auto;
+}
+.pos-receipt .pos-receipt-contact {
+    text-align: center;
+    font-family: 'Fira Mono', monospace !important;
+    font-size:9pt !important;
+}
+.pos-receipt{
+    font-family: 'Fira Mono', monospace !important;
+    font-size:9pt !important;
+}
+.pos .pos-receipt{
+    font-family: 'Fira Mono', monospace !important;
+    font-size:9pt !important;
+}
+.pos-receipt .pos-receipt-amount{
+    font-family: 'Fira Mono', monospace !important;
+    font-size:9pt !important;
+    padding-left: 0px;
+}
