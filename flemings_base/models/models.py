@@ -543,7 +543,7 @@ class FlemingsSalesAccountMove(models.Model):
 
             if record.move_type == 'out_refund':
                 picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'incoming'), ('return_picking_type_id', '!=', False)], limit=1)
-                location_id = record.partner_id.property_stock_customer
+                location_id = record.partner_id.property_stock_supplier
                 location_dest_id = record.location_return_id
                 is_credit = True
             else:
