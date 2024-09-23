@@ -24,9 +24,6 @@ class FlemingsPurchasePriceReport(models.TransientModel):
     product_ids = fields.Many2many('product.product', string='Product(s)')
     partner_ids = fields.Many2many('res.partner', string='Vendor(s)', domain="[('supplier_rank', '>', 0), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
-    file_data = fields.Binary('Download file', readonly=True)
-    filename = fields.Char('Filename', size=64, readonly=True)
-
     @api.onchange('from_date', 'to_date')
     def onchange_to_date(self):
         if self.to_date and self.from_date and self.to_date < self.from_date:
@@ -114,7 +111,7 @@ class FlemingsPurchasePriceReportXlsx(models.AbstractModel):
             sheet.merge_range(1, 3, 1, 0, 'Period : ' + purchase_period, workbook.add_format(
                 {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'num_format': 'dd/mm/yyyy'}))
 
-            vendor_domain = [('date_approve', '>=', obj.from_date), ('date_approve', '<=', obj.to_date), ('state', 'in', ('purchase', 'done'))]
+            vendor_domain = [('company_id', '=', obj.company_id.id), ('date_approve', '>=', obj.from_date), ('date_approve', '<=', obj.to_date), ('state', 'in', ('purchase', 'done'))]
             if obj.partner_ids:
                 vendor_domain.append(('partner_id', 'in', obj.partner_ids.ids or []))
 
