@@ -115,7 +115,11 @@ class FGGrossProfitReportXlsx(models.AbstractModel):
             sheet.set_row(row + 3, 18)
 
             sheet.merge_range(row, 0, row, 6, 'GROSS PROFIT REPORT', workbook.add_format(
-                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True}))
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 18}))
+
+            row += 1
+            sheet.merge_range(row, 0, row, 6, str(obj.company_id.name).upper(), workbook.add_format(
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 14}))
 
             row += 2
             sheet.write(row, 0, 'From', align_bold_left)
