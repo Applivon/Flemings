@@ -13,8 +13,6 @@ class FlemingsPurchaseAudiListSummary(models.TransientModel):
     to_date = fields.Date('To Date', default=lambda *a: str(datetime.now() + relativedelta(months=+1, day=1, days=-1))[:10])
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
     partner_ids = fields.Many2many('res.partner', string='Vendor(s)', domain="[('supplier_rank', '>', 0), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
-    file_data = fields.Binary('Download file', readonly=True)
-    filename = fields.Char('Filename', size=64, readonly=True)
 
     @api.onchange('from_date', 'to_date')
     def onchange_to_date(self):
@@ -72,7 +70,7 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
             sheet.merge_range(1, 3, 1, 0, 'Period : ' + purchase_period, workbook.add_format(
                 {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'num_format': 'dd/mm/yyyy'}))
 
-            purchase_domain = [('date_approve', '>=', obj.from_date), ('date_approve', '<=', obj.to_date), ('state', 'in', ('purchase', 'done'))]
+            purchase_domain = [('company_id', '=', obj.company_id.id), ('date_approve', '>=', obj.from_date), ('date_approve', '<=', obj.to_date), ('state', 'in', ('purchase', 'done'))]
             if obj.partner_ids:
                 purchase_domain.append(('partner_id', 'in', obj.partner_ids.ids or []))
 
@@ -87,6 +85,10 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
 
             for index in range(0, len(titles)):
                 sheet.write(row, index, titles[index], align_bold_center)
+
+            if not currencies:
+                sheet.merge_range(row + 2, 0, row + 2, 4, 'No Record(s) found', workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'text_wrap': True}))
+
             for currency_id in currencies:
                 qty_total = gross_total = 0
                 untaxed_total = tax_total = net_total = 0
