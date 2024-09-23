@@ -50,7 +50,8 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
         for obj in objects:
             sheet.set_row(0, 20)
             sheet.set_row(1, 20)
-            sheet.set_row(3, 30)
+            sheet.set_row(3, 20)
+            sheet.set_row(4, 30)
 
             sheet.set_column('A:A', 20)
             sheet.set_column('B:B', 20)
@@ -66,9 +67,11 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
             purchase_period = str(date_from) + ' - ' + str(date_to)
 
             sheet.merge_range(0, 3, 0, 0, 'PURCHASE AUDIT LIST SUMMARY', workbook.add_format(
-                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True}))
-            sheet.merge_range(1, 3, 1, 0, 'Period : ' + purchase_period, workbook.add_format(
-                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'num_format': 'dd/mm/yyyy'}))
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 18}))
+            sheet.merge_range(1, 3, 1, 0, str(obj.company_id.name).upper(), workbook.add_format(
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 14}))
+            sheet.merge_range(2, 3, 2, 0, 'Period : ' + purchase_period, workbook.add_format(
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'num_format': 'dd/mm/yyyy', 'font_size': 13}))
 
             purchase_domain = [('company_id', '=', obj.company_id.id), ('date_approve', '>=', obj.from_date), ('date_approve', '<=', obj.to_date), ('state', 'in', ('purchase', 'done'))]
             if obj.partner_ids:
@@ -77,7 +80,7 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
             purchase_orders = self.env['purchase.order'].sudo().search(purchase_domain, order='date_approve')
             currencies = purchase_orders.mapped('currency_id')
 
-            row = 3
+            row = 4
             titles = [
                 'Date', 'PO Number', 'Vendor', 'Delivery Date', 'Term', 'Total Qty',
                 'Currency', 'Gross Total', 'Tax Base', 'Tax', 'Net Total'
