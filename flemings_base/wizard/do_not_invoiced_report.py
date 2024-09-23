@@ -73,6 +73,10 @@ class FlemingsDoNotInvoicedReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 0, row, 4, 'DO NOT INVOICED REPORT', workbook.add_format(
                 {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 18}))
 
+            row += 1
+            sheet.merge_range(row, 0, row, 4, str(obj.company_id.name).upper(), workbook.add_format(
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 14}))
+
             row += 2
             sheet.write(row, 0, 'From', align_bold_left)
             sheet.write(row, 1, str(date_from), align_left)
