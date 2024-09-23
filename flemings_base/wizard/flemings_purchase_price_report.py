@@ -92,7 +92,8 @@ class FlemingsPurchasePriceReportXlsx(models.AbstractModel):
         for obj in objects:
             sheet.set_row(0, 20)
             sheet.set_row(1, 20)
-            sheet.set_row(3, 35)
+            sheet.set_row(3, 20)
+            sheet.set_row(4, 35)
 
             sheet.set_column('A:A', 15)
             sheet.set_column('B:B', 35)
@@ -107,9 +108,11 @@ class FlemingsPurchasePriceReportXlsx(models.AbstractModel):
             purchase_period = str(date_from) + ' - ' + str(date_to)
 
             sheet.merge_range(0, 3, 0, 0, 'PURCHASE PRICE REPORT', workbook.add_format(
-                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True}))
-            sheet.merge_range(1, 3, 1, 0, 'Period : ' + purchase_period, workbook.add_format(
-                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'num_format': 'dd/mm/yyyy'}))
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 18}))
+            sheet.merge_range(1, 3, 1, 0, str(obj.company_id.name).upper(), workbook.add_format(
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 14}))
+            sheet.merge_range(2, 3, 2, 0, 'Period : ' + purchase_period, workbook.add_format(
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'num_format': 'dd/mm/yyyy', 'font_size': 13}))
 
             vendor_domain = [('company_id', '=', obj.company_id.id), ('date_approve', '>=', obj.from_date), ('date_approve', '<=', obj.to_date), ('state', 'in', ('purchase', 'done'))]
             if obj.partner_ids:
@@ -119,7 +122,10 @@ class FlemingsPurchasePriceReportXlsx(models.AbstractModel):
             purchase_order_ids = purchase_orders.mapped('id')
             vendors = purchase_orders.mapped('partner_id')
 
-            row = 3
+            row = 4
+            if not vendors:
+                sheet.merge_range(row + 1, 0, row + 1, 3, 'No Record(s) found', workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'text_wrap': True}))
+
             for vendor_id in vendors:
                 line_data = obj.get_vendor_purchase_price_data(vendor_id, purchase_order_ids)
                 if line_data:
