@@ -18,6 +18,7 @@
 						<group>
 							<field name="date_from" required="1"/>
 							<field name="date_to" required="1"/>
+							<field name="company_id" invisible="1"/>
 						</group>
 						<group/><group/>
 

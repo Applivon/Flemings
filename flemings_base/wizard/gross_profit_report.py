@@ -15,6 +15,7 @@ class FGGrossProfitReport(models.TransientModel):
     partner_ids = fields.Many2many('res.partner', string='Customer')
     user_ids = fields.Many2many('res.users', string='Salesperson')
     product_ids = fields.Many2many('product.product', string='Product')
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
 
     def generate_xlsx_report(self):
         return {
@@ -27,6 +28,9 @@ class FGGrossProfitReport(models.TransientModel):
         where = "invoice.move_type = 'out_invoice' AND invoice.state = 'posted' " \
                 "AND inv_line.product_id IS NOT NULL AND invoice.invoice_date BETWEEN '%s' AND '%s'" \
                 "" % (self.date_from, self.date_to)
+
+        if self.company_id:
+            where += "AND invoice.company_id = %s" % self.company_id.id
 
         if self.partner_ids:
             partners = tuple(self.partner_ids.ids)
