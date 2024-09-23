@@ -14,7 +14,8 @@ class COGSDetailedReport(models.TransientModel):
     from_date = fields.Date('From Date', default=lambda *a: str(datetime.now() + relativedelta(day=1))[:10])
     to_date = fields.Date('To Date', default=lambda *a: str(datetime.now() + relativedelta(months=+1, day=1, days=-1))[:10])
     product_ids = fields.Many2many('product.product', string='Product(s)')
-    sgd_currency_id = fields.Many2one('res.currency', string='SGD Currency', default=lambda self: self.env['res.currency'].search([('name', '=', 'SGD')], limit=1))
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
+    currency_id = fields.Many2one(related='company_id.currency_id', string='Currency')
 
     file_data = fields.Binary('Download file', readonly=True)
     filename = fields.Char('Filename', size=64, readonly=True)
@@ -99,7 +100,7 @@ class FlemingsCOGSDetailedReportXlsx(models.AbstractModel):
 
             domain = [
                 ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('stock_move_id.picking_id', '!=', False),
-                ('reference', '!=', False), '|', ('value', '<', 0), ('quantity', '<', 0)
+                ('company_id', '=', obj.company_id.id), ('reference', '!=', False), '|', ('value', '<', 0), ('quantity', '<', 0)
             ]
             if obj.product_ids:
                 domain += [('product_id', 'in', obj.product_ids.ids or [])]
@@ -121,7 +122,7 @@ class FlemingsCOGSDetailedReportXlsx(models.AbstractModel):
             #     sheet.write(row, 1, str(product_id.default_code or ''), align_left)
             #     sheet.write(row, 2, str(product_id.name or ''), align_left)
             #     sheet.write(row, 3, str(do_nos or ''), align_left)
-            #     sheet.write(row, 4, str(obj.sgd_currency_id.symbol or '') + ' ' + str('%.2f' % abs(cogs_value) or 0), align_right)
+            #     sheet.write(row, 4, str(obj.currency_id.symbol or '') + ' ' + str('%.2f' % abs(cogs_value) or 0), align_right)
             #
             #     row += 1
             #     sno += 1
