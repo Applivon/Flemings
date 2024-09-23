@@ -21,8 +21,6 @@
                             <field name="to_date" required="1"/>
                             <field name="company_id" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
-                            <field name="file_data" filename="filename" invisible="1"/>
-                            <field name="filename" invisible="1"/>
                         </group>
                     </group>
                     <group/><group/>

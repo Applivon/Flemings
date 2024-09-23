@@ -17,9 +17,6 @@ class COGSDetailedReport(models.TransientModel):
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
     currency_id = fields.Many2one(related='company_id.currency_id', string='Currency')
 
-    file_data = fields.Binary('Download file', readonly=True)
-    filename = fields.Char('Filename', size=64, readonly=True)
-
     @api.onchange('from_date', 'to_date')
     def onchange_to_date(self):
         if self.to_date and self.from_date and self.to_date < self.from_date:
