@@ -14,10 +14,8 @@ class OpenInvoiceReport(models.TransientModel):
     from_date = fields.Date('From Date', default=lambda *a: str(datetime.now() + relativedelta(day=1))[:10])
     to_date = fields.Date('To Date', default=lambda *a: str(datetime.now() + relativedelta(months=+1, day=1, days=-1))[:10])
     partner_ids = fields.Many2many('res.partner', string='Customer(s)')
-    sgd_currency_id = fields.Many2one('res.currency', string='SGD Currency', default=lambda self: self.env['res.currency'].search([('name', '=', 'SGD')], limit=1))
-
-    file_data = fields.Binary('Download file', readonly=True)
-    filename = fields.Char('Filename', size=64, readonly=True)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
+    currency_id = fields.Many2one(related='company_id.currency_id', string='Currency')
 
     @api.onchange('from_date', 'to_date')
     def onchange_to_date(self):
@@ -89,7 +87,7 @@ class FlemingsOpenInvoiceReportXlsx(models.AbstractModel):
 
             domain = [
                 ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('amount_residual', '>', 0),
-                ('invoice_date', '>=', obj.from_date), ('invoice_date', '<=', obj.to_date)
+                ('company_id', '=', obj.company_id.id), ('invoice_date', '>=', obj.from_date), ('invoice_date', '<=', obj.to_date)
             ]
             if obj.partner_ids:
                 domain += [('partner_id', 'in', obj.partner_ids.ids or [])]
@@ -121,10 +119,10 @@ class FlemingsOpenInvoiceReportXlsx(models.AbstractModel):
             if line_data:
                 row += 1
                 sheet.write(row, 3, 'Total', align_bold_right)
-                sheet.write(row, 4, str(obj.sgd_currency_id.symbol or '') + ' ' + str('%.2f' % sub_total or 0), align_bold_right)
-                sheet.write(row, 5, str(obj.sgd_currency_id.symbol or '') + ' ' + str('%.2f' % taxed_total or 0), align_bold_right)
-                sheet.write(row, 6, str(obj.sgd_currency_id.symbol or '') + ' ' + str('%.2f' % paid_amount or 0), align_bold_right)
-                sheet.write(row, 7, str(obj.sgd_currency_id.symbol or '') + ' ' + str('%.2f' % balance_amount or 0), align_bold_right)
+                sheet.write(row, 4, str(obj.currency_id.symbol or '') + ' ' + str('%.2f' % sub_total or 0), align_bold_right)
+                sheet.write(row, 5, str(obj.currency_id.symbol or '') + ' ' + str('%.2f' % taxed_total or 0), align_bold_right)
+                sheet.write(row, 6, str(obj.currency_id.symbol or '') + ' ' + str('%.2f' % paid_amount or 0), align_bold_right)
+                sheet.write(row, 7, str(obj.currency_id.symbol or '') + ' ' + str('%.2f' % balance_amount or 0), align_bold_right)
 
             else:
                 sheet.merge_range(row + 1, 0, row + 1, 6, 'No Record(s) found', workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'text_wrap': True}))
