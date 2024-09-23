@@ -185,9 +185,11 @@ class FlemingsStockProductTemplate(models.Model):
         res = super(FlemingsStockProductTemplate, self).create(vals)
         for record in res:
             # Update Variant Minimum Stock Level
-            if 'min_stock_quantity' in vals:
-                for variant in record.product_variant_ids:
-                    variant.min_stock_quantity = record.min_stock_quantity
+            # if 'min_stock_quantity' in vals:
+            #     for variant in record.product_variant_ids:
+            #         variant.min_stock_quantity = record.min_stock_quantity
+            if 'min_stock_quantity' in vals and vals.get('min_stock_quantity') > 0 and record.product_variant_count > 1:
+                record.min_stock_quantity = 0
 
         return res
 
@@ -195,9 +197,11 @@ class FlemingsStockProductTemplate(models.Model):
         res = super(FlemingsStockProductTemplate, self).write(vals)
         for record in self:
             # Update Variant Minimum Stock Level
-            if 'min_stock_quantity' in vals:
-                for variant in record.product_variant_ids:
-                    variant.min_stock_quantity = record.min_stock_quantity
+            # if 'min_stock_quantity' in vals:
+            #     for variant in record.product_variant_ids:
+            #         variant.min_stock_quantity = record.min_stock_quantity
+            if 'min_stock_quantity' in vals and vals.get('min_stock_quantity') > 0 and record.product_variant_count > 1:
+                record.min_stock_quantity = 0
 
         return res
 

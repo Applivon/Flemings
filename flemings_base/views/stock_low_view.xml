@@ -110,11 +110,10 @@
 		<record id="fg_product_template_min_stock_only_form_view_inherit" model="ir.ui.view">
 			<field name="name">product.template.product.form.sync</field>
 			<field name="model">product.template</field>
-			<field name="inherit_id" ref="product.product_template_form_view"/>
+			<field name="inherit_id" ref="product.product_template_only_form_view"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='uom_po_id']" position="after">
-					<field name="detailed_type" invisible="0"/>
-					<field name="min_stock_quantity" attrs="{'invisible': [('detailed_type', '!=', 'product')]}"/>
+					<field name="min_stock_quantity" attrs="{'invisible': ['|', ('product_variant_count', '&gt;', 1), ('detailed_type', '!=', 'product')]}"/>
 				</xpath>
 			</field>
 		</record>
@@ -125,11 +124,22 @@
 			<field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='barcode']" position="after">
-					<field name="detailed_type" invisible="0"/>
+					<field name="detailed_type" invisible="1"/>
 					<field name="min_stock_quantity" attrs="{'invisible': [('detailed_type', '!=', 'product')]}"/>
 				</xpath>
 			</field>
 		</record>
+
+		<record id="fg_product_product_min_stock_normal_form_view_inherit" model="ir.ui.view">
+            <field name="name">fg.product.product.min.stock.normal.form.view.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='uom_po_id']" position="after">
+                    <field name="min_stock_quantity" attrs="{'invisible': [('detailed_type', '!=', 'product')]}"/>
+                </xpath>
+            </field>
+        </record>
 
     </data>
 </odoo>
