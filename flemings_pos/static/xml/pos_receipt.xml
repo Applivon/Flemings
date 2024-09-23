@@ -93,25 +93,7 @@
                 </t>
                 <br/>
                 <hr style="border-top: 1px ;"/>
-                <!-- <div class="pos-receipt-amount receipt-change">
-                    CHANGE
-                    <span t-esc="env.pos.format_currency(receipt.change)" class="pos-receipt-right-align"/>
-                </div>
-                <br/> -->
-
-                <!-- Extra Payment Info -->
-
-                <!-- <t t-if="receipt.total_discount">
-                    <div>
-                        Discounts
-                        <span t-esc="env.pos.format_currency(receipt.total_discount)" class="pos-receipt-right-align"/>
-                    </div>
-                </t> -->
                 <br/>
-                <div>
-                    TOTAL SAVINGS
-                    <span t-esc="env.pos.format_currency(0)" class="pos-receipt-right-align"/>
-                </div>
                 <t t-if="isTaxIncluded">
                     <t id="tax-details" t-foreach="receipt.tax_details" t-as="tax" t-key="tax.tax.id">
                         <div>
@@ -148,27 +130,6 @@
                     <br/>
                     <br/>
                 </div>
-
-                <!-- <div class="after-footer">
-                    <t t-foreach="receipt.paymentlines" t-as="line" t-key="line_index">
-                        <t t-if="line.ticket">
-                            <br />
-                            <div class="pos-payment-terminal-receipt">
-                                <t t-out="line.ticket" />
-                            </div>
-                        </t>
-                    </t>
-                </div> -->
-                <!-- <br/> -->
-                <!-- <div class="pos-receipt-order-data">
-                    <div><t t-esc="receipt.name" /></div>
-                    <t t-if="receipt.date.localestring">
-                        <div><t t-esc="receipt.date.localestring" /></div>
-                    </t>
-                    <t t-else="">
-                        <div><t t-esc="receipt.date.validation_date" /></div>
-                    </t>
-                </div> -->
                 <hr style="border-top: 1px dashed;"/>
             </div>
         </xpath>
