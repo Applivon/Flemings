@@ -14,9 +14,7 @@ class DoNotInvoicedReport(models.TransientModel):
     from_date = fields.Date('From Date', default=lambda *a: str(datetime.now() + relativedelta(day=1))[:10])
     to_date = fields.Date('To Date', default=lambda *a: str(datetime.now() + relativedelta(months=+1, day=1, days=-1))[:10])
     partner_ids = fields.Many2many('res.partner', string='Customer(s)')
-
-    file_data = fields.Binary('Download file', readonly=True)
-    filename = fields.Char('Filename', size=64, readonly=True)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
 
     @api.onchange('from_date', 'to_date')
     def onchange_to_date(self):
@@ -90,7 +88,7 @@ class FlemingsDoNotInvoicedReportXlsx(models.AbstractModel):
 
             domain = [
                 ('sale_id', '!=', False), ('sale_id.fg_invoice_status', 'in', ['to_invoice', 'partial_invoice']),
-                ('scheduled_date', '>=', obj.from_date), ('scheduled_date', '<=', obj.to_date)
+                ('company_id', '=', obj.company_id.id), ('scheduled_date', '>=', obj.from_date), ('scheduled_date', '<=', obj.to_date)
             ]
             if obj.partner_ids:
                 domain += ['', ('sale_id.partner_id', 'in', obj.partner_ids.ids or []), ('partner_id', 'in', obj.partner_ids.ids or [])]
