@@ -13,10 +13,8 @@ class PurchaseCOGSSummaryReport(models.TransientModel):
 
     from_date = fields.Date('From Date', default=lambda *a: str(datetime.now() + relativedelta(day=1))[:10])
     to_date = fields.Date('To Date', default=lambda *a: str(datetime.now() + relativedelta(months=+1, day=1, days=-1))[:10])
-    sgd_currency_id = fields.Many2one('res.currency', string='SGD Currency', default=lambda self: self.env['res.currency'].search([('name', '=', 'SGD')], limit=1))
-
-    file_data = fields.Binary('Download file', readonly=True)
-    filename = fields.Char('Filename', size=64, readonly=True)
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
+    currency_id = fields.Many2one(related='company_id.currency_id', string='Currency')
 
     @api.onchange('from_date', 'to_date')
     def onchange_to_date(self):
@@ -76,11 +74,15 @@ class FlemingsPurchaseCOGSSummaryReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 0, row, 4, 'SUMMARY REPORT FOR STOCK, PURCHASE, COGS', workbook.add_format(
                 {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 16}))
 
+            row += 1
+            sheet.merge_range(row, 0, row, 4, str(obj.company_id.name).upper(), workbook.add_format(
+                {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 14}))
+
             stock_valuation_env = self.env['stock.valuation.layer'].sudo()
             purchase_order_env = self.env['purchase.order'].sudo()
             from_date_time = datetime.combine(obj.from_date, time.min).replace(microsecond=0)
             from_date = obj.get_utc_datetime(from_date_time)
-            opening_stocks_total = sum(stock_valuation_env.search([('create_date', '<=', from_date)]).mapped('value')) or 0
+            opening_stocks_total = sum(stock_valuation_env.search([('company_id', '=', obj.company_id.id), ('create_date', '<=', from_date)]).mapped('value')) or 0
 
             row += 2
             sheet.write(row, 0, 'From', align_bold_left)
@@ -92,7 +94,7 @@ class FlemingsPurchaseCOGSSummaryReportXlsx(models.AbstractModel):
 
             row += 2
             sheet.write(row, 0, 'Opening Stock', align_bold_left)
-            sheet.write(row, 1, str(obj.sgd_currency_id.symbol) + ' ' + str('%.2f' % opening_stocks_total or 0), align_bold_right)
+            sheet.write(row, 1, str(obj.currency_id.symbol) + ' ' + str('%.2f' % opening_stocks_total or 0), align_bold_right)
 
             row += 2
             titles = ['S.No', 'Date', 'Stock', 'Purchase', 'COGS']
@@ -113,22 +115,22 @@ class FlemingsPurchaseCOGSSummaryReportXlsx(models.AbstractModel):
                 to_date = obj.get_utc_datetime(to_date_time)
 
                 stocks_total = sum(stock_valuation_env.search(
-                    [('create_date', '<=', to_date)]).mapped('value')) or 0
+                    [('company_id', '=', obj.company_id.id), ('create_date', '<=', to_date)]).mapped('value')) or 0
                 # purchase_total = sum(stock_valuation_env.search(
-                #     [('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '>', 0)]).mapped('value')) or 0
+                #     [('company_id', '=', obj.company_id.id), ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '>', 0)]).mapped('value')) or 0
                 purchase_total = sum(purchase_order_env.search(
-                    [('date_approve', '>=', from_date), ('date_approve', '<=', to_date)]).mapped('amount_untaxed')) or 0
+                    [('company_id', '=', obj.company_id.id), ('date_approve', '>=', from_date), ('date_approve', '<=', to_date)]).mapped('amount_untaxed')) or 0
                 sales_total = sum(stock_valuation_env.search(
-                    [('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '<', 0), ('quantity', '<', 0),
+                    [('company_id', '=', obj.company_id.id), ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '<', 0), ('quantity', '<', 0),
                      ('stock_move_id.location_id.usage', 'in', ('internal', 'transit')),
                      ('stock_move_id.location_dest_id.usage', 'not in', ('internal', 'transit'))
                      ]).mapped('value')) or 0
 
                 sheet.write(row, 0, str(sno), align_center)
                 sheet.write(row, 1, str(datetime.strftime(start_date, '%d-%m-%Y') or ''), align_left)
-                sheet.write(row, 2, str(obj.sgd_currency_id.symbol or '') + ' ' + str('%.2f' % stocks_total or 0), align_right)
-                sheet.write(row, 3, str(obj.sgd_currency_id.symbol or '') + ' ' + str('%.2f' % purchase_total or 0), align_right)
-                sheet.write(row, 4, str(obj.sgd_currency_id.symbol or '') + ' ' + str('%.2f' % abs(sales_total) or 0), align_right)
+                sheet.write(row, 2, str(obj.currency_id.symbol or '') + ' ' + str('%.2f' % stocks_total or 0), align_right)
+                sheet.write(row, 3, str(obj.currency_id.symbol or '') + ' ' + str('%.2f' % purchase_total or 0), align_right)
+                sheet.write(row, 4, str(obj.currency_id.symbol or '') + ' ' + str('%.2f' % abs(sales_total) or 0), align_right)
 
                 row += 1
                 sno += 1
