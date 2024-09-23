@@ -549,7 +549,7 @@ class FlemingsSalesAccountMove(models.Model):
             else:
                 picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'outgoing'), ('return_picking_type_id', '!=', False)], limit=1)
                 location_id = record.location_source_id
-                location_dest_id = record.partner_id.property_stock_supplier
+                location_dest_id = record.partner_id.property_stock_customer
                 is_debit = True
 
             record.picking_return_id = record.flemings_create_picking(picking_type_id, location_id, location_dest_id, debit=is_debit, credit=is_credit)
