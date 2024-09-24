@@ -305,6 +305,14 @@ class FlemingsSalesOrder(models.Model):
                     'fg_remarks': order.fg_remarks,
                     'summary_remarks': order.summary_remarks,
                 })
+
+            # Update Order Line Remarks into DO Operations & Detailed Operations
+            for picking in order.picking_ids.filtered(lambda x: x.state != 'cancel'):
+                for move_id in picking.move_ids_without_package.filtered(lambda x: x.sale_line_id):
+                    move_id.write({'remarks': move_id.sale_line_id.remarks})
+                for move_line_id in picking.move_line_ids_without_package.filtered(lambda x: x.move_id.sale_line_id):
+                    move_line_id.write({'remarks': move_line_id.move_id.sale_line_id.remarks})
+
         return res
 
     @api.depends('invoice_status', 'order_line', 'order_line.invoice_status', 'picking_ids', 'picking_ids.state', 'invoice_ids')
@@ -1015,3 +1023,21 @@ class FlemingAccountPayment(models.Model):
 
     sale_ids = fields.Many2many('sale.order', string='Sales Order(s)', compute='_compute_payment_sale_ids')
     sale_id = fields.Many2one('sale.order', string='Sales Order')
+
+
+class FlemingStockMoveRemarks(models.Model):
+    _inherit = 'stock.move'
+
+    remarks = fields.Text('Remarks')
+
+
+class FlemingStockMoveLineRemarks(models.Model):
+    _inherit = 'stock.move.line'
+
+    remarks = fields.Text('Remarks')
+
+    def write(self, vals):
+        res = super(FlemingStockMoveLineRemarks, self).write(vals)
+        for record in self.filtered(lambda x: x.move_id and x.move_id.remarks and not x.remarks):
+            record.write({'remarks': record.move_id.sale_line_id.remarks})
+        return res
