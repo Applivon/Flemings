@@ -884,7 +884,7 @@
             <field name="search_view_id" ref="view_mo_image_for_work_order_search"/>
         </record>
 
-		<menuitem id="menu_mo_image_for_work_order" parent="mrp.menu_mrp_manufacturing" action="action_mo_image_for_work_order" sequence="10"/>
+		<!--<menuitem id="menu_mo_image_for_work_order" parent="mrp.menu_mrp_manufacturing" action="action_mo_image_for_work_order" sequence="10"/>-->
 
 		<!-- Account Payments - Form View -->
 		<record id="fg_account_payment_order_form_view_inherit" model="ir.ui.view">

@@ -15,7 +15,7 @@
 			<field name="name">view.work.order.summary.report.wizard.form</field>
 			<field name="model">work.order.summary.report.wizard</field>
 			<field name="arch" type="xml">
-				<form string="Work Order Generation">
+				<form string="Work Order Report Generation">
                     <group>
                         <group>
                             <field name="work_order_no" required="1"/>
@@ -38,13 +38,13 @@
 		</record>
 	
         <record id="action_work_order_summary_report_wizard" model="ir.actions.act_window">
-            <field name="name">Work Order Generation</field>
+            <field name="name">Work Order Report Generation</field>
             <field name="res_model">work.order.summary.report.wizard</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
 
-        <menuitem id="menu_work_order_summary_report_wizard" parent="mrp.menu_mrp_reporting" action="action_work_order_summary_report_wizard" sequence="10"/>
+        <menuitem name="Work Order Generation" id="menu_work_order_summary_report_wizard" parent="mrp.menu_mrp_reporting" action="action_work_order_summary_report_wizard" sequence="10"/>
 
 	</data>
 </odoo>
