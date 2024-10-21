@@ -1,33 +1,126 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-    <record id="paperformat_thermal_printing" model="report.paperformat">
-        <field name="name">Thermal Printing Report Template</field>
-        <field name="default" eval="True" />
-        <field name="format">custom</field>
-        <field name="page_height">250</field>
-        <field name="page_width">80</field>
+    <!-- OLd Format-->
+<!--    <record id="paperformat_thermal_printing" model="report.paperformat">-->
+<!--        <field name="name">Thermal Printing Report Template</field>-->
+<!--        <field name="default" eval="True" />-->
+<!--        <field name="format">custom</field>-->
+<!--        <field name="page_height">250</field>-->
+<!--        <field name="page_width">80</field>-->
+<!--        <field name="orientation">Portrait</field>-->
+<!--        <field name="margin_top">3</field>-->
+<!--        <field name="margin_bottom">10</field>-->
+<!--        <field name="margin_left">3</field>-->
+<!--        <field name="margin_right">3</field>-->
+<!--        <field name="header_line" eval="False" />-->
+<!--        <field name="dpi">90</field>-->
+<!--    </record>-->
+    <record id="paperformat_thermal_printing_a4" model="report.paperformat">
+        <field name="name">EOD New Report</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">3</field>
+        <field name="margin_top">38</field>
         <field name="margin_bottom">10</field>
-        <field name="margin_left">3</field>
-        <field name="margin_right">3</field>
-        <field name="header_line" eval="False" />
-        <field name="dpi">90</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">80</field>
     </record>
     <record id="action_report_pos_session_summary" model="ir.actions.report">
         <field name="name">EOD Report</field>
         <field name="model">pos.session</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">flemings_pos.report_session_summary</field>
-        <field name="report_file">flemings_pos.report_session_summary</field>
+        <field name="report_name">flemings_pos.report_session_summary_document</field>
+        <field name="report_file">flemings_pos.report_session_summary_document</field>
         <field name="binding_model_id" ref="point_of_sale.model_pos_session" />
         <field name="binding_type">report</field>
-        <field name="paperformat_id" ref="flemings_pos.paperformat_thermal_printing"/>
+        <field name="paperformat_id" ref="flemings_pos.paperformat_thermal_printing_a4"/>
     </record>
-    <template id="report_session_summary">
+    <template id="report_session_summary_document">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <div style="line-height: 2">
+                <div class="article"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+                    <t t-call="flemings_pos.report_session_summary" t-lang="lang"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+
+    <template id="report_session_summary">
+        <t t-if="o and 'company_id' in o">
+            <t t-set="company" t-value="o.company_id.sudo()"/>
+        </t>
+        <t t-if="not o or not 'company_id' in o">
+            <t t-set="company" t-value="res_company"/>
+        </t>
+        <div class="header">
+            <style>
+                td {word-break: break-word !important; word-spacing: 3px !important; padding:3px; page-break-inside: avoid !important;}
+
+                .non-border, .non-border > tr, .non-border > tr > td {
+                    border: none !important; border-color: #ffffff !important;
+                }
+            </style>
+            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                    <thead>
+                        <tr>
+                            <td style="width:25%; text-align:left; padding-left:6px;">
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
+                            </td>
+                            <td style="width:50%; text-align:left;">
+                                <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
+                                    <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:14pt; font-weight:bold; padding-right:4px;"/>
+                                    <p style="margin-bottom:0px; padding-top:0px; text-align:left; white-space:nowrap;">
+                                        <span t-if="company.street or company.street2">
+                                            <br/>
+                                            <span t-if="company.street">
+                                                <span t-field="company.street"/>
+                                            </span>
+                                            <span t-if="company.street2">,
+                                                <span t-field="company.street2"/>
+                                            </span>
+                                            <br/>
+                                        </span>
+
+                                        <span t-if="company.country_id">
+                                            <span t-field="company.country_id.name"/>
+                                        </span>
+                                        <span t-if="company.zip">
+                                            <span t-field="company.zip"/>
+                                        </span>
+                                        <span t-if="company.phone">Tel:
+                                            <span t-field="company.phone"/>
+                                        </span>
+                                        <span t-if="company.vat">Fax:
+                                            <span t-field="company.fax"/>
+                                        </span>
+                                        <br/>
+
+                                        <span t-if="company.email">Email:
+                                            <span t-field="company.email"/>
+                                        </span>
+                                        <span t-if="company.website">
+                                            <span t-field="company.website"/>
+                                        </span>
+                                    </p>
+                                </div>
+                            </td>
+                            <td style="width:25%; text-align:right; padding-right:6px;">
+                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
+                            </td>
+                            </tr>
+
+                    </thead>
+                </table>
+            <hr/>
+        </div>
+        <div class="page" style="font-family:sans-serif !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
+            <div style="line-height: 2">
                     <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
                         Date:
                     </span>
@@ -112,7 +205,7 @@
                     <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
                         Total Sales:
                     </span>
-                    
+
                     <span t-esc="o.convert_currency(o.total_payments_amount)"/>
                     <br/>
                     <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
@@ -138,8 +231,122 @@
                     <span t-esc="o.report_get_format_time('now','datetime')"/>
                     <br/>
                 </div>
-            </t>
-        </t>
+        </div>
+<!--        <t t-call="web.html_container">-->
+<!--            <t t-foreach="docs" t-as="o">-->
+<!--                <div style="line-height: 2">-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Date:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.report_get_format_time(o.create_date,'datetime')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Cashier:-->
+<!--                    </span>-->
+<!--                    <span t-field="o.user_id.name"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Session:-->
+<!--                    </span>-->
+<!--                    <span t-field="o.display_name"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Clock In:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.report_get_format_time(o.start_at,'time')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        First Sale:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_sale_data('first_sale')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Time:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_sale_data('first_time')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Last Sale:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_sale_data('last_sale')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Time:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_sale_data('last_time')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Clock Out:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.report_get_format_time(o.stop_at,'time')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Opening Balance:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.convert_currency(o.cash_register_balance_start)"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Denomination:-->
+<!--                    </span><br/>-->
+<!--                    &lt;!&ndash; <span t-esc="o.get_session_value('domination')"/> &ndash;&gt;-->
+<!--                    <span t-foreach="o.get_session_value('domination')" t-as="result" style="margin-left:20px">-->
+<!--                        <span t-esc="result"/><br/>-->
+<!--                    </span>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Payment Method :-->
+<!--                    </span>-->
+<!--&lt;!&ndash;                    S$<span t-esc="o.get_session_value('total_bank_value')"/>&ndash;&gt;-->
+<!--                    <br/>-->
+<!--                    <span t-foreach="o.get_session_value('payment_method')" t-as="result" style="margin-left:20px">-->
+<!--                        <span t-esc="result"/><br/>-->
+<!--                    </span>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Void Sales:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_session_value('void_sales')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Cash In Hand:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.convert_currency(o.cash_register_balance_end_real)"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Cash Should Be:-->
+<!--                    </span>-->
+<!--                    &lt;!&ndash; <span t-esc="o.convert_currency(o.cash_real_transaction)"/> &ndash;&gt;-->
+<!--                    <span t-esc="o.get_session_value('cash_shoule_be')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Total Sales:-->
+<!--                    </span>-->
+<!--                    -->
+<!--                    <span t-esc="o.convert_currency(o.total_payments_amount)"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Cash In:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_session_value('cash_in_amount')"/>-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Cash Out:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_session_value('cash_out_amount')"/>-->
+<!--                    <br/>-->
+
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Difference:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_session_value('cash_diff')"/>-->
+<!--                    &lt;!&ndash; <span t-esc="o.convert_currency(o.cash_register_difference)"/> &ndash;&gt;-->
+<!--                    <br/>-->
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Print Date/Time:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.report_get_format_time('now','datetime')"/>-->
+<!--                    <br/>-->
+<!--                </div>-->
+<!--            </t>-->
+<!--        </t>-->
     </template>
 
 
