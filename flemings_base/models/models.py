@@ -57,7 +57,7 @@ class FlemingsResPartner(models.Model):
     def get_view(self, view_id=None, view_type='form', **options):
         res = super(FlemingsResPartner, self).get_view(view_id, view_type, **options)
 
-        if self.env.user.fg_purchaser_group:
+        if self.env.user.fg_procurement_group:
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
@@ -73,13 +73,13 @@ class FlemingsResPartner(models.Model):
                 res['arch'] = etree.tostring(doc)
 
         if (self._context.get('default_supplier_rank') and self._context.get('default_supplier_rank') == 1
-                and not (self.env.user.fg_finance_group or self.env.user.fg_admin_group)):
+                and not (self.env.user.fg_su_group)):
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
                     node.set('create', 'false')
                     node.set('delete', 'false')
-                    if view_type == 'form' and not self.env.user.fg_purchaser_group:
+                    if view_type == 'form' and not self.env.user.fg_procurement_group:
                         node.set('edit', 'false')
                 res['arch'] = etree.tostring(doc)
 
@@ -87,7 +87,7 @@ class FlemingsResPartner(models.Model):
 
     def _compute_can_edit_partner_address(self):
         for record in self:
-            if self.env.user.fg_sales_group or self.env.user.fg_purchaser_group:
+            if self.env.user.fg_sales_group or self.env.user.fg_procurement_group:
                 can_edit_partner_address = False
             elif self.type == 'contact' and record.parent_id:
                 can_edit_partner_address = False
@@ -98,7 +98,7 @@ class FlemingsResPartner(models.Model):
     def _compute_is_fg_user_group(self):
         for record in self:
             record.is_sales_user_group = True if self.env.user.fg_sales_group else False
-            record.is_purchaser_user_group = True if self.env.user.fg_purchaser_group else False
+            record.is_purchaser_user_group = True if self.env.user.fg_procurement_group else False
 
     can_edit_partner_address = fields.Boolean('Can Edit Person Address ?', compute='_compute_can_edit_partner_address')
     is_sales_user_group = fields.Boolean('Is Sales User ?', compute='_compute_is_fg_user_group')
@@ -372,8 +372,7 @@ class FlemingsSalesOrder(models.Model):
             if not record.picking_ids:
                 record.can_user_edit_qty = True
             elif record.picking_ids and (
-                    self.env.user.has_group('flemings_base.fg_admin_group') or
-                    self.env.user.has_group('flemings_base.fg_finance_group')
+                    self.env.user.has_group('flemings_base.fg_su_group')
             ):
                 record.can_user_edit_qty = True
             else:
@@ -426,7 +425,7 @@ class FlemingsSalesAccountMove(models.Model):
     @api.model
     def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
         if self._context.get('default_move_type', False) and self._context.get('default_move_type') == 'entry':
-            if not (self.env.user.has_group('flemings_base.fg_admin_group') or self.env.user.has_group('flemings_base.fg_finance_group')):
+            if not (self.env.user.has_group('flemings_base.fg_su_group')):
                 args += [('journal_id', 'in', self.env.user.journal_ids.ids or [])]
 
         return super(FlemingsSalesAccountMove, self)._search(args, offset, limit, order, count=count, access_rights_uid=access_rights_uid)
@@ -434,7 +433,7 @@ class FlemingsSalesAccountMove(models.Model):
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         if self._context.get('default_move_type', False) and self._context.get('default_move_type') == 'entry':
-            if not (self.env.user.has_group('flemings_base.fg_admin_group') or self.env.user.has_group('flemings_base.fg_finance_group')):
+            if not (self.env.user.has_group('flemings_base.fg_su_group')):
                 domain += [('journal_id', 'in', self.env.user.journal_ids.ids or [])]
 
         return super(FlemingsSalesAccountMove, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
@@ -670,7 +669,7 @@ class FlemingsSalesAccountMoveLines(models.Model):
     @api.model
     def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
         if self._context.get('journal_type', False) and self._context.get('journal_type') == 'general':
-            if not (self.env.user.has_group('flemings_base.fg_admin_group') or self.env.user.has_group('flemings_base.fg_finance_group')):
+            if not (self.env.user.has_group('flemings_base.fg_su_group')):
                 args += [('journal_id', 'in', self.env.user.journal_ids.ids or [])]
 
         return super(FlemingsSalesAccountMoveLines, self)._search(args, offset, limit, order, count=count, access_rights_uid=access_rights_uid)
@@ -678,7 +677,7 @@ class FlemingsSalesAccountMoveLines(models.Model):
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         if self._context.get('journal_type', False) and self._context.get('journal_type') == 'general':
-            if not (self.env.user.has_group('flemings_base.fg_admin_group') or self.env.user.has_group('flemings_base.fg_finance_group')):
+            if not (self.env.user.has_group('flemings_base.fg_su_group')):
                 domain += [('journal_id', 'in', self.env.user.journal_ids.ids or [])]
 
         return super(FlemingsSalesAccountMoveLines, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)

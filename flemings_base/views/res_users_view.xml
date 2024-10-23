@@ -17,18 +17,17 @@
 						<group>
 							<field name="fg_sales_group"/>
 							<field name="fg_inventory_group"/>
-							<field name="fg_production_group"/>
-							<field name="fg_logistics_group"/>
-							<field name="fg_finance_group"/>
-							<field name="fg_admin_group"/>
+							<field name="fg_finance_with_report_group"/>
+							<field name="fg_mr_group"/>
+							<field name="fg_su_group" groups="flemings_base.fg_su_group"/>
 						</group>
 						<group>
-							<field name="fg_purchaser_group"/>
-							<field name="fg_business_support_group"/>
-							<field name="fg_product_group"/>
-							<field name="fg_production_controller_group"/>
+							<field name="fg_procurement_group"/>
 							<field name="fg_operations_group"/>
-							<field name="fg_hr_group"/>
+							<field name="fg_finance_wo_report_group"/>
+							<field name="fg_product_marketing_group"/>
+							<field name="fg_su_with_hr_group"/>
+							<field name="fg_su_wo_account_group"/>
 						</group>
 					</group>
 				</xpath>
