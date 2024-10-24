@@ -6,6 +6,22 @@ array_coin = [10,5,2,1,0.5,0.2,0,1,0.05]
 class posConfig(models.Model):
     _inherit = "pos.config"
     address = fields.Char(string='Address')
+class posOrder(models.Model):
+    _inherit = "pos.order"
+    def get_exchange_rate(self):
+        return  self.currency_id.with_context(date=self.date_order or self.create_date).inverse_rate or 1.0
+    def get_order_taxes(self):
+        order = self
+        tax_summary = {}
+        for line in order.lines:
+            for tax in line.tax_ids_after_fiscal_position:
+                tax_amount = line.price_subtotal * (tax.amount / 100)
+                if tax.id in tax_summary:
+                    tax_summary[tax.id]['amount'] += tax_amount
+                else:
+                    tax_summary[tax.id] = {'name': tax.name, 'amount': tax_amount}
+        tax_array = [{'name': tax_info['name'], 'amount': tax_info['amount']} for tax_info in tax_summary.values()]
+        return tax_array
 
 class PosSession(models.Model):
     _inherit = 'pos.session'

@@ -11,9 +11,10 @@
     'maintainer': 'Applivon',
     'company': 'Applivon',
     'website': 'https://www.applivon.com',
-    'depends': ['flemings_base'],
+    'depends': ['flemings_base','point_of_sale'],
     'data': [
         'report/EOD.xml',
+        'report/customer_invoice.xml',
     ],
     'qweb': [],
     'images': ['static/description/applivon-logo.jpg'],
@@ -27,6 +28,9 @@
             "flemings_pos/static/xml/customer_screen.xml",
             "flemings_pos/static/xml/pos_receipt.xml",
             "flemings_pos/static/css/style.css",
+            # "flemings_pos/static/js/customer_receipt.js",
+            "flemings_pos/static/js/CustomPrintReceipt.js",
+            "flemings_pos/static/js/PaymentScreenCustom.js",
             ],
         },
 
