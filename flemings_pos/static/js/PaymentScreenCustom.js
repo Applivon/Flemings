@@ -28,19 +28,19 @@ odoo.define('flemings_pos.PaymentScreenCustom', function(require) {
                     syncOrderResult = await this.env.pos.push_single_order(this.currentOrder);
 
                     // 2. Invoice.
-                    if (this.shouldDownloadInvoice() && this.currentOrder.is_to_invoice()) {
-                        if (syncOrderResult.length) {
-                            debugger;
-                            let new_tax_invoice = 'flemings_base.print_report_fg_tax_invoice';
+//                    if (this.shouldDownloadInvoice() && this.currentOrder.is_to_invoice()) {
+//                        if (syncOrderResult.length) {
+//                            debugger;
+//                            let new_tax_invoice = 'flemings_base.print_report_fg_tax_invoice';
 //                            /*await this.env.legacyActionManager.do_action(new_tax_invoice, {
 //                                additional_context: {
 //                                    active_ids: [syncOrderResult[0].account_move],
 //                                },
 //                            });*/
-                        } else {
-                            throw { code: 401, message: 'Backend Invoice', data: { order: this.currentOrder } };
-                        }
-                    }
+//                        } else {
+//                            throw { code: 401, message: 'Backend Invoice', data: { order: this.currentOrder } };
+//                        }
+//                    }
 
                     // 3. Post process.
                     if (syncOrderResult.length && this.currentOrder.wait_for_push_order()) {
