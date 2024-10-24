@@ -3,6 +3,7 @@ odoo.define('flemings_pos.PaymentScreenCustom', function(require) {
 
     const OrderReceipt = require('point_of_sale.PaymentScreen');
     const Registries = require('point_of_sale.Registries');
+    const { isConnectionError } = require('point_of_sale.utils');
     const PaymentScreenCustom = PaymentScreen =>
         class extends PaymentScreen {
              async _finalizeValidation() {
