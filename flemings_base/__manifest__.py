@@ -11,8 +11,13 @@
     'maintainer': 'Applivon',
     'company': 'Applivon',
     'website': 'https://www.applivon.com',
-    'depends': ['base', 'base_setup', 'web', 'crm', 'sale', 'purchase', 'account', 'stock',
-                'l10n_sg', 'point_of_sale', 'delivery', 'report_xlsx', 'mrp', 'sale_stock'],
+    'depends': [
+        'base', 'base_setup', 'web', 'crm', 'sale', 'purchase', 'account', 'stock',
+        'l10n_sg', 'point_of_sale', 'delivery', 'report_xlsx', 'mrp', 'sale_stock',
+        'uom', 'sale_management', 'spreadsheet_dashboard', 'hr', 'hr_contract',
+        'hr_holidays', 'hr_expense', 'hr_attendance', 'hr_timesheet', 'hr_timesheet_attendance',
+        'sg_hr_report', 'sg_hr_employee'
+    ],
     'data': [
         # Data
         'data/data.xml',
@@ -26,6 +31,7 @@
         'views/views.xml',
         'views/purchase_view.xml',
         'views/stock_low_view.xml',
+        'views/hide_menus_view.xml',
 
         # Wizard
         'wizard/flemings_purchase_price_report_view.xml',

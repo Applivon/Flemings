@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="access_management_tree_view_ah" model="ir.ui.view">
+            <field name="name">access_management_tree_view_ah</field>
+            <field name="model">access.management</field>
+            <field name="arch" type="xml">
+                <tree decoration-muted="(not active)">
+                    <field name="group_id"/>
+                    <field name="user_ids" widget="many2many_tags"/>
+                    <field name="total_menus"/>
+                    <field name="active" invisible="0" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="access_management_form_view_ah" model="ir.ui.view">
+            <field name="name">access_management_form_view_ah</field>
+            <field name="model">access.management</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <widget name="web_ribbon" title="Deactivated" bg_color="bg-danger" attrs="{'invisible': [('active','=',True)]}"/>
+                            <field name="active" invisible="1"/>
+                            <button attrs="{'invisible':[('active','=',False)]}" class="oe_stat_button"
+								name ="toggle_active_value"
+								type ="object"
+								icon ="fa-stop">
+                                <div class="o_stat_info o_form_field">
+                                    <span style="font-weight: bold;" class="text-danger">Deactivate Rule</span>
+                                </div>
+                            </button>
+                            <button attrs="{'invisible':[('active','=',True)]}" class="oe_stat_button"
+								name ="toggle_active_value"
+								type ="object"
+								icon ="fa-play">
+                                <div class="o_stat_info o_form_field">
+                                    <span style="font-weight: bold;" class="text-success">Activate Rule</span>
+                                </div>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name" invisible="1"/>
+                                <field name="group_id" options="{'no_create': True}" required="1" default_focus="1"/>
+                                <field name="user_ids" readonly="1" force_save="1" widget='many2many_tags' options="{'no_create': True}" domain="[('share','=',False)]"/>
+                            </group>
+                            <group>
+                                <field name="company_ids" widget="many2many_tags" groups="base.group_multi_company"  options="{'no_create': True}"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string='Hide Menu'>
+                                <field name="self_module_menu_ids" invisible="1"/>
+                                <field name='hide_menu_ids' domain="[('id','not in',self_module_menu_ids)]"/>
+                            </page>
+
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="access_management_search_view" model="ir.ui.view">
+            <field name="name">access.management.search.view</field>
+            <field name="model">access.management</field>
+            <field name="arch" type="xml">
+                <search string="Hide Menu Access">
+                    <field name="group_id"/>
+                    <field name="user_ids"/>
+                    <field name="active"/>
+                    <field name="create_uid"/>
+                    <separator/>
+                    <filter string="All" name="all" domain="['|', ('active', '=', False), ('active', '=', True)]"/>
+                    <separator/>
+                    <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Created By" name="created_by" domain="[]" context="{'group_by': 'create_uid'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_access_management_ah" model="ir.actions.act_window">
+            <field name="name">Hide Menu Access</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">access.management</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_all': 1}</field>
+        </record>
+
+        <menuitem id="main_menu_simplify_access_management" name="Hide Menu Access" action="action_access_management_ah" parent="base.menu_security" sequence="30"/>
+
+    </data>
+</odoo>
