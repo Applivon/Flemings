@@ -65,23 +65,31 @@ class FlemingsResPartner(models.Model):
                     node.set('delete', 'false')
                 res['arch'] = etree.tostring(doc)
 
-        if self.env.user.fg_sales_group:
+        # if self.env.user.fg_sales_group:
+        #     if view_type in ('tree', 'form', 'kanban'):
+        #         doc = etree.XML(res['arch'])
+        #         for node in doc.xpath("//" + view_type + ""):
+        #             node.set('create', 'false')
+        #         res['arch'] = etree.tostring(doc)
+
+        if (self._context.get('default_supplier_rank') and self._context.get('default_supplier_rank') == 1
+                and (self.env.user.fg_sales_group or self.env.user.fg_mr_group)):
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
                     node.set('create', 'false')
                 res['arch'] = etree.tostring(doc)
 
-        if (self._context.get('default_supplier_rank') and self._context.get('default_supplier_rank') == 1
-                and not (self.env.user.fg_su_group)):
-            if view_type in ('tree', 'form', 'kanban'):
-                doc = etree.XML(res['arch'])
-                for node in doc.xpath("//" + view_type + ""):
-                    node.set('create', 'false')
-                    node.set('delete', 'false')
-                    if view_type == 'form' and not self.env.user.fg_procurement_group:
-                        node.set('edit', 'false')
-                res['arch'] = etree.tostring(doc)
+        # if (self._context.get('default_supplier_rank') and self._context.get('default_supplier_rank') == 1
+        #         and not (self.env.user.fg_su_group)):
+        #     if view_type in ('tree', 'form', 'kanban'):
+        #         doc = etree.XML(res['arch'])
+        #         for node in doc.xpath("//" + view_type + ""):
+        #             node.set('create', 'false')
+        #             node.set('delete', 'false')
+        #             if view_type == 'form' and not self.env.user.fg_procurement_group:
+        #                 node.set('edit', 'false')
+        #         res['arch'] = etree.tostring(doc)
 
         return res
 
@@ -202,6 +210,22 @@ class FlemingsSalesOrderLine(models.Model):
 
 class FlemingsSalesOrder(models.Model):
     _inherit = 'sale.order'
+
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+        res = super(FlemingsSalesOrder, self).get_view(view_id, view_type, **options)
+
+        if (not self._context.get('search_default_my_quotation') and not self._context.get('search_default_my_quotation', False)
+                and (self.env.user.fg_operations_group or self.env.user.fg_mr_group or self.env.user.fg_product_marketing_group)):
+            if view_type in ('tree', 'form', 'kanban'):
+                doc = etree.XML(res['arch'])
+                for node in doc.xpath("//" + view_type + ""):
+                    node.set('create', 'false')
+                    node.set('delete', 'false')
+                    node.set('edit', 'false')
+                res['arch'] = etree.tostring(doc)
+
+        return res
 
     @api.depends('picking_ids', 'invoice_ids')
     def _compute_so_delivery_invoice_names(self):
@@ -690,6 +714,23 @@ class FlemingsSalesAccountMoveLines(models.Model):
 class FlemingsProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+        res = super(FlemingsProductTemplate, self).get_view(view_id, view_type, **options)
+
+        if ((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
+                (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
+                and self.env.user.fg_sales_group):
+            if view_type in ('tree', 'form', 'kanban'):
+                doc = etree.XML(res['arch'])
+                for node in doc.xpath("//" + view_type + ""):
+                    node.set('create', 'false')
+                    node.set('delete', 'false')
+                    node.set('edit', 'false')
+                res['arch'] = etree.tostring(doc)
+
+        return res
+
     item_category_id = fields.Many2one('fg.item.category', string='Item Category')
 
     def _compute_template_fg_available_stock(self):
@@ -713,6 +754,23 @@ class FlemingsProductTemplate(models.Model):
 
 class FlemingsProductProduct(models.Model):
     _inherit = 'product.product'
+
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+        res = super(FlemingsProductProduct, self).get_view(view_id, view_type, **options)
+
+        if ((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
+                (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
+                and self.env.user.fg_sales_group):
+            if view_type in ('tree', 'form', 'kanban'):
+                doc = etree.XML(res['arch'])
+                for node in doc.xpath("//" + view_type + ""):
+                    node.set('create', 'false')
+                    node.set('delete', 'false')
+                    node.set('edit', 'false')
+                res['arch'] = etree.tostring(doc)
+
+        return res
 
     def get_product_multiline_description_sale(self):
         """ Compute a multiline description of this product, in the context of sales
@@ -1039,4 +1097,22 @@ class FlemingStockMoveLineRemarks(models.Model):
         res = super(FlemingStockMoveLineRemarks, self).write(vals)
         for record in self.filtered(lambda x: x.move_id and x.move_id.remarks and not x.remarks):
             record.write({'remarks': record.move_id.sale_line_id.remarks})
+        return res
+
+
+class FlemingsProductPricelist(models.Model):
+    _inherit = 'product.pricelist'
+
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+        res = super(FlemingsProductPricelist, self).get_view(view_id, view_type, **options)
+
+        if (self._context.get('default_base') and self._context.get('default_base') == 'list_price'
+                and self.env.user.fg_sales_group):
+            if view_type in ('tree', 'form', 'kanban'):
+                doc = etree.XML(res['arch'])
+                for node in doc.xpath("//" + view_type + ""):
+                    node.set('delete', 'false')
+                res['arch'] = etree.tostring(doc)
+
         return res

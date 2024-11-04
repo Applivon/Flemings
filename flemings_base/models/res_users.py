@@ -159,6 +159,7 @@ class FlemingsResUsers(models.Model):
                     or 'fg_product_marketing_group' in vals or 'fg_su_wo_account_group' in vals \
                     or 'fg_su_with_hr_group' in vals or 'fg_su_group' in vals:
                 record.update_flemings_external_system_user_groups()
+                record.add_default_groups()
 
         return res
 
@@ -172,8 +173,21 @@ class FlemingsResUsers(models.Model):
                     or 'fg_product_marketing_group' in vals or 'fg_su_wo_account_group' in vals \
                     or 'fg_su_with_hr_group' in vals or 'fg_su_group' in vals:
                 record.update_flemings_external_system_user_groups()
+                record.add_default_groups()
 
         return res
+
+        # To Add Core Default Groups
+    def add_default_groups(self):
+        for record in self:
+            if record.has_group('flemings_base.fg_procurement_group'):
+                for group_xml_id in ['stock.group_stock_user', 'quality.group_quality_user']:
+                    gid = self.env.ref(group_xml_id).id
+                    self.env.cr.execute(""" 
+                      INSERT INTO res_groups_users_rel (gid, uid) SELECT %s, %s 
+                        WHERE NOT EXISTS (SELECT gid FROM res_groups_users_rel 
+                          WHERE gid = %s and uid = %s
+                        )""" % (gid, record.id, gid, record.id))
 
     @api.model
     def get_view(self, view_id=None, view_type='form', **options):
