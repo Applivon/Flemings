@@ -225,6 +225,14 @@ class FlemingsSalesOrder(models.Model):
                     node.set('edit', 'false')
                 res['arch'] = etree.tostring(doc)
 
+        if (self._context.get('create', True)
+                and self.env.user.fg_finance_with_report_group):
+            if view_type in ('tree', 'form', 'kanban'):
+                doc = etree.XML(res['arch'])
+                for node in doc.xpath("//" + view_type + ""):
+                    node.set('delete', 'false')
+                res['arch'] = etree.tostring(doc)
+
         return res
 
     @api.depends('picking_ids', 'invoice_ids')
@@ -235,8 +243,8 @@ class FlemingsSalesOrder(models.Model):
                 'computed_customer_invoice_names': ' '.join([i.name for i in record.invoice_ids]),
             })
 
-    computed_delivery_order_names = fields.Text(string='Delivery Order', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
-    computed_customer_invoice_names = fields.Text(string='Customer Invoice', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
+    computed_delivery_order_names = fields.Text(string='Delivery Order', store=False, readonly=True, compute_sudo='_compute_so_delivery_invoice_names')
+    computed_customer_invoice_names = fields.Text(string='Customer Invoice', store=False, readonly=True, compute_sudo='_compute_so_delivery_invoice_names')
 
     delivery_order_names = fields.Text(related='computed_delivery_order_names', string='Delivery Order', store=True, readonly=True)
     customer_invoice_names = fields.Text(related='computed_customer_invoice_names', string='Customer Invoice', store=True, readonly=True)
@@ -354,7 +362,7 @@ class FlemingsSalesOrder(models.Model):
 
     computed_fg_invoice_status = fields.Selection([
         ('no', 'Nothing to Invoice'), ('to_invoice', 'To Invoice'), ('partial_invoice', 'Partially Invoiced')
-    ], string='Invoice Status', compute='_compute_fg_invoice_status', store=False, readonly=True)
+    ], string='Invoice Status', compute_sudo='_compute_fg_invoice_status', store=False, readonly=True)
     fg_invoice_status = fields.Selection(
         related='computed_fg_invoice_status', string='Invoice Status', store=True, readonly=True)
 
@@ -388,7 +396,7 @@ class FlemingsSalesOrder(models.Model):
                             'price_unit': line.price_unit
                         })
 
-    can_user_edit_qty = fields.Boolean('Can User Edit SO Qty ?', compute='_compute_can_user_edit_qty')
+    can_user_edit_qty = fields.Boolean('Can User Edit SO Qty ?', compute_sudo='_compute_can_user_edit_qty')
 
     @api.depends('picking_ids', 'partner_id')
     def _compute_can_user_edit_qty(self):
@@ -718,9 +726,13 @@ class FlemingsProductTemplate(models.Model):
     def get_view(self, view_id=None, view_type='form', **options):
         res = super(FlemingsProductTemplate, self).get_view(view_id, view_type, **options)
 
+        account_product_action_ids = self.env.ref('account.product_product_action_sellable').ids
+        account_product_action_ids += self.env.ref('account.product_product_action_purchasable').ids
+        
         if ((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
                 (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
-                and self.env.user.fg_sales_group):
+                and self._context.get('action_id', False) and self._context.get('action_id', False) not in account_product_action_ids
+                and (self.env.user.fg_sales_group or self.env.user.fg_finance_with_report_group)):
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
@@ -761,7 +773,7 @@ class FlemingsProductProduct(models.Model):
 
         if ((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
                 (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
-                and self.env.user.fg_sales_group):
+                and (self.env.user.fg_sales_group or self.env.user.fg_finance_with_report_group)):
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):

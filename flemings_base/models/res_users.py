@@ -180,8 +180,17 @@ class FlemingsResUsers(models.Model):
         # To Add Core Default Groups
     def add_default_groups(self):
         for record in self:
-            if record.has_group('flemings_base.fg_procurement_group'):
+            if record.has_group('flemings_base.fg_procurement_group') or record.has_group('flemings_base.fg_inventory_group') or record.has_group('flemings_base.fg_finance_with_report_group') or record.has_group('flemings_base.fg_finance_with_report_group'):
                 for group_xml_id in ['stock.group_stock_user', 'quality.group_quality_user']:
+                    gid = self.env.ref(group_xml_id).id
+                    self.env.cr.execute(""" 
+                      INSERT INTO res_groups_users_rel (gid, uid) SELECT %s, %s 
+                        WHERE NOT EXISTS (SELECT gid FROM res_groups_users_rel 
+                          WHERE gid = %s and uid = %s
+                        )""" % (gid, record.id, gid, record.id))
+
+            if record.has_group('flemings_base.fg_finance_with_report_group'):
+                for group_xml_id in ['base.group_erp_manager', 'account.group_account_user', 'account.group_account_manager']:
                     gid = self.env.ref(group_xml_id).id
                     self.env.cr.execute(""" 
                       INSERT INTO res_groups_users_rel (gid, uid) SELECT %s, %s 
