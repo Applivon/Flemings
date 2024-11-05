@@ -193,11 +193,11 @@ class FlemingsResUsers(models.Model):
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_sales_group') or record.has_group('flemings_base.fg_product_marketing_group') or record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
-                for group_xml_id in ['website.group_website_designer']:
+                for group_xml_id in ['website.group_website_designer', 'base.group_erp_manager']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
-                for group_xml_id in ['sales_team.group_sale_manager', 'purchase.group_purchase_manager', 'stock.group_stock_manager', 'hr_timesheet.group_timesheet_manager', 'point_of_sale.group_pos_manager', 'mrp.group_mrp_manager', 'hr.group_hr_manager', 'hr_contract.group_hr_contract_manager', 'hr_payroll.group_hr_payroll_manager', 'l10n_sg_hr_payroll.group_hr_payroll_admin', 'hr_attendance.group_hr_attendance_manager', 'hr_holidays.group_hr_holidays_manager', 'hr_expense.group_hr_expense_manager', 'project.group_project_manager', 'base.group_erp_manager']:
+                for group_xml_id in ['sales_team.group_sale_manager', 'purchase.group_purchase_manager', 'stock.group_stock_manager', 'hr_timesheet.group_timesheet_manager', 'point_of_sale.group_pos_manager', 'mrp.group_mrp_manager', 'hr.group_hr_manager', 'hr_contract.group_hr_contract_manager', 'hr_payroll.group_hr_payroll_manager', 'l10n_sg_hr_payroll.group_hr_payroll_admin', 'hr_attendance.group_hr_attendance_manager', 'hr_holidays.group_hr_holidays_manager', 'hr_expense.group_hr_expense_manager', 'project.group_project_manager']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_su_group'):
