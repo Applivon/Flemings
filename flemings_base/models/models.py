@@ -729,10 +729,10 @@ class FlemingsProductTemplate(models.Model):
         account_product_action_ids = self.env.ref('account.product_product_action_sellable').ids
         account_product_action_ids += self.env.ref('account.product_product_action_purchasable').ids
         
-        if ((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
+        if (((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
                 (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
-                and self._context.get('action_id', False) and self._context.get('action_id', False) not in account_product_action_ids
-                and (self.env.user.fg_sales_group or self.env.user.fg_finance_with_report_group)):
+                and self._context.get('action_id', False) not in account_product_action_ids)
+                and (self.env.user.fg_sales_group or self.env.user.fg_finance_with_report_group or self.env.user.fg_mr_group)):
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
@@ -771,9 +771,9 @@ class FlemingsProductProduct(models.Model):
     def get_view(self, view_id=None, view_type='form', **options):
         res = super(FlemingsProductProduct, self).get_view(view_id, view_type, **options)
 
-        if ((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
-                (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
-                and (self.env.user.fg_sales_group or self.env.user.fg_finance_with_report_group)):
+        if (((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
+                (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1))
+                and (self.env.user.fg_sales_group or self.env.user.fg_finance_with_report_group or self.env.user.fg_mr_group)):
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
@@ -1128,3 +1128,10 @@ class FlemingsProductPricelist(models.Model):
                 res['arch'] = etree.tostring(doc)
 
         return res
+
+
+class FGWebsiteVisitor(models.Model):
+    _inherit = 'website.visitor'
+
+    lead_ids = fields.Many2many('crm.lead', string='Leads')
+    lead_count = fields.Integer('# Leads', compute="_compute_lead_count")

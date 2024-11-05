@@ -180,23 +180,36 @@ class FlemingsResUsers(models.Model):
         # To Add Core Default Groups
     def add_default_groups(self):
         for record in self:
-            if record.has_group('flemings_base.fg_procurement_group') or record.has_group('flemings_base.fg_inventory_group') or record.has_group('flemings_base.fg_finance_with_report_group') or record.has_group('flemings_base.fg_finance_with_report_group'):
+            if record.has_group('flemings_base.fg_procurement_group') or record.has_group('flemings_base.fg_inventory_group') or record.has_group('flemings_base.fg_finance_with_report_group') or record.has_group('flemings_base.fg_finance_wo_report_group') or record.has_group('flemings_base.fg_operations_group') or record.has_group('flemings_base.fg_mr_group') or record.has_group('flemings_base.fg_product_marketing_group'):
                 for group_xml_id in ['stock.group_stock_user', 'quality.group_quality_user']:
-                    gid = self.env.ref(group_xml_id).id
-                    self.env.cr.execute(""" 
-                      INSERT INTO res_groups_users_rel (gid, uid) SELECT %s, %s 
-                        WHERE NOT EXISTS (SELECT gid FROM res_groups_users_rel 
-                          WHERE gid = %s and uid = %s
-                        )""" % (gid, record.id, gid, record.id))
+                    record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_finance_with_report_group'):
                 for group_xml_id in ['base.group_erp_manager', 'account.group_account_user', 'account.group_account_manager']:
-                    gid = self.env.ref(group_xml_id).id
-                    self.env.cr.execute(""" 
-                      INSERT INTO res_groups_users_rel (gid, uid) SELECT %s, %s 
-                        WHERE NOT EXISTS (SELECT gid FROM res_groups_users_rel 
-                          WHERE gid = %s and uid = %s
-                        )""" % (gid, record.id, gid, record.id))
+                    record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
+
+            if record.has_group('flemings_base.fg_mr_group'):
+                for group_xml_id in ['mrp.group_mrp_user']:
+                    record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
+
+            if record.has_group('flemings_base.fg_sales_group') or record.has_group('flemings_base.fg_product_marketing_group') or record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
+                for group_xml_id in ['website.group_website_designer']:
+                    record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
+
+            if record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
+                for group_xml_id in ['sales_team.group_sale_manager', 'purchase.group_purchase_manager', 'stock.group_stock_manager', 'hr_timesheet.group_timesheet_manager', 'point_of_sale.group_pos_manager', 'mrp.group_mrp_manager', 'hr.group_hr_manager', 'hr_contract.group_hr_contract_manager', 'hr_payroll.group_hr_payroll_manager', 'l10n_sg_hr_payroll.group_hr_payroll_admin', 'hr_attendance.group_hr_attendance_manager', 'hr_holidays.group_hr_holidays_manager', 'hr_expense.group_hr_expense_manager', 'project.group_project_manager', 'base.group_erp_manager']:
+                    record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
+
+            if record.has_group('flemings_base.fg_su_group'):
+                for group_xml_id in ['account.group_account_manager', 'base.group_system']:
+                    record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
+
+    def insert_user_core_groups(self, record, gid):
+        self.env.cr.execute(""" 
+          INSERT INTO res_groups_users_rel (gid, uid) SELECT %s, %s 
+            WHERE NOT EXISTS (SELECT gid FROM res_groups_users_rel 
+              WHERE gid = %s and uid = %s
+            )""" % (gid, record.id, gid, record.id))
 
     @api.model
     def get_view(self, view_id=None, view_type='form', **options):
