@@ -47,6 +47,7 @@
         'wizard/work_order_summary_report_view.xml',
         'wizard/purchase_audit_list_summary_view.xml',
         'wizard/inventory_detailed_report_view.xml',
+        'wizard/salary_summary_report_view.xml',
 
         # Report
         'report/base_report.xml',

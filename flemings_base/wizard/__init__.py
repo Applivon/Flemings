@@ -14,3 +14,4 @@ from . import tax_invoice_xls
 from . import work_order_summary_report
 from . import purchase_audit_list_summary
 from . import inventory_detailed_report
+from . import salary_summary_report

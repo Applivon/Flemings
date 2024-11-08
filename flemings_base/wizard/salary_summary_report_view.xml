@@ -1,0 +1,84 @@
+<odoo>
+	<data>
+		
+	    <record id="fg_salary_summary_report_xlsx" model="ir.actions.report">
+	        <field name="name">Salary Summary Report</field>
+	        <field name="model">fg.salary.summary.report</field>
+	        <field name="report_type">xlsx</field>
+	        <field name="report_name">flemings_base.fg_salary_summary_report_xlsx</field>
+	        <field name="report_file">Salary Summary Report</field>
+			<field name="print_report_name">(object._get_salary_summary_report_name())</field>
+	    </record>
+
+		<record id="fg_salary_summary_report_wizard_form_view" model="ir.ui.view">
+            <field name="name">fg.salary.summary.report.wizard.form.view</field>
+            <field name="model">fg.salary.summary.report</field>
+            <field name="arch" type="xml">
+				<form string="Salary Summary Report">
+					<sheet>
+						<group>
+							<label for="from_month" string="From"/>
+							<div>
+								<field name="from_month" required="1" class="oe_inline" placeholder="Month"/>
+								<span style="padding-left:15px; padding-right:15px; font-weight:bold;">-</span>
+								<field name="from_year" required="1" class="oe_inline" placeholder="Year"/>
+							</div>
+							<label for="to_month" string="To"/>
+							<div>
+								<field name="to_month" required="1" class="oe_inline" placeholder="Month"/>
+								<span style="padding-left:15px; padding-right:15px; font-weight:bold;">-</span>
+								<field name="to_year" required="1" class="oe_inline" placeholder="Year"/>
+							</div>
+							<field name="date_from" invisible="1"/>
+							<field name="date_to" invisible="1"/>
+							<field name="company_id" invisible="1"/>
+						</group>
+						<group/><group/>
+
+						<group>
+							<field name="employee_ids" widget="many2many_tags" options="{'no_open':True, 'no_create':True}"/>
+						</group>
+						<group/><group/>
+
+						<group>
+							<field name="salary_rule_ids" options="{'no_create':True}">
+								<tree>
+									<field name="sequence"/>
+									<field name="name"/>
+									<field name="code"/>
+									<field name="category_id" options="{'no_create':True}"/>
+								</tree>
+								<form>
+									<group>
+										<group>
+											<field name="sequence"/>
+											<field name="name"/>
+											<field name="code"/>
+											<field name="category_id" options="{'no_create':True}"/>
+										</group>
+									</group>
+								</form>
+							</field>
+						</group>
+
+						<footer>
+							<button name="generate_xlsx_report" string="Print" type="object" class="btn-primary"/>
+							<button string="Cancel" special="cancel" class="btn-default"/>
+						</footer>
+					</sheet>
+				</form>
+            </field>
+		</record>
+
+		<record id="action_fg_salary_summary_report_wizard" model="ir.actions.act_window">
+			<field name="name">Salary Summary Report</field>
+			<field name="res_model">fg.salary.summary.report</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+
+		<menuitem id="menu_fg_salary_summary_report_wizard" name="Salary" parent="sg_hr_report.menu_report_payroll1_summary"
+				  action="action_fg_salary_summary_report_wizard" sequence="10"/>
+
+    </data>
+</odoo>
