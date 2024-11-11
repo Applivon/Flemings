@@ -82,7 +82,7 @@ class FGSalarySummaryReport(models.TransientModel):
         return report_name
 
 
-class FGGrossProfitReportXlsx(models.AbstractModel):
+class FGSalarySummaryReportXlsx(models.AbstractModel):
     _name = 'report.flemings_base.fg_salary_summary_report_xlsx'
     _description = 'Salary Summary Report XLSX'
     _inherit = 'report.report_xlsx.abstract'
@@ -182,11 +182,8 @@ class FGGrossProfitReportXlsx(models.AbstractModel):
                         while start_date <= end_date:
                             emp_column += 1
                             month_to_date = start_date + relativedelta(months=+1, day=1, days=-1)
-                            if annual_leave_type_id:
-                                leaves_dict = [i[str(month_to_date)] for i in remaining_leaves if str(month_to_date) in i]
-                                sheet.write(row, emp_column, str((leaves_dict[0][employee_id.id][annual_leave_type_id.id].get('remaining_leaves', 0.0)) if leaves_dict else 0), align_right)
-                            else:
-                                sheet.write(row, emp_column, str(0), align_right)
+                            leaves_dict = [i[str(month_to_date)] for i in remaining_leaves if str(month_to_date) in i]
+                            sheet.write(row, emp_column, str((leaves_dict[0][employee_id.id][annual_leave_type_id.id].get('remaining_leaves', 0.0)) if leaves_dict else 0), align_right)
                             start_date += delta
 
                         for emp_rule_id in emp_rule_ids:
