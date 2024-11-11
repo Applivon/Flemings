@@ -149,17 +149,18 @@ class FGGrossProfitReportXlsx(models.AbstractModel):
                 title_column += 1
                 sheet.write(row, title_column, 'TOTAL', align_bold_center)
 
-                annual_leave_type_id = self.env['hr.leave.type'].sudo().search([('name', '=', 'Annual Leave')], limit=1)
+                annual_leave_type_id = self.env['hr.leave.type'].sudo().search([('is_annual_leave', '=', True)], limit=1)
 
                 remaining_leaves = []
-                start_date, end_date = obj.date_from, obj.date_to
-                delta = relativedelta(months=+1)
-                while start_date <= end_date:
-                    month_to_date = start_date + relativedelta(months=+1, day=1, days=-1)
-                    remaining_leaves.append({
-                        str(month_to_date): annual_leave_type_id.with_context(ignore_future=True).get_employees_days(employee_ids.ids, date=month_to_date)
-                    })
-                    start_date += delta
+                if annual_leave_type_id:
+                    start_date, end_date = obj.date_from, obj.date_to
+                    delta = relativedelta(months=+1)
+                    while start_date <= end_date:
+                        month_to_date = start_date + relativedelta(months=+1, day=1, days=-1)
+                        remaining_leaves.append({
+                            str(month_to_date): annual_leave_type_id.with_context(ignore_future=True).get_employees_days(employee_ids.ids, date=month_to_date)
+                        })
+                        start_date += delta
 
                 for employee_id in employee_ids:
                     emp_payslip_line_ids = payslip_line_ids.filtered(lambda x: x.slip_id.employee_id.id == employee_id.id)
@@ -181,8 +182,11 @@ class FGGrossProfitReportXlsx(models.AbstractModel):
                         while start_date <= end_date:
                             emp_column += 1
                             month_to_date = start_date + relativedelta(months=+1, day=1, days=-1)
-                            leaves_dict = [i[str(month_to_date)] for i in remaining_leaves if str(month_to_date) in i]
-                            sheet.write(row, emp_column, str((leaves_dict[0][employee_id.id][annual_leave_type_id.id].get('remaining_leaves', 0.0)) if leaves_dict else 0), align_right)
+                            if annual_leave_type_id:
+                                leaves_dict = [i[str(month_to_date)] for i in remaining_leaves if str(month_to_date) in i]
+                                sheet.write(row, emp_column, str((leaves_dict[0][employee_id.id][annual_leave_type_id.id].get('remaining_leaves', 0.0)) if leaves_dict else 0), align_right)
+                            else:
+                                sheet.write(row, emp_column, str(0), align_right)
                             start_date += delta
 
                         for emp_rule_id in emp_rule_ids:
