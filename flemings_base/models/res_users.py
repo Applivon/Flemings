@@ -240,6 +240,7 @@ class FlemingsResUsers(models.Model):
                                      'hr_attendance.group_hr_attendance', 'hr_attendance.group_hr_attendance_user', 'hr_attendance.group_hr_attendance_manager', 'hr_attendance.group_hr_attendance_kiosk',
                                      'hr_holidays.group_hr_holidays_responsible', 'hr_holidays.group_hr_holidays_user', 'hr_holidays.group_hr_holidays_manager',
                                      'hr_expense.group_hr_expense_team_approver', 'hr_expense.group_hr_expense_user', 'hr_expense.group_hr_expense_manager',
+                                     'quality.group_quality_user', 'quality.group_quality_manager',
                                      'project.group_project_user', 'project.group_project_manager', 'l10n_sg_hr_payroll.group_hr_payroll_admin']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
