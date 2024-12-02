@@ -1136,8 +1136,8 @@ class FlemingsProductPricelist(models.Model):
 class FGWebsiteVisitor(models.Model):
     _inherit = 'website.visitor'
 
-    lead_ids = fields.Many2many('crm.lead', string='Leads')
-    lead_count = fields.Integer('# Leads', compute="_compute_lead_count")
+    lead_ids = fields.Many2many('crm.lead', string='Leads', groups="")
+    lead_count = fields.Integer('# Leads', compute="_compute_lead_count", groups="")
 
 
 class FGAccountTransferModelLines(models.Model):
