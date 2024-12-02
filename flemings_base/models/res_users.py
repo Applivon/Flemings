@@ -159,6 +159,7 @@ class FlemingsResUsers(models.Model):
                     or 'fg_product_marketing_group' in vals or 'fg_su_wo_account_group' in vals \
                     or 'fg_su_with_hr_group' in vals or 'fg_su_group' in vals:
                 record.update_flemings_external_system_user_groups()
+                record.remove_default_groups()
                 record.add_default_groups()
 
         return res
@@ -173,11 +174,37 @@ class FlemingsResUsers(models.Model):
                     or 'fg_product_marketing_group' in vals or 'fg_su_wo_account_group' in vals \
                     or 'fg_su_with_hr_group' in vals or 'fg_su_group' in vals:
                 record.update_flemings_external_system_user_groups()
+                record.remove_default_groups()
                 record.add_default_groups()
 
         return res
 
-        # To Add Core Default Groups
+    # To Remove Core Default Groups
+    def remove_default_groups(self):
+        for record in self:
+            for group_xml_id in [
+                'base.group_system', 'base.group_erp_manager',
+                'account.group_account_user', 'account.group_account_manager',
+                'stock.group_stock_user', 'stock.group_stock_manager',
+                'mrp.group_mrp_user', 'mrp.group_mrp_manager',
+                'hr_attendance.group_hr_attendance', 'hr_attendance.group_hr_attendance_user', 'hr_attendance.group_hr_attendance_manager',
+                'hr_holidays.group_hr_holidays_responsible', 'hr_holidays.group_hr_holidays_user', 'hr_holidays.group_hr_holidays_manager',
+                'hr_expense.group_hr_expense_team_approver', 'hr_expense.group_hr_expense_user', 'hr_expense.group_hr_expense_manager',
+                'project.group_project_user', 'project.group_project_manager',
+                'sales_team.group_sale_salesman', 'sales_team.group_sale_salesman_all_leads', 'sales_team.group_sale_manager',
+                'purchase.group_purchase_user', 'purchase.group_purchase_manager',
+                'hr_timesheet.group_hr_timesheet_user', 'hr_timesheet.group_hr_timesheet_approver', 'hr_timesheet.group_timesheet_manager',
+                'point_of_sale.group_pos_user', 'point_of_sale.group_pos_manager',
+                'hr_attendance.group_hr_attendance_kiosk', 'hr.group_hr_user', 'hr.group_hr_manager',
+                'hr_contract.group_hr_contract_employee_manager', 'hr_contract.group_hr_contract_manager',
+                'hr_payroll.group_hr_payroll_user', 'hr_payroll.group_hr_payroll_employee_manager', 'hr_payroll.group_hr_payroll_manager',
+                'website.group_website_designer', 'website.group_website_restricted_editor',
+                'quality.group_quality_user', 'l10n_sg_hr_payroll.group_hr_payroll_admin',
+
+            ]:
+                record.remove_user_core_groups(record, self.env.ref(group_xml_id).id)
+
+    # To Add Core Default Groups
     def add_default_groups(self):
         for record in self:
             if record.has_group('flemings_base.fg_procurement_group') or record.has_group('flemings_base.fg_inventory_group') or record.has_group('flemings_base.fg_finance_with_report_group') or record.has_group('flemings_base.fg_finance_wo_report_group') or record.has_group('flemings_base.fg_operations_group') or record.has_group('flemings_base.fg_mr_group') or record.has_group('flemings_base.fg_product_marketing_group'):
@@ -193,7 +220,7 @@ class FlemingsResUsers(models.Model):
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_sales_group') or record.has_group('flemings_base.fg_product_marketing_group') or record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
-                for group_xml_id in ['website.group_website_designer', 'base.group_erp_manager']:
+                for group_xml_id in ['website.group_website_designer', 'base.group_system']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
@@ -210,6 +237,9 @@ class FlemingsResUsers(models.Model):
             WHERE NOT EXISTS (SELECT gid FROM res_groups_users_rel 
               WHERE gid = %s and uid = %s
             )""" % (gid, record.id, gid, record.id))
+
+    def remove_user_core_groups(self, record, gid):
+        self.env.cr.execute(""" DELETE FROM res_groups_users_rel WHERE gid = %s and uid = %s """ % (gid, record.id))
 
     @api.model
     def get_view(self, view_id=None, view_type='form', **options):
