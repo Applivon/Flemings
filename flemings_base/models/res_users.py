@@ -184,7 +184,7 @@ class FlemingsResUsers(models.Model):
         for record in self:
             for group_xml_id in [
                 'base.group_system', 'base.group_erp_manager',
-                'account.group_account_user', 'account.group_account_manager',
+                'account.group_account_user', 'account.group_account_manager', 'account.group_account_invoice', 'account.group_account_readonly',
                 'stock.group_stock_user', 'stock.group_stock_manager',
                 'mrp.group_mrp_user', 'mrp.group_mrp_manager',
                 'hr_attendance.group_hr_attendance', 'hr_attendance.group_hr_attendance_user', 'hr_attendance.group_hr_attendance_manager',
@@ -212,7 +212,7 @@ class FlemingsResUsers(models.Model):
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_finance_with_report_group'):
-                for group_xml_id in ['base.group_erp_manager', 'account.group_account_user', 'account.group_account_manager']:
+                for group_xml_id in ['base.group_erp_manager', 'account.group_account_user', 'account.group_account_manager', 'account.group_account_invoice']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_mr_group'):

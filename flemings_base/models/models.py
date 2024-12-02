@@ -14,6 +14,9 @@ from odoo.exceptions import UserError, ValidationError
 
 import os
 from odoo.addons.web.controllers.main import clean
+from odoo.tools.float_utils import float_repr
+
+IRAS_DIGITS = 2
 
 
 class FlemingsProductAttribute(models.Model):
@@ -732,7 +735,7 @@ class FlemingsProductTemplate(models.Model):
         if (((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
                 (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
                 and self._context.get('action_id', False) not in account_product_action_ids)
-                and (self.env.user.fg_sales_group or self.env.user.fg_finance_with_report_group or self.env.user.fg_mr_group)):
+                and (self.env.user.fg_sales_group or self.env.user.fg_mr_group)):
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
@@ -773,7 +776,7 @@ class FlemingsProductProduct(models.Model):
 
         if (((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
                 (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1))
-                and (self.env.user.fg_sales_group or self.env.user.fg_finance_with_report_group or self.env.user.fg_mr_group)):
+                and (self.env.user.fg_sales_group or self.env.user.fg_mr_group)):
             if view_type in ('tree', 'form', 'kanban'):
                 doc = etree.XML(res['arch'])
                 for node in doc.xpath("//" + view_type + ""):
@@ -1135,3 +1138,90 @@ class FGWebsiteVisitor(models.Model):
 
     lead_ids = fields.Many2many('crm.lead', string='Leads')
     lead_count = fields.Integer('# Leads', compute="_compute_lead_count")
+
+
+class FGAccountTransferModelLines(models.Model):
+    _inherit = 'account.transfer.model.line'
+
+    transfer_model_id = fields.Many2one('account.transfer.model', string="Transfer Model", required=True, ondelete='cascade')
+
+
+class FGIrasAuditFile(models.Model):
+    _inherit = 'account.report'
+
+    def _l10n_sg_get_gldata(self, date_from, date_to):
+        """
+        Generate gldata for IRAS Audit File
+        """
+        gldata_lines = []
+        total_debit = 0.0
+        total_credit = 0.0
+        transaction_count_total = 0
+        glt_currency = 'SGD'
+
+        company = self.env.company
+        move_line_ids = self.env['account.move.line'].search([
+            ('company_id', '=', company.id),
+            ('date', '>=', date_from),
+            ('date', '<=', date_to)
+            ])
+
+        options = self._get_options(previous_options={
+            'multi_company': {'id': company.id, 'name': company.name},
+            'unfold_all': True,
+            'unfolded_lines': [],
+            'date': {
+                'mode': 'range',
+                'date_from': fields.Date.from_string(date_from),
+                'date_to': fields.Date.from_string(date_from)
+            }
+        })
+        general_ledger_report = self.env.ref('account_reports.general_ledger_report')
+        handler = self.env['account.general.ledger.report.handler']
+        accounts_results = handler._query_values(general_ledger_report, options)
+        # accounts_results = self._general_ledger_query_values(options)
+        all_accounts = self.env['account.account'].search([('company_id', '=', company.id)])
+
+        for account in all_accounts:
+            initial_bal = dict(accounts_results).get(account.id, {'initial_balance': {'balance': 0, 'amount_currency': 0, 'debit': 0, 'credit': 0}})['initial_balance']
+            gldata_lines.append({
+                'TransactionDate': date_from,
+                'AccountID': account.code,
+                'AccountName': account.name,
+                'TransactionDescription': 'OPENING BALANCE',
+                'Name': False,
+                'TransactionID': False,
+                'SourceDocumentID': False,
+                'SourceType': False,
+                'Debit': float_repr(initial_bal['debit'], IRAS_DIGITS),
+                'Credit': float_repr(initial_bal['credit'], IRAS_DIGITS),
+                'Balance': float_repr(initial_bal['balance'], IRAS_DIGITS)
+            })
+            balance = initial_bal['balance']
+            for move_line_id in move_line_ids:
+                if move_line_id.account_id.code == account.code:
+                    balance = company.currency_id.round(balance + move_line_id.debit - move_line_id.credit)
+                    total_credit += move_line_id.credit
+                    total_debit += move_line_id.debit
+                    transaction_count_total += 1
+                    account_type_dict = dict(self.env['account.account']._fields['account_type']._description_selection(self.env))
+                    gldata_lines.append({
+                        'TransactionDate': fields.Date.to_string(move_line_id.date),
+                        'AccountID': move_line_id.account_id.code,
+                        'AccountName': move_line_id.account_id.name,
+                        'TransactionDescription': move_line_id.name,
+                        'Name': move_line_id.partner_id.name if move_line_id.partner_id else False,
+                        'TransactionID': move_line_id.move_id.name,
+                        'SourceDocumentID': move_line_id.move_id.invoice_origin if move_line_id.move_id else False,
+                        'SourceType': account_type_dict[move_line_id.account_id.account_type][:20],
+                        'Debit': float_repr(move_line_id.debit, IRAS_DIGITS),
+                        'Credit': float_repr(move_line_id.credit, IRAS_DIGITS),
+                        'Balance': float_repr(balance, IRAS_DIGITS)
+                    })
+        return {
+            'lines': gldata_lines,
+            'TotalDebit': float_repr(total_debit, IRAS_DIGITS),
+            'TotalCredit': float_repr(total_credit, IRAS_DIGITS),
+            'TransactionCountTotal': str(transaction_count_total),
+            'GLTCurrency': glt_currency
+        }
