@@ -223,8 +223,8 @@ class FlemingsResUsers(models.Model):
                 for group_xml_id in ['mrp.group_mrp_user', 'mrp.group_mrp_manager', 'stock.group_stock_manager']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
-            if record.has_group('flemings_base.fg_sales_group') or record.has_group('flemings_base.fg_product_marketing_group') or record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
-                for group_xml_id in ['website.group_website_designer', 'base.group_system']:
+            if record.has_group('flemings_base.fg_sales_group') or record.has_group('flemings_base.fg_mr_group') or record.has_group('flemings_base.fg_product_marketing_group') or record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
+                for group_xml_id in ['website.group_website_designer', 'base.group_erp_manager', 'base.group_system']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
@@ -232,7 +232,7 @@ class FlemingsResUsers(models.Model):
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_su_group'):
-                for group_xml_id in ['account.group_account_manager', 'base.group_system']:
+                for group_xml_id in ['account.group_account_manager', 'base.group_erp_manager', 'base.group_system']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
     def insert_user_core_groups(self, record, gid):
