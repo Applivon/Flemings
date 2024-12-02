@@ -240,7 +240,7 @@ class FlemingsStockProductProduct(models.Model):
     min_stock_quantity = fields.Float('Minimum Stock Level', default=0)
 
     def create_flemings_product_quant(self):
-        for record in self:
+        for record in self.filtered(lambda x: x.detailed_type == 'product'):
             exist_product_quant = self.env['stock.quant'].sudo().search([('product_id', '=', record.id)])
             location_id = self.env['stock.location'].sudo().search([('company_id', '=', self.env.company.id), ('usage', 'in', ['internal', 'transit'])], order='id asc', limit=1)
             if location_id and not exist_product_quant:
