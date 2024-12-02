@@ -216,7 +216,7 @@ class FlemingsResUsers(models.Model):
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_mr_group'):
-                for group_xml_id in ['mrp.group_mrp_user']:
+                for group_xml_id in ['mrp.group_mrp_user', 'mrp.group_mrp_manager']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
             if record.has_group('flemings_base.fg_finance_wo_report_group'):
