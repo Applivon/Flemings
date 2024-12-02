@@ -219,6 +219,10 @@ class FlemingsResUsers(models.Model):
                 for group_xml_id in ['mrp.group_mrp_user']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
 
+            if record.has_group('flemings_base.fg_finance_wo_report_group'):
+                for group_xml_id in ['mrp.group_mrp_user', 'mrp.group_mrp_manager', 'stock.group_stock_manager']:
+                    record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
+
             if record.has_group('flemings_base.fg_sales_group') or record.has_group('flemings_base.fg_product_marketing_group') or record.has_group('flemings_base.fg_su_wo_account_group') or record.has_group('flemings_base.fg_su_with_hr_group') or record.has_group('flemings_base.fg_su_group'):
                 for group_xml_id in ['website.group_website_designer', 'base.group_system']:
                     record.insert_user_core_groups(record, self.env.ref(group_xml_id).id)
