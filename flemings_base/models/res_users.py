@@ -287,5 +287,14 @@ class FlemingsResUsers(models.Model):
 
             for node in doc.xpath("//group[@string='Flemings User System Group']"):
                 node.set('modifiers', json.dumps({'invisible': True}))
+
+            if self.env.user and self.sudo().env.ref('base.user_root'):
+                if not self.env.user.has_group('flemings_base.fg_su_group') and self.env.user.id != self.sudo().env.ref('base.user_root').id:
+                    group_labels = ['Sales', 'Services', 'Accounting', 'Inventory', 'Manufacturing', 'Website', 'Human Resources', 'Administration', 'Other']
+                    for group_label in group_labels:
+                        if doc.xpath("//group[@string='%s']" % group_label):
+                            node = doc.xpath("//group[@string='%s']" % group_label)[0]
+                            node.set('modifiers', json.dumps({'invisible': True}))
+
             res['arch'] = etree.tostring(doc)
         return res
