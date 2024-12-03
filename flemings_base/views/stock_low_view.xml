@@ -141,5 +141,28 @@
             </field>
         </record>
 
+		<!-- Warehouse -->
+		<record id="fg_stock_view_warehouse_tree_view_inherit" model="ir.ui.view">
+            <field name="name">fg.stock.view.warehouse.tree.view.inherit</field>
+            <field name="model">stock.warehouse</field>
+            <field name="inherit_id" ref="stock.view_warehouse_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="delete">0</attribute>
+                </xpath>
+            </field>
+        </record>
+
+		<record id="fg_stock_view_warehouse_form_view_inherit" model="ir.ui.view">
+            <field name="name">fg.stock.view.warehouse.form.view.inherit</field>
+            <field name="model">stock.warehouse</field>
+            <field name="inherit_id" ref="stock.view_warehouse"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="attributes">
+                    <attribute name="delete">0</attribute>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>
