@@ -725,26 +725,26 @@ class FlemingsSalesAccountMoveLines(models.Model):
 class FlemingsProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    @api.model
-    def get_view(self, view_id=None, view_type='form', **options):
-        res = super(FlemingsProductTemplate, self).get_view(view_id, view_type, **options)
-
-        account_product_action_ids = self.env.ref('account.product_product_action_sellable').ids
-        account_product_action_ids += self.env.ref('account.product_product_action_purchasable').ids
-        
-        if (((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
-                (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
-                and self._context.get('action_id', False) not in account_product_action_ids)
-                and (self.env.user.fg_sales_group or self.env.user.fg_mr_group)):
-            if view_type in ('tree', 'form', 'kanban'):
-                doc = etree.XML(res['arch'])
-                for node in doc.xpath("//" + view_type + ""):
-                    node.set('create', 'false')
-                    node.set('delete', 'false')
-                    node.set('edit', 'false')
-                res['arch'] = etree.tostring(doc)
-
-        return res
+    # @api.model
+    # def get_view(self, view_id=None, view_type='form', **options):
+    #     res = super(FlemingsProductTemplate, self).get_view(view_id, view_type, **options)
+    #
+    #     account_product_action_ids = self.env.ref('account.product_product_action_sellable').ids
+    #     account_product_action_ids += self.env.ref('account.product_product_action_purchasable').ids
+    #
+    #     if (((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
+    #             (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1)
+    #             and self._context.get('action_id', False) not in account_product_action_ids)
+    #             and (self.env.user.fg_sales_group or self.env.user.fg_mr_group)):
+    #         if view_type in ('tree', 'form', 'kanban'):
+    #             doc = etree.XML(res['arch'])
+    #             for node in doc.xpath("//" + view_type + ""):
+    #                 node.set('create', 'false')
+    #                 node.set('delete', 'false')
+    #                 node.set('edit', 'false')
+    #             res['arch'] = etree.tostring(doc)
+    #
+    #     return res
 
     item_category_id = fields.Many2one('fg.item.category', string='Item Category')
 
@@ -770,22 +770,22 @@ class FlemingsProductTemplate(models.Model):
 class FlemingsProductProduct(models.Model):
     _inherit = 'product.product'
 
-    @api.model
-    def get_view(self, view_id=None, view_type='form', **options):
-        res = super(FlemingsProductProduct, self).get_view(view_id, view_type, **options)
-
-        if (((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
-                (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1))
-                and (self.env.user.fg_sales_group or self.env.user.fg_mr_group)):
-            if view_type in ('tree', 'form', 'kanban'):
-                doc = etree.XML(res['arch'])
-                for node in doc.xpath("//" + view_type + ""):
-                    node.set('create', 'false')
-                    node.set('delete', 'false')
-                    node.set('edit', 'false')
-                res['arch'] = etree.tostring(doc)
-
-        return res
+    # @api.model
+    # def get_view(self, view_id=None, view_type='form', **options):
+    #     res = super(FlemingsProductProduct, self).get_view(view_id, view_type, **options)
+    #
+    #     if (((self._context.get('search_default_filter_to_sell') and self._context.get('search_default_filter_to_sell') == 1) or
+    #             (self._context.get('search_default_filter_to_purchase') and self._context.get('search_default_filter_to_purchase') == 1))
+    #             and (self.env.user.fg_sales_group or self.env.user.fg_mr_group)):
+    #         if view_type in ('tree', 'form', 'kanban'):
+    #             doc = etree.XML(res['arch'])
+    #             for node in doc.xpath("//" + view_type + ""):
+    #                 node.set('create', 'false')
+    #                 node.set('delete', 'false')
+    #                 node.set('edit', 'false')
+    #             res['arch'] = etree.tostring(doc)
+    #
+    #     return res
 
     def get_product_multiline_description_sale(self):
         """ Compute a multiline description of this product, in the context of sales
