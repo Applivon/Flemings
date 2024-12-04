@@ -46,6 +46,13 @@ class FlemingsDeliveryMode(models.Model):
     name = fields.Char('Delivery Mode')
 
 
+class FlemingsBrands(models.Model):
+    _name = 'fg.product.brand'
+    _description = 'Brand'
+
+    name = fields.Char('Brand')
+
+
 class FlemingsResPartner(models.Model):
     _inherit = 'res.partner'
 
@@ -747,6 +754,7 @@ class FlemingsProductTemplate(models.Model):
     #     return res
 
     item_category_id = fields.Many2one('fg.item.category', string='Item Category')
+    brand_id = fields.Many2one('fg.product.brand', string='Brand')
 
     def _compute_template_fg_available_stock(self):
         for record in self:

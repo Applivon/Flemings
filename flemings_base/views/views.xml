@@ -401,6 +401,7 @@
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='uom_po_id']" position="after">
 					<field name="item_category_id" options="{'no_create': True}"/>
+					<field name="brand_id" options="{'no_create': True}"/>
 				</xpath>
 			</field>
 		</record>
@@ -958,8 +959,38 @@
             <field name="view_id" ref="fg_delivery_carrier_list_view"/>
 	    </record>
 
+		<!-- Configuration - Brand -->
+		<record id="fg_product_brand_list_view" model="ir.ui.view">
+	        <field name="name">fg.product.brand.tree</field>
+	        <field name="model">fg.product.brand</field>
+	        <field name="arch" type="xml">
+	            <tree string="Brand" editable="bottom" duplicate="0">
+	                <field name="name" required="1"/>
+	            </tree>
+	        </field>
+	    </record>
+
+		<record id="fg_product_brand_search_view" model="ir.ui.view">
+            <field name="name">fg.product.brand.search</field>
+            <field name="model">fg.product.brand</field>
+            <field name="arch" type="xml">
+                <search string="Brand">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+	    <record id="fg_product_brand_action" model="ir.actions.act_window">
+	        <field name="name">Brand</field>
+	        <field name="type">ir.actions.act_window</field>
+	        <field name="res_model">fg.product.brand</field>
+			<field name="search_view_id" ref="fg_product_brand_search_view"/>
+            <field name="view_id" ref="fg_product_brand_list_view"/>
+	    </record>
+
 		<menuitem id="menu_fg_item_category" parent="sale.menu_sale_config" action="fg_item_category_action" sequence="70"/>
 		<menuitem id="menu_fg_delivery_carrier" parent="sale.menu_sale_config" action="fg_delivery_carrier_action" sequence="75"/>
+		<menuitem id="menu_fg_product_brand" parent="sale.menu_sale_config" action="fg_product_brand_action" sequence="80"/>
 
     </data>
 </odoo>
