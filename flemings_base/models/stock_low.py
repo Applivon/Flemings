@@ -233,6 +233,9 @@ class FlemingsStockProductTemplate(models.Model):
 
         return res
 
+    def unlink(self):
+        return super(FlemingsStockProductTemplate, self.sudo()).unlink()
+
 
 class FlemingsStockProductProduct(models.Model):
     _inherit = 'product.product'
@@ -291,8 +294,8 @@ class FlemingsStockProductProduct(models.Model):
     def unlink(self):
         for record in self.filtered(lambda x: x.qty_available == 0):
             record._unlink_zero_quants()
-            record.stock_move_ids.with_context(inventory_unlink=True).filtered(lambda x: x.is_inventory).unlink()
-        return super(FlemingsStockProductProduct, self).unlink()
+            record.stock_move_ids.with_context(inventory_unlink=True).filtered(lambda x: x.is_inventory).sudo().unlink()
+        return super(FlemingsStockProductProduct, self.sudo()).unlink()
 
 
 class FGStockMoves(models.Model):
