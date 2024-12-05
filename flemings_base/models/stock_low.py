@@ -218,6 +218,9 @@ class FlemingsStockProductTemplate(models.Model):
             #         variant.min_stock_quantity = record.min_stock_quantity
             if 'min_stock_quantity' in vals and vals.get('min_stock_quantity') > 0 and record.product_variant_count > 1:
                 record.min_stock_quantity = 0
+            elif 'min_stock_quantity' in vals:
+                for variant in record.product_variant_ids:
+                    variant.min_stock_quantity = record.min_stock_quantity
 
         return res
 
@@ -230,6 +233,9 @@ class FlemingsStockProductTemplate(models.Model):
             #         variant.min_stock_quantity = record.min_stock_quantity
             if 'min_stock_quantity' in vals and vals.get('min_stock_quantity') > 0 and record.product_variant_count > 1:
                 record.min_stock_quantity = 0
+            elif 'min_stock_quantity' in vals:
+                for variant in record.product_variant_ids:
+                    variant.min_stock_quantity = record.min_stock_quantity
 
         return res
 
