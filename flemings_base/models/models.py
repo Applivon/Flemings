@@ -483,7 +483,7 @@ class FlemingsSalesAccountMove(models.Model):
     @api.depends('amount_untaxed', 'amount_tax', 'amount_total', 'currency_id', 'invoice_line_ids.price_total')
     def _compute_sgd_equivalent_amount(self):
         for record in self:
-            record.write({
+            record.update({
                 'computed_sgd_amount_untaxed': record.currency_id._convert(record.amount_untaxed, record.sgd_currency_id, record.company_id, record.invoice_date or record.create_date) if (record.invoice_date or record.create_date) else 0,
                 'computed_sgd_amount_tax': record.currency_id._convert(record.amount_tax, record.sgd_currency_id, record.company_id, record.invoice_date or record.create_date) if (record.invoice_date or record.create_date) else 0,
                 'computed_sgd_amount_total': record.currency_id._convert(record.amount_total, record.sgd_currency_id, record.company_id, record.invoice_date or record.create_date) if (record.invoice_date or record.create_date) else 0,
