@@ -253,8 +253,8 @@ class FlemingsSalesOrder(models.Model):
                 'computed_customer_invoice_names': ' '.join([i.name for i in record.invoice_ids]),
             })
 
-    computed_delivery_order_names = fields.Text(string='Delivery Order', store=False, readonly=True, compute_sudo='_compute_so_delivery_invoice_names')
-    computed_customer_invoice_names = fields.Text(string='Customer Invoice', store=False, readonly=True, compute_sudo='_compute_so_delivery_invoice_names')
+    computed_delivery_order_names = fields.Text(string='Delivery Order', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
+    computed_customer_invoice_names = fields.Text(string='Customer Invoice', store=False, readonly=True, compute='_compute_so_delivery_invoice_names')
 
     delivery_order_names = fields.Text(related='computed_delivery_order_names', string='Delivery Order', store=True, readonly=True)
     customer_invoice_names = fields.Text(related='computed_customer_invoice_names', string='Customer Invoice', store=True, readonly=True)
@@ -372,7 +372,7 @@ class FlemingsSalesOrder(models.Model):
 
     computed_fg_invoice_status = fields.Selection([
         ('no', 'Nothing to Invoice'), ('to_invoice', 'To Invoice'), ('partial_invoice', 'Partially Invoiced')
-    ], string='Invoice Status', compute_sudo='_compute_fg_invoice_status', store=False, readonly=True)
+    ], string='Invoice Status', compute='_compute_fg_invoice_status', store=False, readonly=True)
     fg_invoice_status = fields.Selection(
         related='computed_fg_invoice_status', string='Invoice Status', store=True, readonly=True)
 
