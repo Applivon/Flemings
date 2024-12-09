@@ -100,7 +100,7 @@ class FlemingsCOGSDetailedReportXlsx(models.AbstractModel):
             to_date = obj.get_utc_datetime(to_date_time)
 
             domain = [
-                ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('stock_move_id.picking_id', '!=', False),
+                ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('stock_move_id.picking_id', '!=', False), ('stock_move_id.origin_returned_move_id', '=', False),
                 ('company_id', '=', obj.company_id.id), ('reference', '!=', False), '|', ('value', '<', 0), ('quantity', '<', 0)
             ]
             if obj.product_ids:
