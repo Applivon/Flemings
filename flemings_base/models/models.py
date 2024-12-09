@@ -613,6 +613,7 @@ class FlemingsSalesAccountMove(models.Model):
                 'product_uom_id': move_line.product_uom_id.id,
                 'location_id': location_id.id,
                 'location_dest_id': location_dest_id.id,
+                'lot_id': move_line.lot_id.id,
                 'qty_done': move_line.quantity,
             }))
 
@@ -737,6 +738,7 @@ class FlemingsSalesAccountMoveLines(models.Model):
     picking_id = fields.Many2one('stock.picking', string='Delivery Order', copy=False)
     sale_id = fields.Many2one('sale.order', string='Sale Order', copy=False)
     unit_cost_price = fields.Float('Unit Cost Price', required=True, default=0.0)
+    lot_id = fields.Many2one('stock.lot', string='Lot/Serial No.', copy=False)
 
 
 class FlemingsProductTemplate(models.Model):
