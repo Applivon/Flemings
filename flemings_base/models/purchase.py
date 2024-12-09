@@ -14,6 +14,7 @@ class FGResPartner(models.Model):
             is_buy_internal = user.route_ids.filtered(lambda x: x.is_buy_internal)
             is_buy_external = user.route_ids.filtered(lambda x: x.is_buy_external)
 
+            args += ['|', ('supplier_rank', '>', 0), ('id', 'in', list(set(company_partners.ids)) or [])]
             if is_buy_internal and not is_buy_external:
                 args += [('id', 'in', list(set(company_partners.ids)) or []), ('id', '!=', self.env.context.get('pre_rfq_company_id'))]
             elif is_buy_external and not is_buy_internal:
