@@ -682,10 +682,12 @@
                     <field name="picking_return_id" options="{'no_create':True}" attrs="{'invisible': ['|', ('picking_return_id', '=', False), ('move_type', '!=', 'in_refund')]}" string="Source Picking" readonly="1" force_save="1"/>
                 </xpath>
 				<xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="before">
-					<field name="lot_id" domain="[('product_id', '=', product_id)]" attrs="{'column_invisible': ['|', ('parent.move_type', 'not in', ['out_refund', 'in_refund']), ('parent.not_create_picking', '=', True)], 'required': [('parent.move_type', '=', 'out_refund'), ('parent.not_create_picking', '=', False)]}"/>
+					<field name="product_tracking" column_invisible="1"/>
+					<field name="lot_id" domain="[('product_id', '=', product_id)]" attrs="{'column_invisible': ['|', ('parent.move_type', 'not in', ['out_refund', 'in_refund']), ('parent.not_create_picking', '=', True)], 'required': [('product_tracking', '!=', 'none'), ('parent.move_type', '=', 'out_refund'), ('parent.not_create_picking', '=', False)]}"/>
                 </xpath>
 				<xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='quantity']" position="before">
-					<field name="lot_id" domain="[('product_id', '=', product_id)]" attrs="{'invisible': ['|', ('parent.move_type', 'not in', ['out_refund', 'in_refund']), ('parent.not_create_picking', '=', True)], 'required': [('parent.move_type', '=', 'out_refund'), ('parent.not_create_picking', '=', False)]}"/>
+					<field name="product_tracking" invisible="1"/>
+					<field name="lot_id" domain="[('product_id', '=', product_id)]" attrs="{'invisible': ['|', ('parent.move_type', 'not in', ['out_refund', 'in_refund']), ('parent.not_create_picking', '=', True)], 'required': [('product_tracking', '!=', 'none'), ('parent.move_type', '=', 'out_refund'), ('parent.not_create_picking', '=', False)]}"/>
                 </xpath>
             </field>
         </record>

@@ -739,6 +739,7 @@ class FlemingsSalesAccountMoveLines(models.Model):
     sale_id = fields.Many2one('sale.order', string='Sale Order', copy=False)
     unit_cost_price = fields.Float('Unit Cost Price', required=True, default=0.0)
     lot_id = fields.Many2one('stock.lot', string='Lot/Serial No.', copy=False)
+    product_tracking = fields.Selection(related='product_id.tracking', string='Tracking')
 
 
 class FlemingsProductTemplate(models.Model):
