@@ -910,6 +910,7 @@ class FlemingsStockPicking(models.Model):
                     'name': move_line.product_id.get_product_multiline_description_sale(),
                     'quantity': move_line.quantity_done,
                     'product_uom_id': move_line.product_uom.id,
+                    'price_unit': move_line.sale_line_id.price_unit or 0,
                 }))
             record.is_fully_invoiced = True
 
