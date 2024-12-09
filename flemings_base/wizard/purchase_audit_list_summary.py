@@ -58,9 +58,9 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
             sheet.set_column('C:C', 35)
             sheet.set_column('D:D', 16)
             sheet.set_column('E:E', 20)
-            sheet.set_column('F:F', 18)
-            sheet.set_column('G:G', 12)
-            sheet.set_column('H:K', 18)
+            sheet.set_column('F:G', 18)
+            sheet.set_column('H:H', 12)
+            sheet.set_column('I:L', 18)
 
             date_from = datetime.strftime(obj.from_date, '%d/%m/%Y')
             date_to = datetime.strftime(obj.to_date, '%d/%m/%Y')
@@ -82,7 +82,7 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
 
             row = 4
             titles = [
-                'Date', 'PO Number', 'Vendor', 'Delivery Date', 'Term', 'Total Qty',
+                'Date', 'PO Number', 'Vendor', 'Delivery Date', 'Term', 'Total Qty', 'Received Qty',
                 'Currency', 'Gross Total', 'Tax Base', 'Tax', 'Net Total'
             ]
 
@@ -93,7 +93,7 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
                 sheet.merge_range(row + 2, 0, row + 2, 4, 'No Record(s) found', workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'text_wrap': True}))
 
             for currency_id in currencies:
-                qty_total = gross_total = 0
+                qty_total = received_total = gross_total = 0
                 untaxed_total = tax_total = net_total = 0
                 sheet.write(row + 2, 0, 'Currency : ' + str(currency_id.name), align_bold_left)
                 row += 4
@@ -109,15 +109,17 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
                     sheet.write(row, 2, order.partner_id.display_name or '', align_left)
                     sheet.write(row, 3, last_receipt.date_done.strftime("%d %b %Y") if (last_receipt and last_receipt.date_done) else '', align_center)
                     sheet.write(row, 4, order.payment_term_id.name or '', align_left)
-                    sheet.write(row, 5, str('%.2f' % sum(order.order_line.mapped('qty_received'))), align_right)
-                    sheet.write(row, 6, str(currency_id.name) or '', align_center)
-                    sheet.write(row, 7, str('%.2f' % sum(order.order_line.mapped('price_subtotal'))), align_right)
-                    sheet.write(row, 8, str('%.2f' % order.amount_untaxed), align_right)
-                    sheet.write(row, 9, str('%.2f' % order.amount_tax), align_right)
-                    sheet.write(row, 10, str('%.2f' % order.amount_total), align_right)
+                    sheet.write(row, 5, str('%.2f' % sum(order.order_line.mapped('product_qty')) or 0), align_right)
+                    sheet.write(row, 6, str('%.2f' % sum(order.order_line.mapped('qty_received')) or 0), align_right)
+                    sheet.write(row, 7, str(currency_id.name) or '', align_center)
+                    sheet.write(row, 8, str('%.2f' % sum(order.order_line.mapped('price_subtotal')) or 0), align_right)
+                    sheet.write(row, 9, str('%.2f' % order.amount_untaxed), align_right)
+                    sheet.write(row, 10, str('%.2f' % order.amount_tax), align_right)
+                    sheet.write(row, 11, str('%.2f' % order.amount_total), align_right)
                     row += 1
 
-                    qty_total += sum(order.order_line.mapped('qty_received'))
+                    qty_total += sum(order.order_line.mapped('product_qty'))
+                    received_total += sum(order.order_line.mapped('qty_received'))
                     gross_total += sum(order.order_line.mapped('price_subtotal'))
 
                     untaxed_total += order.amount_untaxed
@@ -127,8 +129,9 @@ class FlemingsPurchaseAudiListSummaryXlsx(models.AbstractModel):
                 row += 1
                 sheet.write(row, 0, 'Sub Total (' + str(currency_id.name) + ')', align_bold_right)
                 sheet.write(row, 5, str('%.2f' % qty_total), align_bold_right)
-                sheet.write(row, 7, str('%.2f' % gross_total), align_bold_right)
-                sheet.write(row, 8, str('%.2f' % untaxed_total), align_bold_right)
-                sheet.write(row, 9, str('%.2f' % tax_total), align_bold_right)
-                sheet.write(row, 10, str('%.2f' % net_total), align_bold_right)
+                sheet.write(row, 6, str('%.2f' % received_total), align_bold_right)
+                sheet.write(row, 8, str('%.2f' % gross_total), align_bold_right)
+                sheet.write(row, 9, str('%.2f' % untaxed_total), align_bold_right)
+                sheet.write(row, 10, str('%.2f' % tax_total), align_bold_right)
+                sheet.write(row, 11, str('%.2f' % net_total), align_bold_right)
                 row += 1
