@@ -119,7 +119,7 @@ class FlemingsPurchaseCOGSSummaryReportXlsx(models.AbstractModel):
                 # purchase_total = sum(stock_valuation_env.search(
                 #     [('company_id', '=', obj.company_id.id), ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '>', 0)]).mapped('value')) or 0
                 purchase_total = sum(purchase_order_env.search(
-                    [('company_id', '=', obj.company_id.id), ('date_approve', '>=', from_date), ('date_approve', '<=', to_date)]).mapped('amount_untaxed')) or 0
+                    [('company_id', '=', obj.company_id.id), ('date_approve', '>=', from_date), ('date_approve', '<=', to_date), ('state', 'in', ['purchase', 'done'])]).mapped('amount_untaxed')) or 0
                 sales_total = sum(stock_valuation_env.search(
                     [('company_id', '=', obj.company_id.id), ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '<', 0), ('quantity', '<', 0),
                      ('stock_move_id.location_id.usage', 'in', ('internal', 'transit')),
