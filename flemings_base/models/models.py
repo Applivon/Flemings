@@ -493,8 +493,9 @@ class FlemingsSalesAccountMove(models.Model):
     @api.depends('invoice_line_ids', 'invoice_line_ids.picking_id')
     def _compute_invoice_delivery_invoice_names(self):
         for record in self:
+            picking_ids = record.sale_id.mapped('picking_ids') + record.invoice_line_ids.mapped('picking_id') + record.picking_return_id
             record.write({
-                'computed_delivery_order_names': ', '.join([i.name for i in record.invoice_line_ids.mapped('picking_id')]),
+                'computed_delivery_order_names': ', '.join([i.name for i in list(set(picking_ids))]),
             })
 
     computed_delivery_order_names = fields.Text(string='Delivery Order', store=False, readonly=True, compute='_compute_invoice_delivery_invoice_names')
