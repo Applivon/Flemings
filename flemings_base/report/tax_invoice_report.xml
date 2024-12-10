@@ -232,7 +232,7 @@
                     </thead>
                 </table>
 
-                <div class="last-page" style="position: absolute; top: 945px; width: 96%; font-size: 8pt;">
+                <div class="last-page" style="position: absolute; top: 940px; width: 96%; font-size: 8pt;">
                     <div>
                         <div style="width: 100%; float: left; ">
                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
@@ -514,12 +514,12 @@
             <field name="page_height">0</field>
             <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">120</field>
+            <field name="margin_top">118</field>
             <field name="margin_bottom">10</field>
             <field name="margin_left">8</field>
             <field name="margin_right">8</field>
             <field name="header_line" eval="False"/>
-            <field name="header_spacing">115</field>
+            <field name="header_spacing">113</field>
             <field name="dpi">80</field>
         </record>
 
