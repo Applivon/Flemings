@@ -146,7 +146,7 @@ class FlemingsPurchaseOrder(models.Model):
             if rec.currency_id.id != company_partner.property_product_pricelist.currency_id.id:
                 sale_order_data.update({'pricelist_id': rec.partner_id.property_product_pricelist.id})
 
-            sale_order_data.update({'pricelist_id': company.partner_id.property_product_pricelist.id})
+            # sale_order_data.update({'pricelist_id': company_partner.property_product_pricelist.id})
 
             # Custom End - Inter Company Currency if mismatched updated new Pricelist
 
