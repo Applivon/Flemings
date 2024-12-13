@@ -927,6 +927,10 @@ class FlemingsStockPicking(models.Model):
             new_invoice_id = self.env['account.move'].create(invoice_vals)
         return
 
+    def do_print_picking(self):
+        self.write({'printed': True})
+        return self.env.ref('flemings_base.report_fg_delivery_order').report_action(self)
+
 
 class FlemingsStockRoute(models.Model):
     _inherit = 'stock.route'
