@@ -186,11 +186,11 @@
                     <span t-foreach="o.get_session_value('payment_method')" t-as="result" style="margin-left:20px">
                         <span t-esc="result"/><br/>
                     </span>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Void Sales:
-                    </span>
-                    <span t-esc="o.get_session_value('void_sales')"/>
-                    <br/>
+<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                        Void Sales:-->
+<!--                    </span>-->
+<!--                    <span t-esc="o.get_session_value('void_sales')"/>-->
+<!--                    <br/>-->
                     <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
                         Cash In Hand:
                     </span>

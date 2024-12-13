@@ -10,6 +10,8 @@ class posOrder(models.Model):
     _inherit = "pos.order"
     def get_exchange_rate(self):
         return  self.currency_id.with_context(date=self.date_order or self.create_date).inverse_rate or 1.0
+    def get_margin_report(self):
+        return sum(self.lines.mapped('margin'))
     def get_order_taxes(self):
         order = self
         tax_summary = {}

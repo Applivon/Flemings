@@ -354,7 +354,7 @@
                         Total Quantity : <span t-esc="'{0:,.0f}'.format(sum(o.lines.mapped('qty')))"/>
                     </td>
                     <td style="width:24%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">Sub Total : <span t-field="o.currency_id"/></td>
-                    <td style="width:13%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.margin)"/></td>
+                    <td style="width:13%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.get_margin_report())"/></td>
                 </tr>
                 <tr style="height:6px;"/>
                 <tr>
@@ -366,7 +366,7 @@
                 <tr>
                     <td rowspan="3"/>
                     <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Tax Base : <span t-field="o.currency_id"/></td>
-                    <td style="width:13%; padding:5px; text-align:center; font-weight:bold; border-top:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.margin)"/></td>
+                    <td style="width:13%; padding:5px; text-align:center; font-weight:bold; border-top:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.get_margin_report())"/></td>
                 </tr>
 
 <!--                <t t-set="tax_totals" t-value="o.tax_totals"/>-->
