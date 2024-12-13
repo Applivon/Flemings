@@ -344,6 +344,27 @@
             <field name="binding_model_id" eval="False"/>
         </record>
 
+        <!-- Allow updating on noupdate=True records -->
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'stock'), ('name', '=', 'mail_template_data_delivery_confirmation')]"/>
+	        </function>
+	        <value eval="{'noupdate': False}"/>
+	    </function>
+
+        <!-- Update noupdate=1 record -->
+        <record id="stock.mail_template_data_delivery_confirmation" model="mail.template">
+	        <field name="report_template" ref="flemings_base.report_fg_delivery_order"/>
+	    </record>
+
+	    <!-- Revoke noupdate change -->
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'stock'), ('name', '=', 'mail_template_data_delivery_confirmation')]"/>
+	        </function>
+	        <value eval="{'noupdate': True}"/>
+	    </function>
+
     </data>
 </odoo>
 

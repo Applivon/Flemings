@@ -429,6 +429,27 @@
             <field name="print_report_name">'Credit Note - %s' % (object.name or '').replace('/','_')</field>
         </record>
 
+        <!-- Allow updating on noupdate=True records -->
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'account'), ('name', '=', 'email_template_edi_credit_note')]"/>
+	        </function>
+	        <value eval="{'noupdate': False}"/>
+	    </function>
+
+        <!-- Update noupdate=1 record -->
+        <record id="account.email_template_edi_credit_note" model="mail.template">
+	        <field name="report_template" ref="flemings_base.print_report_fg_credit_note"/>
+	    </record>
+
+	    <!-- Revoke noupdate change -->
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'account'), ('name', '=', 'email_template_edi_credit_note')]"/>
+	        </function>
+	        <value eval="{'noupdate': True}"/>
+	    </function>
+
     </data>
 </odoo>
 
