@@ -92,7 +92,7 @@ class FlemingsDoNotInvoicedReportXlsx(models.AbstractModel):
 
             domain = [
                 ('sale_id', '!=', False), ('sale_id.fg_invoice_status', 'in', ['to_invoice', 'partial_invoice']),
-                ('company_id', '=', obj.company_id.id), ('scheduled_date', '>=', obj.from_date), ('scheduled_date', '<=', obj.to_date)
+                ('company_id', '=', obj.company_id.id), ('scheduled_date', '>=', obj.from_date), ('scheduled_date', '<=', obj.to_date), ('picking_type_id.code', '=', 'outgoing')
             ]
             if obj.partner_ids:
                 domain += ['', ('sale_id.partner_id', 'in', obj.partner_ids.ids or []), ('partner_id', 'in', obj.partner_ids.ids or [])]
@@ -111,27 +111,28 @@ class FlemingsDoNotInvoicedReportXlsx(models.AbstractModel):
                     sheet.write(row, 1, str(datetime.strftime(utc_do_dates[0], '%d-%m-%Y') or ''), align_left)
                     sheet.write(row, 2, str(order_id.partner_id.name or ''), align_left)
                     sheet.write(row, 3, str(order_id.name or ''), align_left)
-                    sheet.write(row, 4, str(', '.join([i.name for i in order_id.picking_ids]) or ''), align_left)
+                    sheet.write(row, 4, str(', '.join([i.name for i in order_id.picking_ids.filtered(lambda x: x.picking_type_id.code == 'outgoing')]) or ''), align_left)
 
                     row += 1
                     sno += 1
                 else:
                     for utc_do_date in utc_do_dates:
                         picking_ids = []
-                        for picking_id in order_id.picking_ids:
+                        for picking_id in order_id.picking_ids.filtered(lambda x: x.picking_type_id.code == 'outgoing'):
                             # picking_utc_do_date = obj.get_utc_datetime(picking_id.scheduled_date) and obj.get_utc_datetime(picking_id.scheduled_date).date()
                             picking_utc_do_date = picking_id.scheduled_date and picking_id.scheduled_date.date()
                             if utc_do_date == picking_utc_do_date:
                                 picking_ids += [picking_id]
 
-                        sheet.write(row, 0, str(sno), align_center)
-                        sheet.write(row, 1, str(datetime.strftime(utc_do_date, '%d-%m-%Y') or ''), align_left)
-                        sheet.write(row, 2, str(order_id.partner_id.name or ''), align_left)
-                        sheet.write(row, 3, str(order_id.name or ''), align_left)
-                        sheet.write(row, 4, str(', '.join([i.name for i in picking_ids]) or ''), align_left)
+                        if picking_ids:
+                            sheet.write(row, 0, str(sno), align_center)
+                            sheet.write(row, 1, str(datetime.strftime(utc_do_date, '%d-%m-%Y') or ''), align_left)
+                            sheet.write(row, 2, str(order_id.partner_id.name or ''), align_left)
+                            sheet.write(row, 3, str(order_id.name or ''), align_left)
+                            sheet.write(row, 4, str(', '.join([i.name for i in picking_ids]) or ''), align_left)
 
-                        row += 1
-                        sno += 1
+                            row += 1
+                            sno += 1
 
             if not line_data:
                 sheet.merge_range(row + 1, 0, row + 1, 4, 'No Record(s) found', workbook.add_format({'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'text_wrap': True}))
