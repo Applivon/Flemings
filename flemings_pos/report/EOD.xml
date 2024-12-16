@@ -120,115 +120,124 @@
             <hr/>
         </div>
         <div class="page" style="font-family:sans-serif !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
-            <div style="line-height: 2">
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Date:
+            <div style="line-height: 2.5">
+                     <style>
+                        .span_text{
+                            font-size: 1.2rem;  margin-bottom: 1rem;line-height: 1.2;width:75%;float:left
+                        }
+                        .span_header{
+                            font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2; width:25%;;float:left
+                         }
+
+                    </style>
+                    <span class="span_header">
+                        Date
                     </span>
-                    <span t-esc="o.report_get_format_time(o.create_date,'datetime')"/>
+                    <span class="span_text">: <t t-esc="o.report_get_format_time(o.create_date,'datetime')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Cashier:
+                    <span class="span_header">
+                        Cashier
                     </span>
-                    <span t-field="o.user_id.name"/>
+                    <span class="span_text">: <t t-esc="o.user_id.name"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Session:
+                    <span class="span_header">
+                        Session
                     </span>
-                    <span t-field="o.display_name"/>
+                    <span class="span_text">: <t t-esc="o.display_name"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Clock In:
+                    <span class="span_header">
+                        Clock In
                     </span>
-                    <span t-esc="o.report_get_format_time(o.start_at,'time')"/>
+                    <span class="span_text" >: <t t-esc="o.report_get_format_time(o.start_at,'time')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        First Sale:
+                    <span class="span_header">
+                        First Sale
                     </span>
-                    <span t-esc="o.get_sale_data('first_sale')"/>
+                    <span class="span_text" >: <t t-esc="o.get_sale_data('first_sale')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Time:
+                    <span class="span_header">
+                        Time
                     </span>
-                    <span t-esc="o.get_sale_data('first_time')"/>
+                    <span class="span_text" >: <t t-esc="o.get_sale_data('first_time')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
+                    <span class="span_header">
                         Last Sale:
                     </span>
-                    <span t-esc="o.get_sale_data('last_sale')"/>
+                    <span class="span_text" >: <t t-esc="o.get_sale_data('last_sale')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Time:
+                    <span class="span_header">
+                        Time
                     </span>
-                    <span t-esc="o.get_sale_data('last_time')"/>
+                    <span class="span_text">: <t  t-esc="o.get_sale_data('last_time')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Clock Out:
+                    <span class="span_header">
+                        Clock Out
                     </span>
-                    <span t-esc="o.report_get_format_time(o.stop_at,'time')"/>
+                    <span class="span_text">: <t  t-esc="o.report_get_format_time(o.stop_at,'time')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Opening Balance:
+                    <span class="span_header">
+                        Opening Balance
                     </span>
-                    <span t-esc="o.convert_currency(o.cash_register_balance_start)"/>
+                    <span class="span_text" >: <t t-esc="o.convert_currency(o.cash_register_balance_start)"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Denomination:
-                    </span><br/>
+                    <span class="span_header">
+                        Denomination
+                    </span><span class="span_text">:</span><br/>
                     <!-- <span t-esc="o.get_session_value('domination')"/> -->
                     <span t-foreach="o.get_session_value('domination')" t-as="result" style="margin-left:20px">
-                        <span t-esc="result"/><br/>
+                        <span class="span_text" style="margin-left:25% !important;width:75% !important" t-esc="result"/><br/>
                     </span>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Payment Method :
-                    </span>
+                    <span class="span_header">
+                        Payment Method
+                    </span><span class="span_text">:</span>
 <!--                    S$<span t-esc="o.get_session_value('total_bank_value')"/>-->
                     <br/>
                     <span t-foreach="o.get_session_value('payment_method')" t-as="result" style="margin-left:20px">
-                        <span t-esc="result"/><br/>
+                        <span class="span_text" style="margin-left:25% !important;width:75% !important" t-esc="result"/><br/>
                     </span>
-<!--                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">-->
+<!--                    <span class="span_header">-->
 <!--                        Void Sales:-->
 <!--                    </span>-->
 <!--                    <span t-esc="o.get_session_value('void_sales')"/>-->
 <!--                    <br/>-->
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Cash In Hand:
+                    <span class="span_header">
+                        Cash In Hand
                     </span>
-                    <span t-esc="o.convert_currency(o.cash_register_balance_end_real)"/>
+                    <span  class="span_text" >: <t t-esc="o.convert_currency(o.cash_register_balance_end_real)"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Cash Should Be:
+                    <span class="span_header">
+                        Cash Should Be
                     </span>
                     <!-- <span t-esc="o.convert_currency(o.cash_real_transaction)"/> -->
-                    <span t-esc="o.get_session_value('cash_shoule_be')"/>
+                    <span class="span_text" >: <t t-esc="o.get_session_value('cash_shoule_be')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Total Sales:
+                    <span class="span_header">
+                        Total Sales
                     </span>
 
-                    <span t-esc="o.convert_currency(o.total_payments_amount)"/>
+                    <span class="span_text" >: <t t-esc="o.convert_currency(o.total_payments_amount)"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Cash In:
+                    <span class="span_header">
+                        Cash In
                     </span>
-                    <span t-esc="o.get_session_value('cash_in_amount')"/>
+                    <span class="span_text" >: <t t-esc="o.get_session_value('cash_in_amount')"/></span>
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Cash Out:
+                    <span class="span_header">
+                        Cash Out
                     </span>
-                    <span t-esc="o.get_session_value('cash_out_amount')"/>
+                    <span class="span_text">: <t  t-esc="o.get_session_value('cash_out_amount')"/></span>
                     <br/>
 
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Difference:
+                    <span class="span_header">
+                        Difference
                     </span>
-                    <span t-esc="o.get_session_value('cash_diff')"/>
+                    <span class="span_text" >: <t t-esc="o.get_session_value('cash_diff')"/></span>
                     <!-- <span t-esc="o.convert_currency(o.cash_register_difference)"/> -->
                     <br/>
-                    <span style="font-size: 1.2rem;  margin-bottom: 0.5rem;font-weight: bold;line-height: 1.2;">
-                        Print Date/Time:
+                    <span class="span_header">
+                        Print Date/Time
                     </span>
-                    <span t-esc="o.report_get_format_time('now','datetime')"/>
+                    <span class="span_text" >: <t t-esc="o.report_get_format_time('now','datetime')"/></span>
                     <br/>
                 </div>
         </div>
