@@ -1,7 +1,11 @@
+
 from odoo import api, fields, models
 from datetime import datetime,date
 import pytz
 from odoo.exceptions import UserError
+
+
+
 array_coin = [10,5,2,1,0.5,0.2,0,1,0.05]
 class posConfig(models.Model):
     _inherit = "pos.config"
@@ -24,6 +28,23 @@ class posOrder(models.Model):
                     tax_summary[tax.id] = {'name': tax.name, 'amount': tax_amount}
         tax_array = [{'name': tax_info['name'], 'amount': tax_info['amount']} for tax_info in tax_summary.values()]
         return tax_array
+
+    @api.model
+    def create_from_ui(self, orders,draft=False):
+        order_ids = super(posOrder, self).create_from_ui(orders,draft)
+
+        # Auto-create and validate invoice
+        for order in self.browse([x.get('id') for x in  order_ids]):
+            if not order.to_invoice:
+                for payment in order.payment_ids:
+                    if payment.payment_method_id and payment.payment_method_id.is_auto_invoice:
+                        order.action_pos_order_invoice()
+                        break
+        return order_ids
+class posPaymentMethod(models.Model):
+    _inherit = 'pos.payment.method'
+
+    is_auto_invoice = fields.Boolean(string='Create Invoice?',default=False)
 
 class PosSession(models.Model):
     _inherit = 'pos.session'

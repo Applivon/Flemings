@@ -15,6 +15,7 @@
     'data': [
         'report/EOD.xml',
         'report/customer_invoice.xml',
+        'views/pos_payment_method.xml',
     ],
     'qweb': [],
     'images': ['static/description/applivon-logo.jpg'],
