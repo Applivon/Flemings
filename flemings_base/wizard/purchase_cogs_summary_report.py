@@ -120,11 +120,15 @@ class FlemingsPurchaseCOGSSummaryReportXlsx(models.AbstractModel):
                 #     [('company_id', '=', obj.company_id.id), ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '>', 0)]).mapped('value')) or 0
                 purchase_total = sum(purchase_order_env.search(
                     [('company_id', '=', obj.company_id.id), ('date_approve', '>=', from_date), ('date_approve', '<=', to_date), ('state', 'in', ['purchase', 'done'])]).mapped('amount_untaxed')) or 0
-                sales_total = sum(stock_valuation_env.search(
-                    [('company_id', '=', obj.company_id.id), ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '<', 0), ('quantity', '<', 0),
-                     ('stock_move_id.location_id.usage', 'in', ('internal', 'transit')),
-                     ('stock_move_id.location_dest_id.usage', 'not in', ('internal', 'transit'))
-                     ]).mapped('value')) or 0
+                # sales_total = sum(stock_valuation_env.search(
+                #     [('company_id', '=', obj.company_id.id), ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('value', '<', 0), ('quantity', '<', 0),
+                #      ('stock_move_id.location_id.usage', 'in', ('internal', 'transit')),
+                #      ('stock_move_id.location_dest_id.usage', 'not in', ('internal', 'transit'))
+                #      ]).mapped('value')) or 0
+                sales_total = sum(stock_valuation_env.search([
+                    ('create_date', '>=', from_date), ('create_date', '<=', to_date), ('stock_move_id.picking_id', '!=', False), ('stock_move_id.origin_returned_move_id', '=', False),
+                    ('company_id', '=', obj.company_id.id), ('reference', '!=', False), '|', ('value', '<', 0), ('quantity', '<', 0)
+                ]).mapped('value')) or 0
 
                 sheet.write(row, 0, str(sno), align_center)
                 sheet.write(row, 1, str(datetime.strftime(start_date, '%d-%m-%Y') or ''), align_left)
