@@ -149,7 +149,7 @@
         </template>
 
         <record id="print_report_fg_sales_order" model="ir.actions.report">
-            <field name="name">Sales Order</field>
+            <field name="name">Quotation / Sales Order</field>
             <field name="model">sale.order</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">flemings_base.report_fg_sales_order_document</field>
@@ -157,7 +157,7 @@
             <field name="binding_type">report</field>
             <field name="binding_model_id" ref="flemings_base.model_sale_order"/>
             <field name="paperformat_id" ref="paperformat_fg_sales_order_report"/>
-            <field name="print_report_name">'Sales Order - %s' % (object.name or '').replace('/','_')</field>
+            <field name="print_report_name">(object.state in ('draft', 'sent', 'cancel') and 'Quotation - %s' % (object.name or '').replace('/','_')) or 'Sales Order - %s' % (object.name or '').replace('/','_')</field>
         </record>
 
         <!-- Sales Order Report - Header Layout -->
@@ -298,7 +298,15 @@
                                         <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
-                                                    <td colspan="2" style="width:100%; text-align:center; font-size:15pt;"><strong>SALES ORDER</strong></td>
+                                                    <td colspan="2" style="width:100%; text-align:center; font-size:15pt;">
+                                                        <t t-if="o.state in ('draft', 'sent', 'cancel')">
+                                                            <strong>QUOTATION</strong>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <strong>SALES ORDER</strong>
+                                                        </t>
+
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="width:46%;">Sales Order No.</td>
