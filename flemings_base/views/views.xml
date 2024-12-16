@@ -790,7 +790,8 @@
 			<field name="arch" type="xml">
 				<form string="Reassign WO">
                     <group>
-                        <field name="work_order_id" required="1" options="{'no_open':True, 'no_create':True}"/>
+                        <field name="work_order_id_domain" invisible="1"/>
+                        <field name="work_order_id" required="1" domain="work_order_id_domain" options="{'no_open':True, 'no_create':True}"/>
                         <field name="production_ids" widget="many2many_tags" required="1" invisible="1"/>
                     </group>
                     <footer>

@@ -1040,6 +1040,13 @@ class FlemingMOReassignWO(models.TransientModel):
     _description = 'MO - Work Order No. - Reassign'
     _rec_name = 'work_order_id'
 
+    @api.depends('work_order_id', 'production_ids')
+    def _compute_work_order_id_domain(self):
+        for record in self:
+            work_order_nos = self.env['mrp.production'].sudo().search([('work_order_no', '!=', False)]).mapped('work_order_no') or []
+            record.work_order_id_domain = [('work_order_no', 'in', work_order_nos)]
+
+    work_order_id_domain = fields.Binary(string='Work Order domain', compute='_compute_work_order_id_domain')
     work_order_id = fields.Many2one('mrp.production.work.order.no', string='Work Order No.')
     production_ids = fields.Many2many('mrp.production', string='Manufacturing Order(s)')
 
