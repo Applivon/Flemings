@@ -120,6 +120,9 @@ class FlemingsPurchaseOrder(models.Model):
         for rec in self:
             # check pricelist currency should be same with SO/PO document
             company_partner = rec.company_id.partner_id.with_user(intercompany_uid)
+            context = self._context.copy()
+            context.update({'inter_company_id': rec.company_id.id})
+            company_partner = company_partner.with_context(context)
 
             # Custom Start - Inter Company Currency Issue commented
             # if rec.currency_id.id != company_partner.property_product_pricelist.currency_id.id:
