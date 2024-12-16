@@ -309,7 +309,14 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:46%;">Sales Order No.</td>
+                                                    <td style="width:46%;">
+                                                        <t t-if="o.state in ('draft', 'sent', 'cancel')">
+                                                            Quotation No.
+                                                        </t>
+                                                        <t t-else="">
+                                                            Sales Order No.
+                                                        </t>
+                                                    </td>
                                                     <td style="width:54%;">: <span t-field="o.name"/></td>
                                                 </tr>
                                                 <tr>
