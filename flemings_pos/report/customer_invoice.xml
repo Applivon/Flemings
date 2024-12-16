@@ -230,7 +230,7 @@
                                         <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                             <tr>
                                                 <td style="width:46%;">Country</td>
-                                                <td style="width:54%; padding-left:12px !important;">: <span t-field="o.partner_id.country_id"/></td>
+                                                <td style="width:54%;">: <span t-field="o.partner_id.country_id"/></td>
                                             </tr>
                                         </table>
                                     </td>
@@ -405,12 +405,12 @@
                 </tr>
                 <tr>
                     <td style="width:50%; padding:5px;">
-                        Net Total: <span t-esc="'{0:,.2f}'.format(o.margin)"/>
+                        Net Total: <span t-esc="'{0:,.2f}'.format(o.get_margin_report())"/>
                     </td>
                 </tr>
                 <tr>
                     <td style="width:50%; padding:5px;">
-                        GST: <span t-esc="'{0:,.2f}'.format(o.amount_total - o.margin)"/>
+                        GST: <span t-esc="'{0:,.2f}'.format(o.amount_total - o.get_margin_report())"/>
                     </td>
                 </tr>
                 <tr>

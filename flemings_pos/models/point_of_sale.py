@@ -1,7 +1,12 @@
-from odoo import api, fields, models
+
+from odoo import api, fields, models,_
 from datetime import datetime,date
 import pytz
+import base64
 from odoo.exceptions import UserError
+
+
+
 array_coin = [10,5,2,1,0.5,0.2,0,1,0.05]
 class posConfig(models.Model):
     _inherit = "pos.config"
@@ -24,6 +29,47 @@ class posOrder(models.Model):
                     tax_summary[tax.id] = {'name': tax.name, 'amount': tax_amount}
         tax_array = [{'name': tax_info['name'], 'amount': tax_info['amount']} for tax_info in tax_summary.values()]
         return tax_array
+
+    @api.model
+    def create_from_ui(self, orders,draft=False):
+        order_ids = super(posOrder, self).create_from_ui(orders,draft)
+
+        # Auto-create and validate invoice
+        for order in self.browse([x.get('id') for x in  order_ids]):
+            if not order.to_invoice:
+                for payment in order.payment_ids:
+                    if payment.payment_method_id and payment.payment_method_id.is_auto_invoice:
+                        order.action_pos_order_invoice()
+                        break
+        return order_ids
+    def _add_mail_attachment_fleming(self):
+        filename = 'Customer Receipt -' + self.name + '.pdf'
+        report = self.env['ir.actions.report']._render_qweb_pdf('flemings_pos.print_report_pos_customer_receipt', self.ids[0])
+        receipt = self.env['ir.attachment'].create({
+            'name': filename,
+            'type': 'binary',
+            'datas': base64.b64encode(report[0]),
+            'res_model': 'pos.order',
+            'res_id': self.ids[0],
+            'mimetype': 'application/x-pdf'
+        })
+        attachment = [(4, receipt.id)]
+        return attachment
+    def _prepare_mail_values(self, name, client, ticket):
+        message = _("<p>Dear %s,<br/>Here is your electronic ticket for the %s. </p>") % (client['name'], name)
+
+        return {
+            'subject': _('Customer Receipt %s', name),
+            'body_html': message,
+            'author_id': self.env.user.partner_id.id,
+            'email_from': self.env.company.email or self.env.user.email_formatted,
+            'email_to': client['email'],
+            'attachment_ids': self._add_mail_attachment_fleming(),
+        }
+class posPaymentMethod(models.Model):
+    _inherit = 'pos.payment.method'
+
+    is_auto_invoice = fields.Boolean(string='Create Invoice?',default=False)
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
