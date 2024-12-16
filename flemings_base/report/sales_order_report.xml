@@ -320,7 +320,14 @@
                                                     <td style="width:54%;">: <span t-field="o.name"/></td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width:46%;">Sales Order Date</td>
+                                                    <td style="width:46%;">
+                                                        <t t-if="o.state in ('draft', 'sent', 'cancel')">
+                                                            Quotation Date
+                                                        </t>
+                                                        <t t-else="">
+                                                            Sales Order Date
+                                                        </t>
+                                                    </td>
                                                     <td style="width:54%;">: <span t-field="o.date_order" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
                                                 </tr>
                                                 <tr>
