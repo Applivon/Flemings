@@ -153,13 +153,24 @@ class PosSession(models.Model):
         elif type == 'domination':
             res = []
             message_id = self.env['mail.message'].search([('res_id','=',self.id),('model','=','pos.session'),('body','like','Closing difference')])
-            if 'Money details:' in message_id.body:
+            if message_id  and 'Money details:' in message_id.body:
                 body = message_id.body
                 res = BeautifulSoup(body, "html.parser").get_text()
                 res = re.sub(r'.*Money details:\s*', '', res)
                 res = res.replace('  -', '-').split('-')
                 res =res[::-1]
             else:
+                message_ids = self.env['mail.message'].search(
+                    [('res_id', '=', self.id), ('model', '=', 'pos.session'), ('body', 'like', 'Money details:')])
+                for mess in message_ids:
+                    if mess and 'Opening difference' not in mess.body:
+                        body = mess.body
+                        res = BeautifulSoup(body, "html.parser").get_text()
+                        res = re.sub(r'.*Money details:\s*', '', res)
+                        res = res.replace('  -', '-').split('-')
+                        res = res[::-1]
+                        break
+            if res == []:
                 res = ''
             # account_cashbox = self.cash_register_id.cashbox_end_id
             # if account_cashbox:
