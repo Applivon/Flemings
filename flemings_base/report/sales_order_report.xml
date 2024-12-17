@@ -373,7 +373,7 @@
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td style="width:46%;">Country</td>
-                                                    <td style="width:54%; padding-left:12px !important;">: <span t-field="o.partner_id.country_id"/></td>
+                                                    <td style="width:54%; padding-left:10px !important;">: <span t-field="o.partner_id.country_id"/></td>
                                                 </tr>
                                             </table>
                                         </td>
