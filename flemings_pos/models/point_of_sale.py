@@ -71,7 +71,23 @@ class posPaymentMethod(models.Model):
     _inherit = 'pos.payment.method'
 
     is_auto_invoice = fields.Boolean(string='Create Invoice?',default=False)
+class CustomReport(models.Model):
+    _inherit = 'ir.actions.report'
 
+    def _get_rendering_context(self, report, docids, data):
+        if report.report_name == 'flemings_pos.report_pos_customer_receipt_document':
+            pos_id = self.env['pos.order'].browse(docids)           
+            if not pos_id.partner_id:
+                print ("vinh")
+                paperformat = self.env['report.paperformat'].search([('name','=','customer_receipt_without_attn')])
+                if paperformat:
+                    report.paperformat_id = paperformat.id
+            else:
+                paperformat = self.env['report.paperformat'].search([('name','=','Customer Receipt Paper')])
+                if paperformat:
+                    report.paperformat_id = paperformat.id
+        data = super()._get_rendering_context(report, docids, data)
+        return data
 class PosSession(models.Model):
     _inherit = 'pos.session'
 
