@@ -983,7 +983,7 @@ class FlemingMrpProduction(models.Model):
             raise UserError(_("Work Order No. already generated for one or more selected records !"))
 
         next_sequence = self.env['ir.sequence'].next_by_code('mrp.production.work.order.no')
-        self.env['mrp.production.work.order.no'].create({'work_order_no': next_sequence})
+        self.env['mrp.production.work.order.no'].create({'work_order_no': next_sequence, 'company_id': self.env.company.id})
         for record in self:
             record.work_order_no = next_sequence
         return
@@ -1033,6 +1033,7 @@ class FlemingMrpProductionWorkOrder(models.Model):
     _order = 'create_date desc'
 
     work_order_no = fields.Char(string='Work Order No.', required=True)
+    company_id = fields.Many2one('res.company', string='Company')
 
 
 class FlemingMOReassignWO(models.TransientModel):
@@ -1044,7 +1045,7 @@ class FlemingMOReassignWO(models.TransientModel):
     def _compute_work_order_id_domain(self):
         for record in self:
             work_order_nos = self.env['mrp.production'].sudo().search([('work_order_no', '!=', False)]).mapped('work_order_no') or []
-            record.work_order_id_domain = [('work_order_no', 'in', work_order_nos)]
+            record.work_order_id_domain = [('company_id', '=', self.env.company.id), ('work_order_no', 'in', work_order_nos)]
 
     work_order_id_domain = fields.Binary(string='Work Order domain', compute='_compute_work_order_id_domain')
     work_order_id = fields.Many2one('mrp.production.work.order.no', string='Work Order No.')
