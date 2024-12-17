@@ -4,7 +4,8 @@ from datetime import datetime,date
 import pytz
 import base64
 from odoo.exceptions import UserError
-
+from bs4 import BeautifulSoup
+import re
 
 
 array_coin = [10,5,2,1,0.5,0.2,0,1,0.05]
@@ -151,11 +152,13 @@ class PosSession(models.Model):
             # res = 'S$' + str('%.2f' % cash_out)
         elif type == 'domination':
             res = []
-            if 'Money details:' in self.opening_notes:
-                res = self.opening_notes.replace('Money details:','').split('\n')
-                res = [x.replace('-','') for x in res if x.strip()]
-                res = res[::-1]
-
+            message_id = self.env['mail.message'].search([('res_id','=',self.id),('model','=','pos.session'),('body','like','Closing difference')])
+            if 'Money details:' in message_id.body:
+                body = message_id.body
+                res = BeautifulSoup(body, "html.parser").get_text()
+                res = re.sub(r'.*Money details:\s*', '', res)
+                res = res.replace('  -', '-').split('-')
+                res =res[::-1]
             else:
                 res = ''
             # account_cashbox = self.cash_register_id.cashbox_end_id
