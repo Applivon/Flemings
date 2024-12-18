@@ -830,11 +830,12 @@ class FlemingsProductProduct(models.Model):
 
             fg_available_stock = ''
             seq = 1
-            for quant in product_stock_quants:
+            for quant_location in list(set(product_stock_quants.mapped('location_id'))):
                 if seq != 1:
                     fg_available_stock += '\n'
                 seq += 1
-                fg_available_stock += str(quant.location_id.display_name) + ' : ' + str('{:.2f}'.format(quant.available_quantity))
+                quant_quantity = sum(self.env['stock.quant'].sudo().search([('id', 'in', product_stock_quants.ids), ('location_id', '=', quant_location.id)]).mapped('available_quantity')) or 0
+                fg_available_stock += str(quant_location.display_name) + ' : ' + str('{:.2f}'.format(quant_quantity))
 
             record.fg_available_stock = fg_available_stock
 
