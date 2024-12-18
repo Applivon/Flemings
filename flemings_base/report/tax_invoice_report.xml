@@ -302,6 +302,7 @@
                     <t t-set="line_do" t-value="o.get_line_delivery_orders()"/>
 
                     <t t-if="line_do">
+                        <t t-set="non_picking_invoice_line" t-value="False"/>
                         <t t-foreach="line_do" t-as="do">
                             <tr>
                                 <td colspan="6" style="width:100%; padding:5px; font-weight:bold; text-align:left;">
@@ -311,6 +312,37 @@
                                 </td>
                             </tr>
                             <tr style="height:8px;"/>
+                            <t t-if="not non_picking_invoice_line">
+                                <t t-foreach="o.invoice_line_ids.filtered(lambda x: not x.picking_id).sorted(key=lambda x: x.sequence)" t-as="line">
+                                    <tr>
+                                        <td style="width:5%; padding:5px; text-align:left;">
+                                            <span t-esc="fg_sno"/>
+                                            <span t-set="fg_sno" t-value="fg_sno+1"/>
+                                        </td>
+                                        <td style="width:50%; padding:5px; padding-right:0px !important; text-align:left;">
+                                            <t t-if="line.product_id.default_code">
+                                                <span t-field="line.product_id.default_code"/><br/>
+                                            </t>
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td style="width:8%; padding:5px; text-align:center;">
+                                            <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
+                                        </td>
+                                        <td style="width:12%; padding:5px; text-align:center;">
+                                            <span t-field="line.product_uom_id"/>
+                                        </td>
+                                        <td style="width:12%; padding:5px; text-align:center;">
+                                            <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                            <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                        </td>
+                                        <td style="width:13%; padding:5px; text-align:center;">
+                                            <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                            <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-set="non_picking_invoice_line" t-value="True"/>
+                            </t>
                             <t t-foreach="o.invoice_line_ids.filtered(lambda x: x.picking_id == do).sorted(key=lambda x: x.sequence)" t-as="line">
                                 <tr>
                                     <td style="width:5%; padding:5px; text-align:left;">

@@ -528,7 +528,7 @@ class FlemingsSalesAccountMove(models.Model):
                     'message': _("The Customer PO No. already exists in another invoice !")}}
 
     def get_line_delivery_orders(self):
-        return list(set(self.invoice_line_ids.mapped('picking_id')))
+        return list(set(self.sale_id.mapped('picking_ids') + self.invoice_line_ids.mapped('picking_id')))
 
     @api.model
     def get_views(self, views, options=None):
