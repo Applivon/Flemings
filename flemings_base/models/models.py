@@ -527,8 +527,30 @@ class FlemingsSalesAccountMove(models.Model):
                     'title': _("Warning"),
                     'message': _("The Customer PO No. already exists in another invoice !")}}
 
-    def get_line_delivery_orders(self):
+    def get_fg_delivery_orders(self):
         return list(set(self.sale_id.mapped('picking_ids') + self.invoice_line_ids.mapped('picking_id')))
+
+    def get_line_delivery_orders(self, picking_id):
+        vals_list = []
+        for line_id in self.invoice_line_ids:
+            if line_id.product_id.invoice_policy == 'delivery':
+                move_ids = line_id.mapped('sale_line_ids').mapped('move_ids').filtered(lambda x: x.picking_id.id == picking_id.id and x.state == 'done')
+            else:
+                move_ids = line_id.mapped('sale_line_ids').mapped('move_ids').filtered(lambda x: x.picking_id.id == picking_id.id)
+            for move_id in move_ids:
+                product_name = ''
+                if line_id.product_id.default_code:
+                    product_name += str(line_id.product_id.default_code) + '\n'
+                product_name = str(line_id.name)
+
+                vals_list.append({
+                    'product_name': product_name,
+                    'quantity': move_id.quantity_done or move_id.product_uom_qty,
+                    'product_uom_id': line_id.product_uom_id.name,
+                    'price_unit': line_id.price_unit,
+                    'price_subtotal': (move_id.quantity_done or move_id.product_uom_qty) * line_id.price_unit,
+                })
+        return vals_list
 
     @api.model
     def get_views(self, views, options=None):

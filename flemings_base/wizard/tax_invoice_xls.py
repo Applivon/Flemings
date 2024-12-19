@@ -186,38 +186,25 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
 
             fg_sno = 1
             row += 1
-            line_do = obj.get_line_delivery_orders()
+            line_do = obj.get_fg_delivery_orders()
             if line_do:
-                non_picking_invoice_line = False
                 for do in line_do:
-                    row += 1
-                    sheet.merge_range(row, 0, row, 1, 'DO No. : ' + str(do.name or '') + '  S/O No. : ' + str(do.sale_id.name or '') + '  Delivery Mode : ' + str(obj.delivery_mode_id.name or ''), align_bold_center)
-                    row += 2
+                    do_list_vals = obj.get_line_delivery_orders(do)
+                    if do_list_vals:
+                        row += 1
+                        sheet.merge_range(row, 0, row, 1, 'DO No. : ' + str(do.name or '') + '  S/O No. : ' + str(do.sale_id.name or '') + '  Delivery Mode : ' + str(obj.delivery_mode_id.name or ''), align_bold_center)
+                        row += 2
 
-                    if not non_picking_invoice_line:
-                        for line in obj.invoice_line_ids.filtered(lambda x: not x.picking_id).sorted(key=lambda x: x.sequence):
+                        for do_list in do_list_vals:
                             sheet.write(row, 0, fg_sno, align_center)
-                            sheet.write(row, 1, str(line.product_id.default_code or '') + '\n' + str(line.name or ''), align_left)
-                            sheet.write(row, 2, str('%.0f' % line.quantity or 0), align_center)
-                            sheet.write(row, 3, str(line.product_uom_id.name or ''), align_center)
-                            sheet.write(row, 4, str('%.2f' % line.price_unit or 0), align_center)
-                            sheet.write(row, 5, str('%.2f' % line.price_subtotal or 0), align_center)
+                            sheet.write(row, 1, str(do_list['product_name'] or ''), align_left)
+                            sheet.write(row, 2, str('%.0f' % do_list['quantity'] or 0), align_center)
+                            sheet.write(row, 3, str(do_list['product_uom_id'] or ''), align_center)
+                            sheet.write(row, 4, str('%.2f' % do_list['price_unit'] or 0), align_center)
+                            sheet.write(row, 5, str('%.2f' % do_list['price_subtotal'] or 0), align_center)
 
                             fg_sno += 1
                             row += 1
-
-                        non_picking_invoice_line = True
-
-                    for line in obj.invoice_line_ids.filtered(lambda x: x.picking_id == do).sorted(key=lambda x: x.sequence):
-                        sheet.write(row, 0, fg_sno, align_center)
-                        sheet.write(row, 1, str(line.product_id.default_code or '') + '\n' + str(line.name or ''), align_left)
-                        sheet.write(row, 2, str('%.0f' % line.quantity or 0), align_center)
-                        sheet.write(row, 3, str(line.product_uom_id.name or ''), align_center)
-                        sheet.write(row, 4, str('%.2f' % line.price_unit or 0), align_center)
-                        sheet.write(row, 5, str('%.2f' % line.price_subtotal or 0), align_center)
-
-                        fg_sno += 1
-                        row += 1
             else:
                 for line in obj.invoice_line_ids.sorted(key=lambda x: x.sequence):
                     sheet.write(row, 0, fg_sno, align_center)
