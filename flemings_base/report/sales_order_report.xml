@@ -417,10 +417,7 @@
                                     <!--<tr style="height:6px;"/>-->
                                     <tr>
                                         <td colspan="2" style="width:64%; text-align:left;">
-                                            ATTN :
-                                            <t t-if="contact_customer">
-                                                <span t-if="contact_customer.title" t-esc="contact_customer.title.name"/> <span t-esc="contact_customer.name"/>
-                                            </t>
+                                            ATTN : <span t-field="o.fg_attn"/>
                                         </td>
                                         <td rowspan="3" style="width:36%; text-align:left;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">

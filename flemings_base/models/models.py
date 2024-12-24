@@ -328,6 +328,7 @@ class FlemingsSalesOrder(models.Model):
     customer_service_id = fields.Many2one('res.users', string='Customer Service')
     delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
     fg_remarks = fields.Text('Remarks')
+    fg_attn = fields.Char('Attn')
 
     def _prepare_invoice(self):
         res = super(FlemingsSalesOrder, self)._prepare_invoice()
@@ -335,7 +336,8 @@ class FlemingsSalesOrder(models.Model):
             'sale_id': self.id,
             'delivery_mode_id': self.delivery_mode_id.id or False,
             'customer_po': self.customer_po,
-            'fg_remarks': self.fg_remarks
+            'fg_remarks': self.fg_remarks,
+            'fg_attn': self.fg_attn,
         })
         return res
 
@@ -349,6 +351,7 @@ class FlemingsSalesOrder(models.Model):
                     'customer_po': order.customer_po,
                     'process_by_id': self.env.user.id,
                     'fg_remarks': order.fg_remarks,
+                    'fg_attn': order.fg_attn,
                     'summary_remarks': order.summary_remarks,
                 })
 
@@ -520,6 +523,7 @@ class FlemingsSalesAccountMove(models.Model):
     delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
     customer_po = fields.Char('Customer PO No.', copy=False)
     fg_remarks = fields.Text('Remarks')
+    fg_attn = fields.Char('Attn')
 
     @api.onchange('customer_po')
     def onchange_customer_po(self):
@@ -906,6 +910,7 @@ class FlemingsStockPicking(models.Model):
     customer_po = fields.Char('Customer PO No.', copy=False)
     process_by_id = fields.Many2one('res.users', string='Process By')
     fg_remarks = fields.Text('Remarks')
+    fg_attn = fields.Char('Attn')
     summary_remarks = fields.Text('Summary Remarks')
     is_fully_invoiced = fields.Boolean('Fully Invoiced ?', default=False, copy=False)
     from_credit_note = fields.Boolean('From Credit Note?', default=False, copy=False)
