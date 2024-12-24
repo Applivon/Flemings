@@ -217,6 +217,10 @@ class FlemingsSalesOrderLine(models.Model):
         # negative discounts (= surcharge) are included in the display price
         return max(base_price, pricelist_price)
 
+    def _get_sale_order_line_multiline_description_sale(self):
+        self.ensure_one()
+        return self.product_id.variant_name
+
 
 class FlemingsSalesOrder(models.Model):
     _inherit = 'sale.order'
