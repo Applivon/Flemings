@@ -32,33 +32,40 @@
                     </tr>
                 </thead>
                 <t t-foreach="o.order_line.sorted(key=lambda x: x.sequence)" t-as="line">
-                    <tr>
-                        <td style="width:5%; padding:5px; text-align:left;">
-                            <t t-if="line.display_type"/>
-                            <t t-else="">
+                    <t t-if="line.display_type">
+                        <tr>
+                            <td style="width:5%; padding:5px; text-align:left;"/>
+                            <td colspan="6" style="width:95%; padding:5px; text-align:left;">
+                                <span t-field="line.name"/>
+                            </td>
+                        </tr>
+                    </t>
+                    <t t-else="">
+                        <tr>
+                            <td style="width:5%; padding:5px; text-align:left;">
                                 <span t-field="line.fg_sno"/>
-                            </t>
-                        </td>
-                        <td style="width:40%; padding:5px; padding-right:0px !important; text-align:left;">
-                            <span t-field="line.product_id.default_code"/><br/>
-                            <span t-field="line.name"/>
-                        </td>
-                        <td style="width:8%; padding:5px; text-align:center;">
-                            <span t-esc="'{0:,.0f}'.format(line.product_uom_qty)"/>
-                        </td>
-                        <td style="width:12%; padding:5px; text-align:center;">
-                            <span t-field="line.product_uom"/>
-                        </td>
-                        <td style="width:12%; padding:5px; text-align:center;">
-                            <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
-                            <!--(<span t-field="line.currency_id.symbol"/>)-->
-                        </td>
-                        <td style="width:10%; padding:5px; text-align:right;"/>
-                        <td style="width:13%; padding:5px; text-align:center;">
-                            <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
-                            <!--(<span t-field="line.currency_id.symbol"/>)-->
-                        </td>
-                    </tr>
+                            </td>
+                            <td style="width:40%; padding:5px; padding-right:0px !important; text-align:left;">
+                                <span t-field="line.product_id.default_code"/><br/>
+                                <span t-field="line.product_id.variant_name"/>
+                            </td>
+                            <td style="width:8%; padding:5px; text-align:center;">
+                                <span t-esc="'{0:,.0f}'.format(line.product_uom_qty)"/>
+                            </td>
+                            <td style="width:12%; padding:5px; text-align:center;">
+                                <span t-field="line.product_uom"/>
+                            </td>
+                            <td style="width:12%; padding:5px; text-align:center;">
+                                <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                <!--(<span t-field="line.currency_id.symbol"/>)-->
+                            </td>
+                            <td style="width:10%; padding:5px; text-align:right;"/>
+                            <td style="width:13%; padding:5px; text-align:center;">
+                                <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                <!--(<span t-field="line.currency_id.symbol"/>)-->
+                            </td>
+                        </tr>
+                    </t>
                 </t>
             </table>
 
@@ -132,7 +139,7 @@
             <field name="margin_left">8</field>
             <field name="margin_right">8</field>
             <field name="header_line" eval="False"/>
-            <field name="header_spacing">115</field>
+            <field name="header_spacing">117</field>
             <field name="dpi">80</field>
         </record>
 
@@ -189,10 +196,56 @@
                     <thead>
                         <tr>
                             <td style="width:25%; text-align:left; padding-left:6px;">
-                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="height:2.3cm; width:5cm; float:left !important"/>
                             </td>
                             <td style="width:50%; text-align:left;">
-                                <div style="width:auto; padding-left:15px; font-size:12pt; float:left">
+                                <div style="width:auto; padding-left:15px; font-size:10pt; float:left">
+                                    <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="margin:0px !important; padding:0px !important;">
+                                        <tr>
+                                            <td style="margin:0px; padding:0px; text-align:left; white-space:nowrap;">
+                                                <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:14pt; font-weight:bold; padding-right:4px;"/>
+                                            </td>
+                                        </tr>
+                                        <tr t-if="company.street or company.street2">
+                                            <td style="margin:0px; padding:0px; text-align:left; white-space:nowrap;">
+                                                <t t-if="company.street">
+                                                    <span t-field="company.street"/>
+                                                </t>
+                                                <t t-if="company.street2">,
+                                                    <span t-field="company.street2"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="margin:0px; padding:0px; text-align:left; white-space:nowrap;">
+                                                <t t-if="company.country_id">
+                                                    <span t-field="company.country_id.name"/>
+                                                </t>
+                                                <t t-if="company.zip">
+                                                    ,<span t-field="company.zip"/>
+                                                </t>
+                                                <t t-if="company.phone">Tel:
+                                                    <span t-field="company.phone"/>
+                                                </t>
+                                                <t t-if="company.vat">Fax:
+                                                    <span t-field="company.fax"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="margin:0px; padding:0px; text-align:left; white-space:nowrap;">
+                                                <t t-if="company.email">Email:
+                                                    <span t-field="company.email"/>
+                                                </t>
+                                                <t t-if="company.website">
+                                                    <span t-field="company.website"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <!--<div style="width:auto; padding-left:15px; font-size:12pt; float:left">
                                     <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:14pt; font-weight:bold; padding-right:4px;"/>
                                     <p style="margin-bottom:0px; padding-top:0px; text-align:left; white-space:nowrap;">
                                         <span t-if="company.street or company.street2">
@@ -228,10 +281,10 @@
                                             <span t-field="company.website"/>
                                         </span>
                                     </p>
-                                </div>
+                                </div>-->
                             </td>
                             <td style="width:25%; text-align:right; padding-right:6px;">
-                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="max-width:200px; height:90px; float:left !important"/>
+                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="height:2.5cm; width:3.5cm; float:left !important"/>
                             </td>
                             </tr>
                         <tr>
