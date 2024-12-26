@@ -467,7 +467,7 @@
                         <td style="width:40%; padding:5px;">
                             <!--For local payment, you may pay to (UEN) <span t-field="company.l10n_sg_unique_entity_number"/> or you may scan this QR code
                             <br/>-->
-                            <img t-if="company.paynow_img" t-att-src="image_data_uri(company.paynow_img)" style="text-align:middle !important;"/>
+                            <img t-if="company.paynow_img" t-att-src="image_data_uri(company.paynow_img)" style="height:4.5cm; width:5.3cm; text-align:middle !important;"/>
                         </td>
                     </tr>
                 </table>
