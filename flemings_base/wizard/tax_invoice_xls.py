@@ -265,14 +265,14 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
 
             row += 2
             sheet.merge_range(row, 0, row + 14, 1, str(obj.narration or ''), workbook.add_format({'font_name': 'Arial', 'align': 'left', 'valign': 'top', 'text_wrap': True}))
-            sheet.merge_range(row, 2, row + 1, 5, 'For local payment, you may pay to (UEN) ' + str(obj.company_id.l10n_sg_unique_entity_number) + ' or you may scan this QR code', align_left)
+            # sheet.merge_range(row, 2, row + 1, 5, 'For local payment, you may pay to (UEN) ' + str(obj.company_id.l10n_sg_unique_entity_number) + ' or you may scan this QR code', align_left)
 
-            sheet.merge_range(row + 2, 2, row + 14, 5, '', align_bold_center)
+            sheet.merge_range(row, 2, row + 14, 5, '', align_bold_center)
 
             image_width = 140.0
             image_height = 180.0
             cell_width = 80.0
-            cell_height = 100.0
+            cell_height = 80.0
 
             x_scale = cell_width / image_width
             y_scale = cell_height / image_height
