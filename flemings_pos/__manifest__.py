@@ -33,6 +33,8 @@
             "flemings_pos/static/js/CustomPrintReceipt.js",
             "flemings_pos/static/js/PaymentScreenCustom.js",
             "flemings_pos/static/js/CustomReprint.js",
+            "flemings_pos/static/js/pos_custom_validate.js"
+
             ],
         },
 

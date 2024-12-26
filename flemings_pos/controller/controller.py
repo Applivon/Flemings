@@ -15,3 +15,7 @@ class FlemingReportController(http.Controller):
             ('Content-Disposition', content_disposition(f'Customer Receipt - '+str(pos_id.name)+'.pdf'))  # Đặt tên file tại đây
         ]
         return request.make_response(pdf, headers=pdfhttpheaders)
+    @http.route('/pos/check_stock', type='json', auth='user')
+    def check_stock(self, order_lines):
+        insufficient_products = request.env['pos.order'].check_product_stock(order_lines)
+        return insufficient_products

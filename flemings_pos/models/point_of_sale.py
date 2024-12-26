@@ -18,6 +18,21 @@ class posOrder(models.Model):
         return  self.currency_id.with_context(date=self.date_order or self.create_date).inverse_rate or 1.0
     def get_margin_report(self):
         return sum(self.lines.mapped('margin'))
+
+    def check_product_stock(self, order_lines):
+        insufficient_products = []
+        count = 1
+        for line in order_lines:
+            product = self.env['product.product'].browse(line['product_id'])
+            if product.qty_available <= 0:
+                insufficient_products.append({
+                    'count':count,
+                    'product_name': product.name,
+                    'default_code':product.default_code,
+                    'on_hand': product.qty_available,
+                })
+                count += 1
+        return insufficient_products
     def get_order_taxes(self):
         order = self
         tax_summary = {}
