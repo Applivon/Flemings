@@ -250,8 +250,8 @@
                                         <strong>Date</strong>
                                     </td>
                                     <td style="float:left; width:4%; text-align:center;"/>
-                                    <td style="float:right; width:32%; text-align:center;">
-                                        <strong>Authorisation</strong>
+                                    <td rowspan="2" class="font-italic" style="float:right; width:32%; text-align:center;">
+                                        This is a computer-generated invoice, no signature is required.
                                     </td>
                                 </tr>
                                 <tr>
@@ -259,14 +259,13 @@
                                     <td style="float:left; width:4%; margin-top:100px; text-align:center;"/>
                                     <td style="float:left; width:28%; margin-top:100px; border-bottom: 1px solid black;"/>
                                     <td style="float:left; width:4%; margin-top:100px; text-align:center;"/>
-                                    <td style="float:left; width:32%; margin-top:100px; border-bottom: 1px solid black;"/>
                                 </tr>
-                                <tr>
+                                <!--<tr>
                                     <td colspan="4" style="float:left; width:68%; margin-top:10px;"/>
                                     <td style="float:left; width:32%; margin-top:10px; text-align:center;">
                                         for <span t-esc="company.name"/>
                                     </td>
-                                </tr>
+                                </tr>-->
                             </table>
                         </div>
                         <div style="clear: both;"/>

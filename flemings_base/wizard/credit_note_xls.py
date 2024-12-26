@@ -214,17 +214,17 @@ class FlemingsCreditNoteReportXlsx(models.AbstractModel):
             row += 4
             sheet.merge_range(row, 0, row + 1, 1, 'Received By', align_bold_center)
             sheet.merge_range(row, 2, row + 1, 3, 'Date', align_bold_center)
-            sheet.merge_range(row, 4, row + 1, 5, 'Authorisation', align_bold_center)
+            sheet.merge_range(row, 4, row + 3, 5, 'This is a computer-generated invoice, no signature is required.', workbook.add_format({'italic': True, 'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'text_wrap': True}))
 
             row += 2
             sheet.merge_range(row, 0, row + 6, 1, '', align_bold_center)
             sheet.merge_range(row, 2, row + 6, 3, '', align_bold_center)
-            sheet.merge_range(row, 4, row + 6, 5, '', align_bold_center)
+            # sheet.merge_range(row, 4, row + 6, 5, '', align_bold_center)
 
             row += 7
-            sheet.merge_range(row, 4, row, 5, 'for ' + str(obj.company_id.name), align_bold_center)
+            # sheet.merge_range(row, 4, row, 5, 'for ' + str(obj.company_id.name), align_bold_center)
 
-            row += 2
+            # row += 2
             sheet.set_row(row, 22)
             sheet.merge_range(row, 0, row, 3, 'Print By:  ' + str(self.env.user.name) + ' / ' + str(
                 fields.Datetime.context_timestamp(obj, datetime.now()).strftime('%d-%b-%y %I:%M:%S %p')
