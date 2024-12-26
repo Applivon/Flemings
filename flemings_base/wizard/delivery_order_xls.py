@@ -36,10 +36,10 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 0, row + 7, 0, '', align_bold_center)
             sheet.merge_range(row, 3, row + 7, 3, '', align_bold_center)
 
-            image_width = 140.0
-            image_height = 180.0
-            cell_width = 80.0
-            cell_height = 100.0
+            image_width = 150.0
+            image_height = 100.0
+            cell_width = 30.0
+            cell_height = 20.0
 
             x_scale = cell_width / image_width
             y_scale = cell_height / image_height
@@ -133,7 +133,7 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
                 contact_customer = obj.partner_id
 
             row += 1
-            sheet.merge_range(row, 0, row, 1, 'ATTN: ' + str(contact_customer.title.name or '') + ' ' + str(contact_customer.name or ''), align_left)
+            sheet.merge_range(row, 0, row, 1, 'ATTN: ' + str(obj.fg_attn or ''), align_left)
             sheet.write(row, 2, 'Country', align_left)
             sheet.write(row, 3, str(obj.partner_id.country_id.name or ''), align_left)
 
