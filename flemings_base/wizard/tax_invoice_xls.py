@@ -36,10 +36,10 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
             sheet.merge_range(row, 0, row + 7, 0, '', align_bold_center)
             sheet.merge_range(row, 3, row + 7, 5, '', align_bold_center)
 
-            image_width = 140.0
-            image_height = 180.0
-            cell_width = 80.0
-            cell_height = 100.0
+            image_width = 150.0
+            image_height = 100.0
+            cell_width = 30.0
+            cell_height = 20.0
 
             x_scale = cell_width / image_width
             y_scale = cell_height / image_height
@@ -165,18 +165,17 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
 
             row += 1
             right_column_row += 1
-            if attn_customer:
-                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'ATTN: ' + str(attn_customer.title.name or '') + ' ' + str(attn_customer.name or ''), align_left)
-            else:
-                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Fax: ' + str(contact_customer.fax or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
+            sheet.merge_range(right_column_row, 0, right_column_row, 1, 'ATTN: ' + str(obj.fg_attn or ''), align_left)
 
             sheet.merge_range(right_column_row, 2, right_column_row, 3, 'Country', align_left)
             sheet.merge_range(right_column_row, 4, right_column_row, 5, str(obj.partner_id.country_id.name or ''), align_left)
 
+            row += 1
+            right_column_row += 1
             if attn_customer:
-                row += 1
-                right_column_row += 1
                 sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(attn_customer.phone or '') + '  Fax: ' + str(attn_customer.fax or '') + '  Mob: ' + str(attn_customer.mobile or ''), align_left)
+            else:
+                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Fax: ' + str(contact_customer.fax or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
 
             row += 1
             sheet.set_row(row, 22)
