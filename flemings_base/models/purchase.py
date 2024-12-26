@@ -97,6 +97,10 @@ class FlemingsPurchaseOrder(models.Model):
     fg_remarks = fields.Text('Remarks')
     fg_attn = fields.Char('Attn')
 
+    def print_quotation(self):
+        self.write({'state': "sent"})
+        return self.env.ref('flemings_base.print_report_fg_purchase_order').report_action(self)
+
     # Inter Company Currency Mismatch Condition update
     def inter_company_create_sale_order(self, company):
         """ Create a Sales Order from the current PO (self)

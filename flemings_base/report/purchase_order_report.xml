@@ -385,6 +385,27 @@
             <field name="binding_model_id" eval="False"/>
         </record>
 
+        <!-- Allow updating on noupdate=True records -->
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'purchase'), ('name', '=', 'email_template_edi_purchase')]"/>
+	        </function>
+	        <value eval="{'noupdate': False}"/>
+	    </function>
+
+        <!-- Update noupdate=1 record -->
+        <record id="purchase.email_template_edi_purchase" model="mail.template">
+	        <field name="report_template" ref="flemings_base.print_report_fg_purchase_order"/>
+	    </record>
+
+	    <!-- Revoke noupdate change -->
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'purchase'), ('name', '=', 'email_template_edi_purchase')]"/>
+	        </function>
+	        <value eval="{'noupdate': True}"/>
+	    </function>
+
     </data>
 </odoo>
 
