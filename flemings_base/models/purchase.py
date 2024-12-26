@@ -94,6 +94,8 @@ class FlemingsPurchaseOrder(models.Model):
 
     pre_rfq_id = fields.Many2one('pre.purchase.order', string='Pre-RFQ')
     summary_remarks = fields.Text('Summary Remarks')
+    fg_remarks = fields.Text('Remarks')
+    fg_attn = fields.Char('Attn')
 
     # Inter Company Currency Mismatch Condition update
     def inter_company_create_sale_order(self, company):

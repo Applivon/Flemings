@@ -435,6 +435,12 @@ class FlemingsPurchaseOrder(models.Model):
         res = super(FlemingsPurchaseOrder, self).button_confirm()
         for order in self:
             order.update_vendor_price_book()
+            # Pickings Update
+            for picking in order.picking_ids:
+                picking.write({
+                    'fg_remarks': order.fg_remarks,
+                    'fg_attn': order.fg_attn,
+                })
         return res
 
     def update_vendor_price_book(self):

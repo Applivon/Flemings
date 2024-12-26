@@ -145,6 +145,8 @@
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='currency_id']" position="after">
 					<field name="pre_rfq_id" readonly="1" force_save="1" options="{'no_create':True}" attrs="{'invisible': [('pre_rfq_id', '=', False)]}"/>
+					<field name="fg_remarks"/>
+					<field name="fg_attn"/>
 				</xpath>
 				<xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="before">
 					<field name="remarks"/>
