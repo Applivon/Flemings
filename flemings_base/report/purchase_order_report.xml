@@ -392,9 +392,27 @@
 	        </function>
 	        <value eval="{'noupdate': False}"/>
 	    </function>
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'purchase'), ('name', '=', 'email_template_edi_purchase_done')]"/>
+	        </function>
+	        <value eval="{'noupdate': False}"/>
+	    </function>
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'purchase'), ('name', '=', 'email_template_edi_purchase_reminder')]"/>
+	        </function>
+	        <value eval="{'noupdate': False}"/>
+	    </function>
 
         <!-- Update noupdate=1 record -->
         <record id="purchase.email_template_edi_purchase" model="mail.template">
+	        <field name="report_template" ref="flemings_base.print_report_fg_purchase_order"/>
+	    </record>
+        <record id="purchase.email_template_edi_purchase_done" model="mail.template">
+	        <field name="report_template" ref="flemings_base.print_report_fg_purchase_order"/>
+	    </record>
+        <record id="purchase.email_template_edi_purchase_reminder" model="mail.template">
 	        <field name="report_template" ref="flemings_base.print_report_fg_purchase_order"/>
 	    </record>
 
@@ -402,6 +420,18 @@
         <function name="write" model="ir.model.data">
 	        <function name="search" model="ir.model.data">
 	            <value eval="[('module', '=', 'purchase'), ('name', '=', 'email_template_edi_purchase')]"/>
+	        </function>
+	        <value eval="{'noupdate': True}"/>
+	    </function>
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'purchase'), ('name', '=', 'email_template_edi_purchase_done')]"/>
+	        </function>
+	        <value eval="{'noupdate': True}"/>
+	    </function>
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'purchase'), ('name', '=', 'email_template_edi_purchase_reminder')]"/>
 	        </function>
 	        <value eval="{'noupdate': True}"/>
 	    </function>
