@@ -355,6 +355,10 @@ class FlemingsSalesOrder(models.Model):
                     'summary_remarks': order.summary_remarks,
                 })
 
+                if picking.state not in ('done', 'cancel') and not picking.move_line_ids_without_package:
+                    for move_id in picking.move_ids_without_package:
+                        self.env['stock.move.line'].create(move_id._prepare_move_line_vals(quantity=0, reserved_quant=0))
+
             # Update Order Line Remarks into DO Operations & Detailed Operations
             for picking in order.picking_ids.filtered(lambda x: x.state != 'cancel'):
                 for move_id in picking.move_ids_without_package.filtered(lambda x: x.sale_line_id):
