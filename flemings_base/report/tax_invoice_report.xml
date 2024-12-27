@@ -13,7 +13,7 @@
 
             <div class="header">
                 <style>
-                    td {word-break: break-word !important; word-spacing: 3px !important; padding:3px; page-break-inside: avoid !important;}
+                    td {word-break: break-word !important; word-spacing: 1px 3px !important; padding: 1px 3px !important; page-break-inside: avoid !important;}
 
                     .non-border, .non-border > tr, .non-border > tr > td {
                         border: none !important; border-color: #ffffff !important;
@@ -102,7 +102,7 @@
                                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                     <tr style="height:6px;"/>
                                     <tr>
-                                        <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
+                                        <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important; padding-top:5px !important;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td>Bill To: </td>
@@ -130,7 +130,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
+                                        <td style="width:32%; text-align:left; border-top:1px solid black; vertical-align:top !important; padding-top:5px !important;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td>Deliver To: </td>
@@ -158,7 +158,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important;">
+                                        <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important; padding-top:5px !important;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td colspan="2" style="width:100%; text-align:center; font-size:17pt;"><strong>TAX INVOICE</strong></td>
@@ -432,32 +432,32 @@
                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
                     <tr style="height:10px;"/>
                     <tr>
-                        <td colspan="2" style="width:100%; padding:5px;">
+                        <td colspan="2" style="width:100%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             <span style="text-decoration:underline;">Remarks:</span><span t-field="o.fg_remarks"/>
                         </td>
                     </tr>
                     <tr style="height:6px;"/>
                     <tr>
-                        <td style="width:50%; padding:5px; text-decoration:underline;">For GST Auditing Only (SGD)</td>
+                        <td style="width:50%; padding: 1px 3px !important; text-decoration:underline; word-spacing: 1px 3px !important;">For GST Auditing Only (SGD)</td>
                         <td style="width:50%;"/>
                     </tr>
                     <tr>
-                        <td style="width:50%; padding:5px;">
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             Net Total: <span t-esc="'{0:,.2f}'.format(o.sgd_amount_untaxed)"/>
                         </td>
                     </tr>
                     <tr>
-                        <td style="width:50%; padding:5px;">
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             GST: <span t-esc="'{0:,.2f}'.format(o.sgd_amount_tax)"/>
                         </td>
                     </tr>
                     <tr>
-                        <td style="width:50%; padding:5px;">
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             Total: <span t-esc="'{0:,.2f}'.format(o.sgd_amount_total)"/>
                         </td>
                     </tr>
                     <tr>
-                        <td style="width:50%; padding:5px;">
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             Exchange Rate: <span t-esc="'{0:,.6f}'.format(o.sgd_exchange_rate)"/>
                         </td>
                     </tr>
@@ -523,12 +523,12 @@
             <field name="page_height">0</field>
             <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">118</field>
+            <field name="margin_top">102</field>
             <field name="margin_bottom">10</field>
             <field name="margin_left">8</field>
             <field name="margin_right">8</field>
             <field name="header_line" eval="False"/>
-            <field name="header_spacing">115</field>
+            <field name="header_spacing">99</field>
             <field name="dpi">80</field>
         </record>
 
