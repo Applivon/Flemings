@@ -417,7 +417,12 @@
                                     <!--<tr style="height:6px;"/>-->
                                     <tr>
                                         <td colspan="2" style="width:64%; text-align:left;">
-                                            ATTN : <span t-field="o.fg_attn"/>
+                                            <t t-if="o.fg_attn">
+                                                ATTN : <span t-field="o.fg_attn"/>
+                                            </t>
+                                            <t t-else="">
+                                                ATTN : <span t-field="o.company_id"/>
+                                            </t>
                                         </td>
                                         <td rowspan="3" style="width:36%; text-align:left;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">

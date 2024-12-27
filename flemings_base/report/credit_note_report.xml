@@ -131,7 +131,12 @@
                                                 </tr>-->
                                                 <tr>
                                                     <td>
-                                                        Attn : <span t-field="o.fg_attn"/>
+                                                        <t t-if="o.fg_attn">
+                                                            Attn : <span t-field="o.fg_attn"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            Attn : <span t-field="o.company_id"/>
+                                                        </t>
                                                     </td>
                                                 </tr>
                                                 <tr>

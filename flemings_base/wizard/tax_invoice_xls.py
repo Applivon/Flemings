@@ -165,7 +165,7 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
 
             row += 1
             right_column_row += 1
-            sheet.merge_range(right_column_row, 0, right_column_row, 1, 'ATTN: ' + str(obj.fg_attn or ''), align_left)
+            sheet.merge_range(right_column_row, 0, right_column_row, 1, 'ATTN: ' + str(obj.fg_attn or obj.company_id.name or ''), align_left)
 
             sheet.merge_range(right_column_row, 2, right_column_row, 3, 'Country', align_left)
             sheet.merge_range(right_column_row, 4, right_column_row, 5, str(obj.partner_id.country_id.name or ''), align_left)

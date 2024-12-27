@@ -133,7 +133,7 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
                 contact_customer = obj.partner_id
 
             row += 1
-            sheet.merge_range(row, 0, row, 1, 'ATTN: ' + str(obj.fg_attn or ''), align_left)
+            sheet.merge_range(row, 0, row, 1, 'ATTN: ' + str(obj.fg_attn or obj.company_id.name or ''), align_left)
             sheet.write(row, 2, 'Country', align_left)
             sheet.write(row, 3, str(obj.partner_id.country_id.name or ''), align_left)
 
