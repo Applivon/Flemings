@@ -459,17 +459,17 @@
                     <tr style="height:6px;"/>
                 </table>
 
-                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
-                    <tr>
-                        <td style="width:60%; padding:5px;">
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt;">
+                    <div style="width:100%; page-break-inside:avoid !important;" class="row">
+                        <div style="width:60% !important;">
                             <span t-field="o.narration"/>
-                        </td>
-                        <td style="width:40%; padding:5px;">
+                        </div>
+                        <div style="width:40% !important; padding:5px; text-align:middle !important;">
                             <!--For local payment, you may pay to (UEN) <span t-field="company.l10n_sg_unique_entity_number"/> or you may scan this QR code
                             <br/>-->
-                            <img t-if="company.paynow_img" t-att-src="image_data_uri(company.paynow_img)" style="height:4.5cm; width:5.3cm; text-align:middle !important;"/>
-                        </td>
-                    </tr>
+                            <img t-if="company.paynow_img" t-att-src="image_data_uri(company.paynow_img)" style="height:5cm; width:5.3cm;"/>
+                        </div>
+                    </div>
                 </table>
 
                 <div style="height: 200px; width: 100%;"/>
