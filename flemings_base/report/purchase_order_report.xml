@@ -316,7 +316,7 @@
                                                 ATTN : <span t-field="o.fg_attn"/>
                                             </t>
                                             <t t-else="">
-                                                ATTN : <span t-field="o.company_id"/>
+                                                ATTN : <span t-field="o.partner_id"/>
                                             </t>
                                         </td>
                                     </tr>

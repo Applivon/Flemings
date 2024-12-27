@@ -136,7 +136,7 @@ class FlemingsCreditNoteReportXlsx(models.AbstractModel):
             sheet.merge_range(right_column_row, 4, right_column_row, 5, str(obj.currency_id.name or ''), align_left)
 
             row += 1
-            sheet.merge_range(row, 0, row, 1, 'ATTN: ' + str(obj.fg_attn or obj.company_id.name or ''), align_left)
+            sheet.merge_range(row, 0, row, 1, 'ATTN: ' + str(obj.fg_attn or obj.partner_id.name or ''), align_left)
 
             row += 1
             right_column_row += 1
