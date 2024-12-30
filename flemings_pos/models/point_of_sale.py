@@ -45,7 +45,11 @@ class posOrder(models.Model):
                     tax_summary[tax.id] = {'name': tax.name, 'amount': tax_amount}
         tax_array = [{'name': tax_info['name'], 'amount': tax_info['amount']} for tax_info in tax_summary.values()]
         return tax_array
-
+    def get_narration(self):
+        if self.account_move and len(self.account_move) == 1:
+            return True
+        else:
+            return  False
     @api.model
     def create_from_ui(self, orders,draft=False):
         order_ids = super(posOrder, self).create_from_ui(orders,draft)
