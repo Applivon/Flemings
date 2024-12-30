@@ -32,5 +32,47 @@
 			<field name="company_id" eval="False"/>
 		</record>
 
+		<!--	Sales Order - Custom Sequence	-->
+		<record id="ir_sequence_service_package_ref" model="ir.sequence">
+			<field name="name">Sales Order - Custom Sequence</field>
+			<field name="code">sale.order.fg.seq</field>
+			<field name="prefix">SO/%(range_year)s</field>
+			<field name="padding">4</field>
+			<field name="implementation">no_gap</field>
+			<field name="use_date_range">True</field>
+            <field name="date_range_ids" eval="[(5, 0, 0),
+                        (0, 0, {'date_from': '2024-01-01', 'date_to': '2024-12-31', 'number_next_actual':1}),
+            ]"/>
+			<field name="company_id" eval="False"/>
+		</record>
+
+		<!-- Allow updating on noupdate=True records -->
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'sale'), ('name', '=', 'seq_sale_order')]"/>
+	        </function>
+	        <value eval="{'noupdate': False}"/>
+	    </function>
+
+        <!-- Update noupdate=1 record -->
+        <record id="sale.seq_sale_order" model="ir.sequence">
+	        <field name="name">Quotation - Custom Sequence</field>
+			<field name="prefix">QO/%(range_year)s</field>
+			<field name="padding">4</field>
+			<field name="implementation">no_gap</field>
+			<field name="use_date_range">True</field>
+            <field name="date_range_ids" eval="[(5, 0, 0),
+                        (0, 0, {'date_from': '2024-01-01', 'date_to': '2024-12-31', 'number_next_actual':1}),
+            ]"/>
+	    </record>
+
+	    <!-- Revoke noupdate change -->
+        <function name="write" model="ir.model.data">
+	        <function name="search" model="ir.model.data">
+	            <value eval="[('module', '=', 'sale'), ('name', '=', 'seq_sale_order')]"/>
+	        </function>
+	        <value eval="{'noupdate': True}"/>
+	    </function>
+
 	</data>
 </odoo>

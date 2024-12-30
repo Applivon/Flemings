@@ -293,6 +293,8 @@ class FlemingsSalesOrder(models.Model):
     @api.model
     def create(self, vals):
         res = super(FlemingsSalesOrder, self).create(vals)
+        for record in res:
+            record.qo_sequence = record.name
         for record in res.filtered(lambda x: x.generate_fg_sno):
             asc_order_lines = record.order_line.filtered(lambda x: not x.display_type).sorted(key=lambda r: r.sequence)
             fg_sno = 1
@@ -329,6 +331,7 @@ class FlemingsSalesOrder(models.Model):
     delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
     fg_remarks = fields.Text('Remarks')
     fg_attn = fields.Char('Attn')
+    qo_sequence = fields.Char('Quotation Sequence', copy=False)
 
     def _prepare_invoice(self):
         res = super(FlemingsSalesOrder, self)._prepare_invoice()
@@ -344,6 +347,9 @@ class FlemingsSalesOrder(models.Model):
     def action_confirm(self):
         res = super(FlemingsSalesOrder, self).action_confirm()
         for order in self:
+            seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(order.date_order))
+            order.name = self.env['ir.sequence'].next_by_code('sale.order.fg.seq', sequence_date=seq_date)
+
             order.update_customer_price_book()
             # Pickings Update
             for picking in order.picking_ids:
