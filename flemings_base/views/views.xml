@@ -397,12 +397,19 @@
 		<record id="fg_product_template_item_form_view_inherit" model="ir.ui.view">
 			<field name="name">fg.product.template.item.form.view.inherit</field>
 			<field name="model">product.template</field>
+			<field name="priority" eval="24"/>
 			<field name="inherit_id" ref="product.product_template_form_view"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='uom_po_id']" position="after">
 					<field name="item_category_id" options="{'no_create': True}"/>
 					<field name="brand_id" options="{'no_create': True}"/>
 				</xpath>
+				<xpath expr="//div[@name='options']" position="inside">
+                    <span class="d-inline-block">
+                        <field name="is_overheads_product"/>
+                        <label for="is_overheads_product"/>
+                    </span>
+                </xpath>
 			</field>
 		</record>
 
@@ -1003,6 +1010,55 @@
 		<menuitem id="menu_fg_item_category" parent="sale.menu_sale_config" action="fg_item_category_action" sequence="70"/>
 		<menuitem id="menu_fg_delivery_carrier" parent="sale.menu_sale_config" action="fg_delivery_carrier_action" sequence="75"/>
 		<menuitem id="menu_fg_product_brand" parent="sale.menu_sale_config" action="fg_product_brand_action" sequence="80"/>
+
+		<!-- Actions - Update -->
+		<record id="sale.product_template_action" model="ir.actions.act_window">
+			<field name="context">{"search_default_filter_to_sell":1, "sale_multi_pricelist_product_template": 1, "display_overhead_products": 1}</field>
+		</record>
+
+		<record id="product.product_normal_action_sell" model="ir.actions.act_window">
+            <field name="context">{"search_default_filter_to_sell":1, "display_overhead_products": 1}</field>
+        </record>
+
+		<record id="point_of_sale.product_template_action_pos_product" model="ir.actions.act_window">
+			<field name="context" eval="{'search_default_filter_to_availabe_pos': 1, 'default_available_in_pos': True, 'create_variant_never': 'no_variant', 'display_overhead_products': 1}"/>
+		</record>
+
+		<record id="point_of_sale.product_product_action" model="ir.actions.act_window">
+			<field name="context" eval="{'search_default_filter_to_availabe_pos': 1, 'default_available_in_pos': True, 'display_overhead_products': 1}"/>
+		</record>
+
+		<record id="account.product_product_action_sellable" model="ir.actions.act_window">
+            <field name="context">{'search_default_filter_to_sell': 1, "display_overhead_products": 1}</field>
+        </record>
+
+        <record id="account.product_product_action_purchasable" model="ir.actions.act_window">
+            <field name="context">{'search_default_filter_to_purchase': 1, "display_overhead_products": 1}</field>
+        </record>
+
+		<record id="purchase.product_normal_action_puchased" model="ir.actions.act_window">
+			<field name="context">{"search_default_filter_to_purchase":1, "purchase_product_template": 1, "display_overhead_products": 1}</field>
+		</record>
+
+        <record id="purchase.product_product_action" model="ir.actions.act_window">
+            <field name="context">{"search_default_filter_to_purchase": 1, "display_overhead_products": 1}</field>
+        </record>
+
+		<record id="stock.product_template_action_product" model="ir.actions.act_window">
+			<field name="context">{"search_default_consumable": 1, 'default_detailed_type': 'product', "display_overhead_products": 1}</field>
+		</record>
+
+		<record id="stock.stock_product_normal_action" model="ir.actions.act_window">
+			<field name="context">{"display_overhead_products": 1}</field>
+		</record>
+
+		<record id="mrp.product_template_action" model="ir.actions.act_window">
+            <field name="context">{"search_default_consumable": 1, 'default_detailed_type': 'product', "display_overhead_products": 1}</field>
+        </record>
+
+        <record id="mrp.mrp_product_variant_action" model="ir.actions.act_window">
+            <field name="context">{"display_overhead_products": 1}</field>
+        </record>
 
     </data>
 </odoo>

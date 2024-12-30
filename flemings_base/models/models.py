@@ -851,6 +851,23 @@ class FlemingsProductTemplate(models.Model):
 
     item_category_id = fields.Many2one('fg.item.category', string='Item Category')
     brand_id = fields.Many2one('fg.product.brand', string='Brand')
+    is_overheads_product = fields.Boolean('Overheads ?', default=False)
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if self._context and self._context.get('display_overhead_products', False):
+            args += ['|', ('is_overheads_product', '=', True), ('is_overheads_product', '=', False)]
+        else:
+            args += [('is_overheads_product', '=', False)]
+        return super(FlemingsProductTemplate, self)._search(args, offset, limit, order, count=count, access_rights_uid=access_rights_uid)
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if self._context and self._context.get('display_overhead_products', False):
+            domain += ['|', ('is_overheads_product', '=', True), ('is_overheads_product', '=', False)]
+        else:
+            domain += [('is_overheads_product', '=', False)]
+        return super(FlemingsProductTemplate, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
     def _compute_template_fg_available_stock(self):
         for record in self:
@@ -933,6 +950,22 @@ class FlemingsProductProduct(models.Model):
     variant_name = fields.Char(
         related='computed_variant_name', string='Variant Name', store=True, readonly=True)
     fg_available_stock = fields.Text('Available Stock', compute='_compute_variant_fg_available_stock')
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if self._context and self._context.get('display_overhead_products', False):
+            args += ['|', ('is_overheads_product', '=', True), ('is_overheads_product', '=', False)]
+        else:
+            args += [('is_overheads_product', '=', False)]
+        return super(FlemingsProductProduct, self)._search(args, offset, limit, order, count=count, access_rights_uid=access_rights_uid)
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if self._context and self._context.get('display_overhead_products', False):
+            domain += ['|', ('is_overheads_product', '=', True), ('is_overheads_product', '=', False)]
+        else:
+            domain += [('is_overheads_product', '=', False)]
+        return super(FlemingsProductProduct, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
 
 class FlemingsStockPicking(models.Model):
