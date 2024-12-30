@@ -1396,3 +1396,13 @@ class FGIrasAuditFile(models.Model):
             'TransactionCountTotal': str(transaction_count_total),
             'GLTCurrency': glt_currency
         }
+
+
+class FGIRRules(models.Model):
+    _inherit = 'ir.rule'
+
+    def _get_rules(self, model_name, mode='read'):
+        res = super(FGIRRules, self)._get_rules(model_name, mode)
+        if model_name and model_name == 'account.journal' and self._context and self._context.get('params') and self._context['params'].get('model') and self._context['params'].get('model') == 'pos.config':
+            res = res - self.browse(self.env.ref('flemings_base.fg_account_journal_user_access').id)
+        return res
