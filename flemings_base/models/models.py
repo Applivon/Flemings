@@ -293,6 +293,8 @@ class FlemingsSalesOrder(models.Model):
     @api.model
     def create(self, vals):
         res = super(FlemingsSalesOrder, self).create(vals)
+        for record in res:
+            record.qo_sequence = record.name
         for record in res.filtered(lambda x: x.generate_fg_sno):
             asc_order_lines = record.order_line.filtered(lambda x: not x.display_type).sorted(key=lambda r: r.sequence)
             fg_sno = 1
@@ -329,6 +331,7 @@ class FlemingsSalesOrder(models.Model):
     delivery_mode_id = fields.Many2one('fg.delivery.carrier', string='Delivery Mode')
     fg_remarks = fields.Text('Remarks')
     fg_attn = fields.Char('Attn')
+    qo_sequence = fields.Char('Quotation Sequence', copy=False)
 
     def _prepare_invoice(self):
         res = super(FlemingsSalesOrder, self)._prepare_invoice()
@@ -344,6 +347,9 @@ class FlemingsSalesOrder(models.Model):
     def action_confirm(self):
         res = super(FlemingsSalesOrder, self).action_confirm()
         for order in self:
+            seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(order.date_order))
+            order.name = self.env['ir.sequence'].next_by_code('sale.order.fg.seq', sequence_date=seq_date)
+
             order.update_customer_price_book()
             # Pickings Update
             for picking in order.picking_ids:
@@ -430,6 +436,21 @@ class FlemingsSalesOrder(models.Model):
                 record.can_user_edit_qty = True
             else:
                 record.can_user_edit_qty = False
+
+    @api.depends('partner_id')
+    def _compute_note(self):
+        use_invoice_terms = self.env['ir.config_parameter'].sudo().get_param('account.use_invoice_terms')
+        if not use_invoice_terms:
+            return
+        # for order in self:
+        #     order = order.with_company(order.company_id)
+        #     if order.terms_type == 'html' and self.env.company.invoice_terms_html:
+        #         baseurl = html_keep_url(order._get_note_url() + '/terms')
+        #         context = {'lang': order.partner_id.lang or self.env.user.lang}
+        #         order.note = _('Terms & Conditions: %s', baseurl)
+        #         del context
+        #     elif not is_html_empty(self.env.company.invoice_terms):
+        #         order.note = order.with_context(lang=order.partner_id.lang).env.company.invoice_terms
 
 
 class FlemingsPurchaseOrder(models.Model):
@@ -1375,3 +1396,13 @@ class FGIrasAuditFile(models.Model):
             'TransactionCountTotal': str(transaction_count_total),
             'GLTCurrency': glt_currency
         }
+
+
+class FGIRRules(models.Model):
+    _inherit = 'ir.rule'
+
+    def _get_rules(self, model_name, mode='read'):
+        res = super(FGIRRules, self)._get_rules(model_name, mode)
+        if model_name and model_name == 'account.journal' and self._context and self._context.get('params') and self._context['params'].get('model') and self._context['params'].get('model') == 'pos.config':
+            res = res - self.browse(self.env.ref('flemings_base.fg_account_journal_user_access').id)
+        return res

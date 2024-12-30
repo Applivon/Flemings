@@ -13,7 +13,7 @@
 
             <div class="header">
                 <style>
-                    td {word-break: break-word !important; word-spacing: 3px !important; padding:3px; page-break-inside: avoid !important;}
+                    td {word-break: break-word !important; word-spacing: 1px 3px !important; padding: 1px 3px !important; page-break-inside: avoid !important;}
 
                     .non-border, .non-border > tr, .non-border > tr > td {
                         border: none !important; border-color: #ffffff !important;
@@ -95,7 +95,7 @@
                                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                     <tr style="height:6px;"/>
                                     <tr>
-                                        <td style="width:64%; text-align:left; border-top:1px solid black; vertical-align:top !important;">
+                                        <td style="width:64%; text-align:left; border-top:1px solid black; vertical-align:top !important; padding-top:5px !important;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td>Bill To: </td>
@@ -129,6 +129,40 @@
                                                         </t>
                                                     </td>
                                                 </tr>-->
+                                            </table>
+                                        </td>
+                                        <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important; padding-top:5px !important;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                                                <tr>
+                                                    <td colspan="2" style="width:100%; text-align:center; font-size:17pt;"><strong>CREDIT NOTE</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:46%;">Co Reg. No.</td>
+                                                    <td style="width:54%;">: <span t-field="company.l10n_sg_unique_entity_number"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:46%;">GST Reg. No.</td>
+                                                    <td style="width:54%;">: <span t-field="company.vat"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:46%;">Transaction No.</td>
+                                                    <td style="width:54%;">: <span t-field="o.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:46%;">Date</td>
+                                                    <td style="width:54%;">: <span t-field="o.invoice_date" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:46%;">Currency</td>
+                                                    <td style="width:54%;">: <span t-field="o.currency_id"/></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="width:64%; text-align:left; vertical-align:top !important; padding-top:5px !important;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td>
                                                         <t t-if="o.fg_attn">
@@ -157,31 +191,8 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important;">
+                                        <td style="width:36%; text-align:left; vertical-align:top !important; white-space:nowrap !important; padding-top:5px !important;">
                                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
-                                                <tr>
-                                                    <td colspan="2" style="width:100%; text-align:center; font-size:17pt;"><strong>CREDIT NOTE</strong></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Co Reg. No.</td>
-                                                    <td style="width:54%;">: <span t-field="company.l10n_sg_unique_entity_number"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">GST Reg. No.</td>
-                                                    <td style="width:54%;">: <span t-field="company.vat"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Transaction No.</td>
-                                                    <td style="width:54%;">: <span t-field="o.name"/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Date</td>
-                                                    <td style="width:54%;">: <span t-field="o.invoice_date" t-options='{"widget": "date", "format": "dd MMM yyyy"}'/></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:46%;">Currency</td>
-                                                    <td style="width:54%;">: <span t-field="o.currency_id"/></td>
-                                                </tr>
                                                 <tr>
                                                     <td style="width:46%;">Salesperson</td>
                                                     <td style="width:54%;">: <span t-field="o.user_id"/></td>
@@ -200,7 +211,7 @@
                         <div style="width: 100%; float: left; ">
                             <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                                 <tr>
-                                    <td  style="float:left; width:32%; text-align:center;">
+                                    <td style="float:left; width:32%; text-align:center;">
                                         <strong>Received By</strong>
                                     </td>
                                     <td style="float:left; width:4%; text-align:center;"/>
@@ -331,32 +342,32 @@
                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
                     <tr style="height:10px;"/>
                     <tr>
-                        <td style="width:50%; padding:5px; text-decoration:underline;">For GST Auditing Only (SGD)</td>
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important; text-decoration:underline;">For GST Auditing Only (SGD)</td>
                         <td style="width:50%;"/>
                     </tr>
                     <tr>
-                        <td style="width:50%; padding:5px;">
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             Net Total:
                             <span t-field="o.sgd_currency_id.symbol"/>
                             <span t-esc="'{0:,.2f}'.format(o.sgd_amount_untaxed)"/>
                         </td>
                     </tr>
                     <tr>
-                        <td style="width:50%; padding:5px;">
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             GST:
                             <span t-field="o.sgd_currency_id.symbol"/>
                             <span t-esc="'{0:,.2f}'.format(o.sgd_amount_tax)"/>
                         </td>
                     </tr>
                     <tr>
-                        <td style="width:50%; padding:5px;">
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             Total:
                             <span t-field="o.sgd_currency_id.symbol"/>
                             <span t-esc="'{0:,.2f}'.format(o.sgd_amount_total)"/>
                         </td>
                     </tr>
                     <tr>
-                        <td style="width:50%; padding:5px;">
+                        <td style="width:50%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             Exchange Rate:
                             <span t-field="o.sgd_currency_id.symbol"/>
                             <span t-esc="'{0:,.6f}'.format(o.sgd_exchange_rate)"/>
@@ -364,7 +375,7 @@
                     </tr>
                     <tr style="height:18px;"/>
                     <tr>
-                        <td colspan="2" style="width:100%; padding:5px;">
+                        <td colspan="2" style="width:100%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
                             <span style="text-decoration:underline;">Remarks:</span>
                             <br/><span t-field="o.fg_remarks"/>
                         </td>
