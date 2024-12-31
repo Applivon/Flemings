@@ -735,6 +735,30 @@
 				<xpath expr="//field[@name='components_availability_state']" position="before">
 					<field name="scheduled_production_date" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}"/>
                 </xpath>
+				<xpath expr="//page[@name='miscellaneous']" position="after">
+					<page string="Miscellaneous Cost" name="miscellaneous_cost">
+						<field name="miscellaneous_cost_line">
+							<tree string="Miscellaneous Cost" name="miscellaneous_cost" editable="bottom">
+								<field name="production_id" invisible="1"/>
+								<field name="product_id" required="1" context="{'display_overhead_products': True}" options="{'no_create':True}"/>
+								<field name="company_id" invisible="1"/>
+								<field name="currency_id" invisible="1"/>
+								<field name="cost"/>
+							</tree>
+							<form string="Miscellaneous Cost" name="miscellaneous_cost">
+								<group>
+									<group>
+										<field name="production_id" invisible="1"/>
+										<field name="product_id" required="1" context="{'display_overhead_products': True}" options="{'no_create':True}"/>
+										<field name="company_id" invisible="1"/>
+										<field name="currency_id" invisible="1"/>
+										<field name="cost"/>
+									</group>
+								</group>
+							</form>
+						</field>
+					</page>
+                </xpath>
             </field>
         </record>
 
