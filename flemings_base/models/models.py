@@ -430,14 +430,15 @@ class FlemingsSalesOrder(models.Model):
     @api.depends('picking_ids', 'partner_id')
     def _compute_can_user_edit_qty(self):
         for record in self:
-            if not record.picking_ids:
-                record.can_user_edit_qty = True
-            elif record.picking_ids and (
-                    self.env.user.has_group('flemings_base.fg_su_group')
-            ):
-                record.can_user_edit_qty = True
-            else:
-                record.can_user_edit_qty = False
+            record.can_user_edit_qty = True
+            # if not record.picking_ids:
+            #     record.can_user_edit_qty = True
+            # elif record.picking_ids and (
+            #         self.env.user.has_group('flemings_base.fg_su_group')
+            # ):
+            #     record.can_user_edit_qty = True
+            # else:
+            #     record.can_user_edit_qty = False
 
     @api.depends('partner_id')
     def _compute_note(self):
