@@ -619,8 +619,14 @@ class FlemingsSalesAccountMove(models.Model):
     @api.onchange('not_create_picking')
     def onchange_not_create_picking(self):
         self.location_return_id = self.location_source_id = False
+        for line in self.invoice_line_ids:
+            line.not_create_picking = self.not_create_picking
 
     def action_post(self):
+        for record in self.filtered(lambda x: (x.move_type == 'out_refund' and x.location_return_id) or (x.move_type == 'in_refund' and x.location_source_id)):
+            if record.invoice_line_ids.filtered(lambda x: x.product_id.tracking != 'none' and not x.lot_id):
+                raise UserError(_("Please configure Lot No. in Invoice Lines !"))
+
         res = super(FlemingsSalesAccountMove, self).action_post()
         # Update Invoice Price-book for Customer
         for invoice in self.filtered(lambda x: x.move_type == 'out_invoice'):
@@ -804,6 +810,7 @@ class FlemingsSalesAccountMoveLines(models.Model):
     unit_cost_price = fields.Float('Unit Cost Price', required=True, default=0.0)
     lot_id = fields.Many2one('stock.lot', string='Lot/Serial No.', copy=False)
     product_tracking = fields.Selection(related='product_id.tracking', string='Tracking')
+    not_create_picking = fields.Boolean(string="Don\'t Create Picking")
 
     @api.depends('product_id')
     def _compute_name(self):
