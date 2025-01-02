@@ -120,7 +120,7 @@
                     <td style="width:50%;"/>
                 </tr>
                 <tr>
-                    <td style="width:50%; padding:5px; border-bottom:1px dashed black;">
+                    <td style="width:50%; padding:5px;">
                         <span t-field="o.fg_remarks"/>
                     </td>
                     <td style="width:50%;"/>

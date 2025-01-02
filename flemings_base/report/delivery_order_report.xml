@@ -291,7 +291,7 @@
                                 <td rowspan="3" style="width:17%; padding:5px; border-top:1px solid black;"/>
                             </tr>
                             <tr>
-                                <td style="width:53%; padding:5px; border-bottom:1px dashed black;">
+                                <td style="width:53%; padding:5px;">
                                     <span t-field="o.fg_remarks"/>
                                 </td>
                             </tr>
