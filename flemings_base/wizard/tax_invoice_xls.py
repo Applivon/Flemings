@@ -200,8 +200,8 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
                             sheet.write(row, 1, str(do_list['product_name'] or ''), align_left)
                             sheet.write(row, 2, str('%.0f' % do_list['quantity'] or 0), align_center)
                             sheet.write(row, 3, str(do_list['product_uom_id'] or ''), align_center)
-                            sheet.write(row, 4, str('%.2f' % do_list['price_unit'] or 0), align_center)
-                            sheet.write(row, 5, str('%.2f' % do_list['price_subtotal'] or 0), align_center)
+                            sheet.write(row, 4, str('%.2f' % do_list['price_unit'] or 0), align_right)
+                            sheet.write(row, 5, str('%.2f' % do_list['price_subtotal'] or 0), align_right)
 
                             fg_sno += 1
                             row += 1
@@ -211,8 +211,8 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
                     sheet.write(row, 1, str(line.product_id.default_code or '') + '\n' + str(line.name or ''), align_left)
                     sheet.write(row, 2, str('%.0f' % line.quantity or 0), align_center)
                     sheet.write(row, 3, str(line.product_uom_id.name or ''), align_center)
-                    sheet.write(row, 4, str('%.2f' % line.price_unit or 0), align_center)
-                    sheet.write(row, 5, str('%.2f' % line.price_subtotal or 0), align_center)
+                    sheet.write(row, 4, str('%.2f' % line.price_unit or 0), align_right)
+                    sheet.write(row, 5, str('%.2f' % line.price_subtotal or 0), align_right)
 
                     fg_sno += 1
                     row += 1
@@ -221,11 +221,11 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
             sheet.write(row, 1, 'Total Quantity: ', align_bold_right)
             sheet.write(row, 2, str('%.0f' % sum(obj.invoice_line_ids.mapped('quantity')) or 0), align_bold_center)
             sheet.merge_range(row, 3, row, 4, 'Sub Total : ' + str(obj.currency_id.name or ''), align_bold_right)
-            sheet.write(row, 5, str('%.2f' % obj.amount_untaxed or 0), align_bold_center)
+            sheet.write(row, 5, str('%.2f' % obj.amount_untaxed or 0), align_bold_right)
 
             row += 2
             sheet.merge_range(row, 3, row, 4, 'Tax Base : ' + str(obj.currency_id.name or ''), align_bold_right)
-            sheet.write(row, 5, str('%.2f' % obj.amount_untaxed or 0), align_bold_center)
+            sheet.write(row, 5, str('%.2f' % obj.amount_untaxed or 0), align_bold_right)
 
             row += 1
             tax_totals = obj.tax_totals
@@ -233,21 +233,22 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
                 subtotal_to_show = subtotal['name']
                 for amount_by_group in tax_totals['groups_by_subtotal'][subtotal_to_show]:
                     sheet.merge_range(row, 3, row, 4, str(amount_by_group['tax_group_name']) + ' : ' + str(obj.currency_id.name or ''), align_bold_right)
-                    sheet.write(row, 5, str('%.2f' % amount_by_group['tax_group_amount'] or 0), align_bold_center)
+                    sheet.write(row, 5, str('%.2f' % amount_by_group['tax_group_amount'] or 0), align_bold_right)
                     row += 1
 
             row += 1
             sheet.merge_range(row, 3, row, 4, 'Grand Total : ' + str(obj.currency_id.name or ''), align_bold_right)
-            sheet.write(row, 5, str('%.2f' % obj.amount_total or 0), align_bold_center)
+            sheet.write(row, 5, str('%.2f' % obj.amount_total or 0), align_bold_right)
 
             row += 2
             sheet.merge_range(row, 3, row, 5, '1% monthly interest will be charged on the overdue amount.', align_right)
 
-            row += 2
-            sheet.merge_range(row, 0, row, 1, 'Remarks: ', align_bold_left)
+            if obj.fg_remarks:
+                row += 2
+                sheet.merge_range(row, 0, row, 1, 'Remarks: ', align_bold_left)
 
-            row += 1
-            sheet.merge_range(row, 0, row + 1, 1, str(obj.fg_remarks or ''), align_left)
+                row += 1
+                sheet.merge_range(row, 0, row + 1, 1, str(obj.fg_remarks or ''), align_left)
 
             row += 3
             sheet.merge_range(row, 0, row, 1, 'For GST Auditing Only (SGD)', align_bold_left)

@@ -161,12 +161,14 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
                 row += 1
 
             row += 1
-            sheet.write(row, 0, 'Remarks', align_left)
+            if obj.fg_remarks:
+                sheet.write(row, 0, 'Remarks', align_left)
             sheet.write(row, 1, 'Total Quantity: ', align_right)
             sheet.write(row, 2, str('%.0f' % sum(obj.move_line_ids_without_package.mapped('qty_done')) or 0), align_center)
 
-            row += 1
-            sheet.merge_range(row, 0, row + 1, 1, str(obj.fg_remarks or ''), align_left)
+            if obj.fg_remarks:
+                row += 1
+                sheet.merge_range(row, 0, row + 1, 1, str(obj.fg_remarks or ''), align_left)
 
             row += 4
             sheet.merge_range(row, 0, row+1, 1, 'Received in good order & condition by', align_bold_center)
