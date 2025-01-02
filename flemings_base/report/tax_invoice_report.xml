@@ -346,11 +346,11 @@
                                         <td style="width:12%; padding:5px; text-align:center;">
                                             <span t-esc="do_list['product_uom_id']"/>
                                         </td>
-                                        <td style="width:12%; padding:5px; text-align:center;">
+                                        <td style="width:12%; padding:5px; text-align:right;">
                                             <span t-esc="'{0:,.2f}'.format(do_list['price_unit'])"/>
                                             <!--(<span t-field="line.currency_id.symbol"/>)-->
                                         </td>
-                                        <td style="width:13%; padding:5px; text-align:center;">
+                                        <td style="width:13%; padding:5px; text-align:right;">
                                             <span t-esc="'{0:,.2f}'.format(do_list['price_subtotal'])"/>
                                             <!--(<span t-field="line.currency_id.symbol"/>)-->
                                         </td>
@@ -378,11 +378,11 @@
                                 <td style="width:12%; padding:5px; text-align:center;">
                                     <span t-field="line.product_uom_id"/>
                                 </td>
-                                <td style="width:12%; padding:5px; text-align:center;">
+                                <td style="width:12%; padding:5px; text-align:right;">
                                     <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
                                     <!--(<span t-field="line.currency_id.symbol"/>)-->
                                 </td>
-                                <td style="width:13%; padding:5px; text-align:center;">
+                                <td style="width:13%; padding:5px; text-align:right;">
                                     <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
                                     <!--(<span t-field="line.currency_id.symbol"/>)-->
                                 </td>
@@ -397,7 +397,7 @@
                             Total Quantity : <span t-esc="'{0:,.0f}'.format(sum(o.invoice_line_ids.mapped('quantity')))"/>
                         </td>
                         <td style="width:24%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">Sub Total : <span t-field="o.currency_id"/></td>
-                        <td style="width:13%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                        <td style="width:13%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
                     </tr>
                     <tr style="height:6px;"/>
                     <tr>
@@ -409,7 +409,7 @@
                     <tr>
                         <td rowspan="3"/>
                         <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Tax Base : <span t-field="o.currency_id"/></td>
-                        <td style="width:13%; padding:5px; text-align:center; font-weight:bold; border-top:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                        <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
                     </tr>
 
                     <t t-set="tax_totals" t-value="o.tax_totals"/>
@@ -420,7 +420,7 @@
                                 <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">
                                     <span t-esc="amount_by_group['tax_group_name']"/> : <span t-field="o.currency_id"/>
                                 </td>
-                                <td style="width:13%; padding:5px; text-align:center; font-weight:bold;">
+                                <td style="width:13%; padding:5px; text-align:right; font-weight:bold;">
                                     <span t-esc="'{0:,.2f}'.format(amount_by_group['tax_group_amount'])"/>
                                 </td>
                             </tr>
@@ -429,7 +429,7 @@
 
                     <tr>
                         <td style="width:24%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
-                        <td style="width:13%; padding:5px; text-align:center; font-weight:bold; border-top:3px double black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
+                        <td style="width:13%; padding:5px; text-align:right; font-weight:bold; border-top:3px double black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
                     </tr>
                     <tr>
                         <td colspan="3" style="width:100%; padding:5px; text-align:right;">
