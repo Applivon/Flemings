@@ -21,7 +21,7 @@
                 </style>
 
                 <t t-set="contact_customer" t-value="o.partner_id.parent_id or o.partner_id"/>
-                <t t-if="o.partner_id.parent_id">
+                <!--<t t-if="o.partner_id.parent_id">
                     <t t-set="attn_customer" t-value="o.partner_id"/>
                 </t>
                 <t t-else="">
@@ -31,7 +31,8 @@
                     <t t-else="1">
                         <t t-set="attn_customer" t-value="contact_customer"/>
                     </t>
-                </t>
+                </t>-->
+                <t t-set="attn_customer" t-value="o.partner_shipping_id"/>
 
                 <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
                     <thead>
@@ -63,7 +64,7 @@
                                                     <span t-field="company.country_id.name"/>
                                                 </t>
                                                 <t t-if="company.zip">
-                                                    ,<span t-field="company.zip"/>
+                                                    <span t-field="company.zip"/>
                                                 </t>
                                                 <t t-if="company.phone">Tel:
                                                     <span t-field="company.phone"/>

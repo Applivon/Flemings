@@ -178,12 +178,13 @@
                     }
                 </style>
 
-                <t t-if="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))">
+                <!--<t t-if="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))">
                     <t t-set="contact_customer" t-value="o.partner_id.child_ids.filtered(lambda x: x.type in ('contact', 'invoice'))[0]"/>
                 </t>
                 <t t-else="1">
                     <t t-set="contact_customer" t-value="o.partner_id"/>
-                </t>
+                </t>-->
+                <t t-set="contact_customer" t-value="o.partner_shipping_id"/>
 
                 <t t-if="o.partner_shipping_id">
                     <t t-set="delivery_customer" t-value="o.partner_shipping_id"/>
@@ -222,7 +223,7 @@
                                                     <span t-field="company.country_id.name"/>
                                                 </t>
                                                 <t t-if="company.zip">
-                                                    ,<span t-field="company.zip"/>
+                                                    <span t-field="company.zip"/>
                                                 </t>
                                                 <t t-if="company.phone">Tel:
                                                     <span t-field="company.phone"/>
