@@ -19,7 +19,7 @@
                 <t t-set="company" t-value="res_company"/>
             </t>
 
-            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
                 <thead>
                     <tr>
                         <td style="width:5%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
@@ -57,12 +57,12 @@
                             <td style="width:12%; padding:5px; text-align:center;">
                                 <span t-field="line.product_uom"/>
                             </td>
-                            <td style="width:12%; padding:5px; text-align:center;">
+                            <td style="width:12%; padding:5px; text-align:right;">
                                 <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
                                 <!--(<span t-field="line.currency_id.symbol"/>)-->
                             </td>
                             <td style="width:10%; padding:5px; text-align:right;"/>
-                            <td style="width:13%; padding:5px; text-align:center;">
+                            <td style="width:13%; padding:5px; text-align:right;">
                                 <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
                                 <!--(<span t-field="line.currency_id.symbol"/>)-->
                             </td>
@@ -71,14 +71,14 @@
                 </t>
             </table>
 
-            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
                 <tr>
                     <td style="width:53%; padding:5px; border-top:1px solid black; text-align:right; padding-right:0px !important;">Total Quantity:</td>
-                    <td style="width:12%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;">
+                    <td style="width:12%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">
                         <span t-esc="'{0:,.0f}'.format(sum(o.order_line.mapped('product_uom_qty')))"/>
                     </td>
                     <td style="width:22%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">Sub Total : <span t-field="o.currency_id"/></td>
-                    <td style="width:12%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                    <td style="width:12%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
                 </tr>
                 <tr style="height:6px;"/>
                 <tr>
@@ -90,7 +90,7 @@
                 <tr>
                     <td colspan="2" rowspan="3"/>
                     <td style="width:22%; padding:5px; text-align:right; font-weight:bold;">Tax Base : <span t-field="o.currency_id"/></td>
-                    <td style="width:12%; padding:5px; text-align:center; font-weight:bold; border-bottom:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
+                    <td style="width:12%; padding:5px; text-align:right; font-weight:bold; border-bottom:1px solid black;"><span t-esc="'{0:,.2f}'.format(o.amount_untaxed)"/></td>
                 </tr>
 
                 <t t-set="tax_totals" t-value="o.tax_totals"/>
@@ -101,7 +101,7 @@
                             <td style="width:22%; padding:5px; text-align:right; font-weight:bold;">
                                 <span t-esc="amount_by_group['tax_group_name']"/> : <span t-field="o.currency_id"/>
                             </td>
-                            <td style="width:12%; padding:5px; text-align:center; font-weight:bold;">
+                            <td style="width:12%; padding:5px; text-align:right; font-weight:bold;">
                                 <span t-esc="'{0:,.2f}'.format(amount_by_group['tax_group_amount'])"/>
                             </td>
                         </tr>
@@ -110,22 +110,24 @@
 
                 <tr>
                     <td style="width:22%; padding:5px; text-align:right; font-weight:bold;">Grand Total : <span t-field="o.currency_id"/></td>
-                    <td style="width:12%; padding:5px; text-align:center; font-weight:bold; border-bottom:3px double black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
+                    <td style="width:12%; padding:5px; text-align:right; font-weight:bold; border-bottom:3px double black;"><span t-esc="'{0:,.2f}'.format(o.amount_total)"/></td>
                 </tr>
             </table>
 
-            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
-                <tr>
-                    <td style="width:50%; padding:5px; text-decoration:underline;">Remarks</td>
-                    <td style="width:50%;"/>
-                </tr>
-                <tr>
-                    <td style="width:50%; padding:5px; border-bottom:1px dashed black;">
-                        <span t-field="o.fg_remarks"/>
-                    </td>
-                    <td style="width:50%;"/>
-                </tr>
-            </table>
+            <t t-if="o.fg_remarks">
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
+                    <tr>
+                        <td style="width:50%; padding:5px; text-decoration:underline;">Remarks</td>
+                        <td style="width:50%;"/>
+                    </tr>
+                    <tr>
+                        <td style="width:50%; padding:5px;">
+                            <span t-field="o.fg_remarks"/>
+                        </td>
+                        <td style="width:50%;"/>
+                    </tr>
+                </table>
+            </t>
 
         </template>
 
@@ -149,7 +151,7 @@
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                     <t t-call="flemings_base.report_fg_purchase_order_custom_layout">
-                        <div class="page" style="font-family:sans-serif !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
+                        <div class="page" style="font-family:Arial !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
                             <t t-call="flemings_base.report_fg_purchase_order_doc"/>
                         </div>
                     </t>
@@ -173,7 +175,7 @@
         <template id="report_fg_purchase_order_custom_header_layout">
             <div class="header">
                 <style>
-                    td {word-break: break-word !important; word-spacing: 1px 3px !important; padding: 1px 3px !important; page-break-inside: avoid !important;}
+                    td {vertical-align:middle !important; word-break: break-word !important; word-spacing: 1px 3px !important; padding: 1px 3px !important; page-break-inside: avoid !important;}
 
                     .non-border, .non-border > tr, .non-border > tr > td {
                         border: none !important; border-color: #ffffff !important;
@@ -187,18 +189,18 @@
                     <t t-set="contact_customer" t-value="o.partner_id"/>
                 </t>
 
-                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:8pt; padding:3px;">
                     <thead>
                         <tr>
                             <td style="width:25%; text-align:left; padding-left:6px;">
-                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="height:2.3cm; width:5cm; float:left !important"/>
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="height:2.4cm; width:5.4cm; float:left !important"/>
                             </td>
                             <td style="width:50%; text-align:left;">
-                                <div style="width:auto; padding-left:15px; font-size:10pt; float:left">
+                                <div style="width:auto; padding-left:15px; font-size:8pt; float:left">
                                     <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="margin:0px !important; padding:0px !important;">
                                         <tr>
                                             <td style="margin:0px; padding:0px; text-align:left; white-space:nowrap;">
-                                                <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:14pt; font-weight:bold; padding-right:4px;"/>
+                                                <div t-field="company.name" t-attf-style="float:left; color:#000000; white-space:nowrap; font-size:19pt; font-weight:bold; padding-right:4px;"/>
                                             </td>
                                         </tr>
                                         <tr t-if="company.street or company.street2">
@@ -217,11 +219,11 @@
                                                     <span t-field="company.country_id.name"/>
                                                 </t>
                                                 <t t-if="company.zip">
-                                                    ,<span t-field="company.zip"/>
+                                                    <span t-field="company.zip"/>
                                                 </t>
                                                 <t t-if="company.phone">Tel:
                                                     <span t-field="company.phone"/>
-                                                </t>
+                                                </t> |
                                                 <t t-if="company.vat">Fax:
                                                     <span t-field="company.fax"/>
                                                 </t>
@@ -229,9 +231,19 @@
                                         </tr>
                                         <tr>
                                             <td style="margin:0px; padding:0px; text-align:left; white-space:nowrap;">
+                                                <t t-if="company.company_registry">Company Reg No.:
+                                                    <span t-field="company.company_registry"/>
+                                                </t> |
+                                                <t t-if="company.vat">GST No.:
+                                                    <span t-field="company.vat"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="margin:0px; padding:0px; text-align:left; white-space:nowrap;">
                                                 <t t-if="company.email">Email:
                                                     <span t-field="company.email"/>
-                                                </t>
+                                                </t> |
                                                 <t t-if="company.website">
                                                     <span t-field="company.website"/>
                                                 </t>
@@ -241,16 +253,16 @@
                                 </div>
                             </td>
                             <td style="width:25%; text-align:right; padding-right:6px;">
-                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="height:2.5cm; width:3.5cm; float:left !important"/>
+                                <img t-if="company.sgs_img" t-att-src="image_data_uri(company.sgs_img)" alt="Logo" style="height:2cm; width:3.6cm; float:left !important"/>
                             </td>
-                            </tr>
+                        </tr>
                         <tr>
                             <td colspan="3" style="width:100%; padding:3px;">
-                                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:3px;">
                                     <tr style="height:6px;"/>
                                     <tr>
                                         <td style="width:64%; text-align:left; border-top:1px solid black; vertical-align:top !important; padding-top:5px !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td>Vendor: </td>
                                                 </tr>
@@ -278,7 +290,7 @@
                                             </table>
                                         </td>
                                         <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important; padding-top:5px !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td colspan="2" style="width:100%; text-align:center; font-size:15pt;">
                                                         <strong>Purchase Order</strong>
@@ -323,7 +335,6 @@
                                     <tr>
                                         <td style="width:64%; text-align:left;">
                                             Tel: <span t-field="contact_customer.phone"/>
-                                            Fax: <span t-field="contact_customer.fax"/>
                                             Mob: <span t-field="contact_customer.mobile"/>
                                         </td>
                                     </tr>
@@ -351,7 +362,7 @@
                     }
                 </style>
 
-                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
                     <thead>
                         <tr>
                             <td style="width:66%; text-align:left; border-top:1px solid black; vertical-align:middle !important;">
