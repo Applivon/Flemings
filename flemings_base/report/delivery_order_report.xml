@@ -182,7 +182,6 @@
                                             <tr>
                                                 <td style="width:64%; text-align:left;">
                                                     Tel: <span t-field="company.phone"/>
-                                                    Fax: <span t-field="company.fax"/>
                                                     Mob: <span t-field="company.mobile"/>
                                                 </td>
                                             </tr>

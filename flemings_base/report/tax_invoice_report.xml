@@ -235,14 +235,12 @@
                                         <t t-if="attn_customer">
                                             <td colspan="2" style="width:64%; text-align:left;">
                                                 Tel: <span t-field="attn_customer.phone"/>
-                                                Fax: <span t-field="attn_customer.fax"/>
                                                 Mob: <span t-field="attn_customer.mobile"/>
                                             </td>
                                         </t>
                                         <t t-else="">
                                             <td colspan="2" style="width:64%; text-align:left;">
                                                 Tel: <span t-field="contact_customer.phone"/>
-                                                Fax: <span t-field="contact_customer.fax"/>
                                                 Mob: <span t-field="contact_customer.mobile"/>
                                             </td>
                                         </t>
