@@ -112,18 +112,20 @@
                 </tr>
             </table>
 
-            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
-                <tr>
-                    <td style="width:50%; padding:5px; text-decoration:underline;">Remarks</td>
-                    <td style="width:50%;"/>
-                </tr>
-                <tr>
-                    <td style="width:50%; padding:5px;">
-                        <span t-field="o.fg_remarks"/>
-                    </td>
-                    <td style="width:50%;"/>
-                </tr>
-            </table>
+            <t t-if="o.fg_remarks">
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
+                    <tr>
+                        <td style="width:50%; padding:5px; text-decoration:underline;">Remarks</td>
+                        <td style="width:50%;"/>
+                    </tr>
+                    <tr>
+                        <td style="width:50%; padding:5px;">
+                            <span t-field="o.fg_remarks"/>
+                        </td>
+                        <td style="width:50%;"/>
+                    </tr>
+                </table>
+            </t>
 
         </template>
 

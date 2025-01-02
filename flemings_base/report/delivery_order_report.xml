@@ -283,7 +283,7 @@
 
                         <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
                             <tr>
-                                <td style="width:53%; padding:5px; border-top:1px solid black; text-decoration:underline;">Remarks</td>
+                                <td style="width:53%; padding:5px; border-top:1px solid black; text-decoration:underline;"><t t-if="o.fg_remarks">Remarks</t></td>
                                 <td rowspan="3" style="width:13%; padding:5px; padding-right:0px !important; border-top:1px solid black; text-align:right; white-space:nowrap !important;">Total Quantity:</td>
                                 <td rowspan="3" style="width:17%; padding:5px; border-top:1px solid black; text-align:center; font-weight:bold;">
                                     <span t-esc="'{0:,.0f}'.format(sum(o.move_line_ids_without_package.mapped('qty_done')))"/>
@@ -292,7 +292,7 @@
                             </tr>
                             <tr>
                                 <td style="width:53%; padding:5px;">
-                                    <span t-field="o.fg_remarks"/>
+                                    <t t-if="o.fg_remarks"><span t-field="o.fg_remarks"/></t>
                                 </td>
                             </tr>
                         </table>

@@ -442,7 +442,9 @@
                     <tr style="height:10px;"/>
                     <tr>
                         <td colspan="2" style="width:100%; padding: 1px 3px !important; word-spacing: 1px 3px !important;">
-                            <span style="text-decoration:underline;">Remarks:</span><span t-field="o.fg_remarks"/>
+                            <t t-if="o.fg_remarks">
+                                <span style="text-decoration:underline;">Remarks:</span><span t-field="o.fg_remarks"/>
+                            </t>
                         </td>
                     </tr>
                     <tr style="height:6px;"/>
