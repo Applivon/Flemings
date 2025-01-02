@@ -93,13 +93,14 @@ class FlemingsCreditNoteReportXlsx(models.AbstractModel):
                 {'font_name': 'Arial', 'align': 'center', 'valign': 'vcenter', 'bold': True, 'font_size': 18}))
 
             contact_customer = obj.partner_id.parent_id or obj.partner_id
-            if obj.partner_id.parent_id:
-                attn_customer = obj.partner_id
-            else:
-                if contact_customer.child_ids.filtered(lambda x: x.type in ('contact', 'invoice', 'delivery')):
-                    attn_customer = contact_customer.child_ids.filtered(lambda x: x.type in ('contact', 'invoice', 'delivery'))[0]
-                else:
-                    attn_customer = contact_customer
+            # if obj.partner_id.parent_id:
+            #     attn_customer = obj.partner_id
+            # else:
+            #     if contact_customer.child_ids.filtered(lambda x: x.type in ('contact', 'invoice', 'delivery')):
+            #         attn_customer = contact_customer.child_ids.filtered(lambda x: x.type in ('contact', 'invoice', 'delivery'))[0]
+            #     else:
+            #         attn_customer = contact_customer
+            attn_customer = obj.partner_shipping_id
 
             row += 1
             sheet.merge_range(row, 0, row, 1, str(contact_customer.name), align_left)
