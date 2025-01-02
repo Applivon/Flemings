@@ -173,9 +173,9 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
             row += 1
             right_column_row += 1
             if attn_customer:
-                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(attn_customer.phone or '') + '  Fax: ' + str(attn_customer.fax or '') + '  Mob: ' + str(attn_customer.mobile or ''), align_left)
+                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(attn_customer.phone or '') + '  Mob: ' + str(attn_customer.mobile or ''), align_left)
             else:
-                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Fax: ' + str(contact_customer.fax or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
+                sheet.merge_range(right_column_row, 0, right_column_row, 1, 'Tel: ' + str(contact_customer.phone or '') + '  Mob: ' + str(contact_customer.mobile or ''), align_left)
 
             row += 1
             sheet.set_row(row, 22)

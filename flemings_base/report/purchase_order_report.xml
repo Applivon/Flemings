@@ -19,7 +19,7 @@
                 <t t-set="company" t-value="res_company"/>
             </t>
 
-            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
                 <thead>
                     <tr>
                         <td style="width:5%; padding:5px; border-top:1px solid black; border-bottom:1px solid black; font-weight:bold; text-align:left;">S/N</td>
@@ -71,7 +71,7 @@
                 </t>
             </table>
 
-            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
                 <tr>
                     <td style="width:53%; padding:5px; border-top:1px solid black; text-align:right; padding-right:0px !important;">Total Quantity:</td>
                     <td style="width:12%; padding:5px; border-top:1px solid black; text-align:right; font-weight:bold;">
@@ -114,7 +114,7 @@
                 </tr>
             </table>
 
-            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
                 <tr>
                     <td style="width:50%; padding:5px; text-decoration:underline;">Remarks</td>
                     <td style="width:50%;"/>
@@ -149,7 +149,7 @@
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                     <t t-call="flemings_base.report_fg_purchase_order_custom_layout">
-                        <div class="page" style="font-family:sans-serif !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
+                        <div class="page" style="font-family:Arial !important; font-size: 10pt; margin-left: 10px !important; margin-right: 10px !important;">
                             <t t-call="flemings_base.report_fg_purchase_order_doc"/>
                         </div>
                     </t>
@@ -173,7 +173,7 @@
         <template id="report_fg_purchase_order_custom_header_layout">
             <div class="header">
                 <style>
-                    td {word-break: break-word !important; word-spacing: 1px 3px !important; padding: 1px 3px !important; page-break-inside: avoid !important;}
+                    td {vertical-align:middle !important; word-break: break-word !important; word-spacing: 1px 3px !important; padding: 1px 3px !important; page-break-inside: avoid !important;}
 
                     .non-border, .non-border > tr, .non-border > tr > td {
                         border: none !important; border-color: #ffffff !important;
@@ -187,7 +187,7 @@
                     <t t-set="contact_customer" t-value="o.partner_id"/>
                 </t>
 
-                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:8pt; padding:3px;">
                     <thead>
                         <tr>
                             <td style="width:25%; text-align:left; padding-left:6px;">
@@ -256,11 +256,11 @@
                         </tr>
                         <tr>
                             <td colspan="3" style="width:100%; padding:3px;">
-                                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:3px;">
                                     <tr style="height:6px;"/>
                                     <tr>
                                         <td style="width:64%; text-align:left; border-top:1px solid black; vertical-align:top !important; padding-top:5px !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td>Vendor: </td>
                                                 </tr>
@@ -288,7 +288,7 @@
                                             </table>
                                         </td>
                                         <td style="width:36%; text-align:left; border-top:1px solid black; vertical-align:top !important; white-space:nowrap !important; padding-top:5px !important;">
-                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:3px;">
+                                            <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:3px;">
                                                 <tr>
                                                     <td colspan="2" style="width:100%; text-align:center; font-size:15pt;">
                                                         <strong>Purchase Order</strong>
@@ -360,7 +360,7 @@
                     }
                 </style>
 
-                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:sans-serif !important; font-size:10pt; padding:5px;">
+                <table width="100%" class="non-border" cellpadding="0px" cellspacing="0px" style="font-family:Arial !important; font-size:10pt; padding:5px;">
                     <thead>
                         <tr>
                             <td style="width:66%; text-align:left; border-top:1px solid black; vertical-align:middle !important;">

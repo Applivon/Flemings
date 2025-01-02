@@ -138,7 +138,7 @@ class FlemingsDeliveryOrderReportXlsx(models.AbstractModel):
             sheet.write(row, 3, str(obj.partner_id.country_id.name or ''), align_left)
 
             row += 1
-            sheet.merge_range(row, 0, row, 1, 'Tel: ' + str(obj.company_id.phone or '') + '  Fax: ' + str(obj.company_id.fax or '') + '  Mob: ' + str(obj.company_id.mobile or ''), align_left)
+            sheet.merge_range(row, 0, row, 1, 'Tel: ' + str(obj.company_id.phone or '') + '  Mob: ' + str(obj.company_id.mobile or ''), align_left)
 
             row += 1
             sheet.merge_range(row, 0, row, 1, 'Email: ' + str(obj.company_id.email or ''), align_left)
