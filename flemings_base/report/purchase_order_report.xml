@@ -48,8 +48,7 @@
                                 <span t-set="fg_sno" t-value="fg_sno+1"/>
                             </td>
                             <td style="width:40%; padding:5px; padding-right:0px !important; text-align:left;">
-                                <span t-field="line.product_id.default_code"/><br/>
-                                <span t-field="line.product_id.variant_name"/>
+                                <span t-field="line.name"/>
                             </td>
                             <td style="width:8%; padding:5px; text-align:center;">
                                 <span t-esc="'{0:,.0f}'.format(line.product_uom_qty)"/>

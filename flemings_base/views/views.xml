@@ -1086,5 +1086,17 @@
             <field name="context">{"display_overhead_products": 1}</field>
         </record>
 
+		<record id="base.action_partner_form" model="ir.actions.act_window">
+            <field name="view_id" ref="base.view_partner_form"/>
+        </record>
+
+		<record id="account.res_partner_action_customer" model="ir.actions.act_window">
+            <field name="view_id" ref="base.view_partner_form"/>
+        </record>
+
+		<record id="account.res_partner_action_supplier" model="ir.actions.act_window">
+            <field name="view_id" ref="base.view_partner_form"/>
+        </record>
+
     </data>
 </odoo>
