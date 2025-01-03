@@ -981,6 +981,18 @@ class FlemingsProductProduct(models.Model):
 class FlemingsStockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    @api.model
+    def get_view(self, view_id=None, view_type='form', **options):
+        res = super(FlemingsStockPicking, self).get_view(view_id, view_type, **options)
+        if self.env.user.fg_sales_group:
+            if view_type in ('tree', 'form', 'kanban'):
+                doc = etree.XML(res['arch'])
+                for node in doc.xpath("//" + view_type + ""):
+                    node.set('create', 'false')
+                res['arch'] = etree.tostring(doc)
+
+        return res
+
     customer_po = fields.Char('Customer PO No.', copy=False)
     process_by_id = fields.Many2one('res.users', string='Process By')
     fg_remarks = fields.Text('Remarks')
