@@ -534,6 +534,9 @@
                 <xpath expr="//field[@name='order_line']/form/group/group/field[@name='route_id']" position="attributes">
 					<attribute name="groups"/>
                 </xpath>
+				<xpath expr="//button[@name='action_view_delivery']" position="attributes">
+					<attribute name="groups"/>
+                </xpath>
            </field>
         </record>
 

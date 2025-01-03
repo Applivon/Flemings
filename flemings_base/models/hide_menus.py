@@ -148,3 +148,21 @@ class ir_ui_menu(models.Model):
         cids = request.httprequest.cookies.get('cids') and request.httprequest.cookies.get('cids').split(',')[0] or self.env.company.id
         hide_ids = self.env.user.access_management_ids.filtered(lambda line: int(cids) in line.company_ids.ids).mapped('hide_menu_ids')
         return self.filtered(lambda menu: menu.id in visible_ids and menu.id not in hide_ids.ids)
+
+
+class FG_ir_ui_view(models.Model):
+    _inherit = 'ir.ui.view'
+
+    def _editable_node(self, node, name_manager):
+        if self and self.model == 'stock.picking' and self.env.user.fg_sales_group:
+            buttons_to_hide = ['action_open_label_type', 'do_unreserve', 'button_scrap', 'action_cancel', 'action_assign', 'signature']
+            for button_name in buttons_to_hide:
+                if node.get('name') == button_name:
+                    node.set('invisible', '1')
+
+        """ Return whether the given node must be considered editable. """
+        func = getattr(self, f"_editable_tag_{node.tag}", None)
+        if func is not None:
+            return func(node, name_manager)
+        # by default views are non-editable
+        return node.tag not in (item[0] for item in type(self).type.selection)
