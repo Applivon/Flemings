@@ -41,29 +41,31 @@
                         </tr>
                     </t>
                     <t t-else="">
-                        <tr>
-                            <td style="width:5%; padding:5px; text-align:left;">
-                                <span t-field="line.fg_sno"/>
-                            </td>
-                            <td style="width:40%; padding:5px; padding-right:0px !important; text-align:left;">
-                                <span t-field="line.name"/>
-                            </td>
-                            <td style="width:8%; padding:5px; text-align:center;">
-                                <span t-esc="'{0:,.0f}'.format(line.product_uom_qty)"/>
-                            </td>
-                            <td style="width:12%; padding:5px; text-align:center;">
-                                <span t-field="line.product_uom"/>
-                            </td>
-                            <td style="width:12%; padding:5px; text-align:right;">
-                                <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
-                                <!--(<span t-field="line.currency_id.symbol"/>)-->
-                            </td>
-                            <td style="width:10%; padding:5px; text-align:right;"/>
-                            <td style="width:13%; padding:5px; text-align:right;">
-                                <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
-                                <!--(<span t-field="line.currency_id.symbol"/>)-->
-                            </td>
-                        </tr>
+                        <t t-if="line.product_uom_qty > 0">
+                            <tr>
+                                <td style="width:5%; padding:5px; text-align:left;">
+                                    <span t-field="line.fg_sno"/>
+                                </td>
+                                <td style="width:40%; padding:5px; padding-right:0px !important; text-align:left;">
+                                    <span t-field="line.name"/>
+                                </td>
+                                <td style="width:8%; padding:5px; text-align:center;">
+                                    <span t-esc="'{0:,.0f}'.format(line.product_uom_qty)"/>
+                                </td>
+                                <td style="width:12%; padding:5px; text-align:center;">
+                                    <span t-field="line.product_uom"/>
+                                </td>
+                                <td style="width:12%; padding:5px; text-align:right;">
+                                    <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                    <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                </td>
+                                <td style="width:10%; padding:5px; text-align:right;"/>
+                                <td style="width:13%; padding:5px; text-align:right;">
+                                    <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                    <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                </td>
+                            </tr>
+                        </t>
                     </t>
                 </t>
             </table>
