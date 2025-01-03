@@ -155,9 +155,14 @@ class FG_ir_ui_view(models.Model):
 
     def _editable_node(self, node, name_manager):
         if self and self.model == 'stock.picking' and self.env.user.fg_sales_group:
-            buttons_to_hide = ['action_open_label_type', 'do_unreserve', 'button_scrap', 'action_cancel', 'action_assign', 'signature']
+            buttons_to_hide = ['action_open_label_type', 'do_unreserve', 'button_scrap', 'action_cancel', 'action_assign', 'signature', 'do_print_picking']
             for button_name in buttons_to_hide:
                 if node.get('name') == button_name:
+                    node.set('invisible', '1')
+
+            for button_xml_id in ['stock.action_report_delivery', 'stock.act_stock_return_picking']:
+                button_id = self.env.ref(button_xml_id).id
+                if button_id and node.get('name') == str(button_id):
                     node.set('invisible', '1')
 
         """ Return whether the given node must be considered editable. """
