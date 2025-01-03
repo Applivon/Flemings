@@ -107,7 +107,7 @@ class FlemingsTaxInvoiceReportXlsx(models.AbstractModel):
 
             row += 1
             sheet.write(row, 0, str(contact_customer.name), align_left)
-            sheet.write(row, 1, str(contact_customer.name), align_left)
+            sheet.write(row, 1, str(delivery_customer.display_name), align_left)
             sheet.merge_range(row, 2, row, 3, 'CO Reg. No.', align_left)
             sheet.merge_range(row, 4, row, 5, str(obj.company_id.l10n_sg_unique_entity_number or ''), align_left)
 

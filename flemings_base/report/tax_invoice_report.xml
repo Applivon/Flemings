@@ -147,7 +147,7 @@
                                                     <td>Deliver To: </td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span t-esc="contact_customer.name"/></td>
+                                                    <td><span t-esc="delivery_customer.display_name"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td><span t-field="delivery_customer.street"/></td>
@@ -358,35 +358,53 @@
                                 </t>
                             </t>
                         </t>
+                        <t t-foreach="o.invoice_line_ids.filtered(lambda x: x.display_type in ('line_section', 'line_note')).sorted(key=lambda x: x.sequence)" t-as="line">
+                            <tr>
+                                <td style="width:5%; padding:5px; text-align:left;"/>
+                                <td colspan="5" style="width:95%; padding:5px; padding-right:0px; text-align:left;">
+                                    <span t-field="line.name"/>
+                                </td>
+                            </tr>
+                        </t>
                     </t>
                     <t t-else="">
                         <t t-foreach="o.invoice_line_ids.sorted(key=lambda x: x.sequence)" t-as="line">
-                            <tr>
-                                <td style="width:5%; padding:5px; text-align:left;">
-                                    <span t-esc="fg_sno"/>
-                                    <span t-set="fg_sno" t-value="fg_sno+1"/>
-                                </td>
-                                <td style="width:50%; padding:5px; padding-right:0px; text-align:left;">
-                                    <t t-if="line.product_id.default_code">
-                                        <span t-field="line.product_id.default_code"/><br/>
-                                    </t>
-                                    <span t-field="line.name"/>
-                                </td>
-                                <td style="width:8%; padding:5px; text-align:center;">
-                                    <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
-                                </td>
-                                <td style="width:12%; padding:5px; text-align:center;">
-                                    <span t-field="line.product_uom_id"/>
-                                </td>
-                                <td style="width:12%; padding:5px; text-align:right;">
-                                    <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
-                                    <!--(<span t-field="line.currency_id.symbol"/>)-->
-                                </td>
-                                <td style="width:13%; padding:5px; text-align:right;">
-                                    <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
-                                    <!--(<span t-field="line.currency_id.symbol"/>)-->
-                                </td>
-                            </tr>
+                            <t t-if="line.display_type in ('line_section', 'line_note')">
+                                <tr>
+                                    <td style="width:5%; padding:5px; text-align:left;"/>
+                                    <td colspan="5" style="width:95%; padding:5px; text-align:left;">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-else="">
+                                <tr>
+                                    <td style="width:5%; padding:5px; text-align:left;">
+                                        <span t-esc="fg_sno"/>
+                                        <span t-set="fg_sno" t-value="fg_sno+1"/>
+                                    </td>
+                                    <td style="width:50%; padding:5px; padding-right:0px; text-align:left;">
+                                        <t t-if="line.product_id.default_code">
+                                            <span t-field="line.product_id.default_code"/><br/>
+                                        </t>
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td style="width:8%; padding:5px; text-align:center;">
+                                        <span t-esc="'{0:,.0f}'.format(line.quantity)"/>
+                                    </td>
+                                    <td style="width:12%; padding:5px; text-align:center;">
+                                        <span t-field="line.product_uom_id"/>
+                                    </td>
+                                    <td style="width:12%; padding:5px; text-align:right;">
+                                        <span t-esc="'{0:,.2f}'.format(line.price_unit)"/>
+                                        <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                    </td>
+                                    <td style="width:13%; padding:5px; text-align:right;">
+                                        <span t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>
+                                        <!--(<span t-field="line.currency_id.symbol"/>)-->
+                                    </td>
+                                </tr>
+                            </t>
                         </t>
                     </t>
                 </table>

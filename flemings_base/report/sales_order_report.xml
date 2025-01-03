@@ -302,7 +302,7 @@
                                                     <td>Deliver To: </td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span t-esc="delivery_customer.name"/></td>
+                                                    <td><span t-esc="delivery_customer.display_name"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td><span t-field="delivery_customer.street"/></td>
